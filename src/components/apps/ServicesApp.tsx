@@ -8,6 +8,7 @@ System impact if absent: Users cannot inspect GitHub portfolio projects, run liv
 import React, { useState, useEffect } from 'react';
 import { portfolioServices } from '@/lib/portfolio';
 import { ServiceUnit } from '@/types';
+import { useI18n } from '@/lib/i18n';
 
 interface ServicesAppProps {
   onNotify?: (msg: string, type?: 'info' | 'warn' | 'error') => void;
@@ -15,6 +16,7 @@ interface ServicesAppProps {
 }
 
 export function ServicesApp({ onNotify, onOpenApp }: ServicesAppProps) {
+  const { t } = useI18n();
   const [servicesList] = useState<ServiceUnit[]>(portfolioServices);
   const [githubStats, setGithubStats] = useState<Record<string, { stars: number; forks: number; updated: string }>>({});
   const [filterCat, setFilterCat] = useState<string>('all');
@@ -109,6 +111,14 @@ export function ServicesApp({ onNotify, onOpenApp }: ServicesAppProps) {
   const estimatedDemand = Math.max(10, Math.round(500 * Math.pow(priceInput / 100, elasticity)));
   const estimatedProfit = Math.round(estimatedDemand * (priceInput - costInput));
 
+  const catLabels: Record<string, string> = {
+    all: t.apps.services.categoryAll,
+    ai: t.apps.services.filterAi,
+    system: t.apps.services.filterSystem,
+    business: t.apps.services.filterBusiness,
+    web: t.apps.services.filterWeb
+  };
+
   return (
     <div className="h-full w-full p-3.5 flex flex-col gap-3 font-sans text-xs overflow-y-auto select-none">
       {/* Top Filter and Search Bar */}
@@ -124,19 +134,21 @@ export function ServicesApp({ onNotify, onOpenApp }: ServicesAppProps) {
                   : 'text-slate-400 hover:text-slate-200'
               }`}
             >
-              {cat}
+              {catLabels[cat] || cat.toUpperCase()}
             </button>
           ))}
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1 bg-black/40 border border-white/10 rounded px-2.5 py-1 text-xs text-slate-100 font-mono focus-within:border-sky-400">
+          <span className="text-slate-500 font-bold">$ grep -i &quot;</span>
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search SILVESTRIKE services..."
-            className="bg-white/5 border border-white/10 rounded px-2.5 py-1 text-xs text-slate-100 outline-none focus:border-sky-400 w-56 font-mono"
+            placeholder={t.apps.services.searchPlaceholder}
+            className="bg-transparent border-none text-slate-100 outline-none w-48 font-mono text-xs"
           />
+          <span className="text-slate-500 font-bold">&quot;</span>
         </div>
       </div>
 
@@ -182,7 +194,7 @@ export function ServicesApp({ onNotify, onOpenApp }: ServicesAppProps) {
                         : 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
                     }`}
                   >
-                    {isHostEngine ? 'HOST ENGINE' : isDeployed ? 'DEPLOYED' : 'RUNNING'}
+                    {isHostEngine ? t.apps.services.statusHostEngine : isDeployed ? t.apps.services.statusDeployed : t.apps.services.statusRunning}
                   </span>
                 </div>
 
@@ -200,11 +212,11 @@ export function ServicesApp({ onNotify, onOpenApp }: ServicesAppProps) {
                         <div className="flex items-center gap-2 bg-white/[0.03] px-2 py-0.5 rounded border border-white/5 flex-wrap">
                           <span className="text-amber-400 font-bold shrink-0">★ {stat ? stat.stars : 0}</span>
                           <span className="text-slate-500 shrink-0">|</span>
-                          <span className="shrink-0">Forks: {stat ? stat.forks : 0}</span>
+                          <span className="shrink-0">{t.apps.services.forkLabel}: {stat ? stat.forks : 0}</span>
                           {stat?.updated && (
                             <>
                               <span className="text-slate-500 shrink-0">|</span>
-                              <span className="shrink-0">Pushed: {stat.updated}</span>
+                              <span className="shrink-0">{t.apps.services.pushedLabel}: {stat.updated}</span>
                             </>
                           )}
                         </div>
@@ -245,7 +257,7 @@ export function ServicesApp({ onNotify, onOpenApp }: ServicesAppProps) {
                     rel="noreferrer"
                     className="flex-1 text-center bg-sky-500 hover:bg-sky-400 text-black font-bold py-1 rounded transition-colors"
                   >
-                    Open Live Site
+                    {t.apps.services.openLiveSite}
                   </a>
                 )}
 
@@ -254,7 +266,7 @@ export function ServicesApp({ onNotify, onOpenApp }: ServicesAppProps) {
                     onClick={() => onOpenApp('app-gitkraken')}
                     className="flex-1 bg-[#1cd0a5]/20 hover:bg-[#1cd0a5]/30 text-[#1cd0a5] font-bold py-1 rounded border border-[#1cd0a5]/40 transition-colors"
                   >
-                    GitKraken Studio
+                    {t.apps.services.openGitKraken}
                   </button>
                 )}
 
@@ -263,7 +275,7 @@ export function ServicesApp({ onNotify, onOpenApp }: ServicesAppProps) {
                     onClick={() => onOpenApp('app-odoo')}
                     className="flex-1 bg-purple-500/20 hover:bg-purple-500/30 text-purple-300 font-bold py-1 rounded border border-purple-500/40 transition-colors"
                   >
-                    Open Odoo ERP
+                    {t.apps.services.openOdoo}
                   </button>
                 )}
 
@@ -272,7 +284,7 @@ export function ServicesApp({ onNotify, onOpenApp }: ServicesAppProps) {
                     onClick={() => setActiveSandbox(s.name)}
                     className="flex-1 bg-white/10 hover:bg-white/20 text-slate-200 py-1 rounded transition-colors"
                   >
-                    Launch Sandbox
+                    {t.apps.services.launchSandbox}
                   </button>
                 )}
 
@@ -300,16 +312,16 @@ export function ServicesApp({ onNotify, onOpenApp }: ServicesAppProps) {
           <div className="h-11 px-4 bg-black/60 border-b border-white/10 flex items-center justify-between select-none">
             <div className="flex items-center gap-2 font-mono text-xs">
               <span className="text-sky-400 font-bold">#</span>
-              <span className="font-semibold text-slate-100">Interactive Sandbox: {activeSandbox}</span>
+              <span className="font-semibold text-slate-100">{t.apps.services.sandboxHeader}: {activeSandbox}</span>
               <span className="bg-sky-500/20 text-sky-300 text-[10px] px-2 py-0.5 rounded font-bold">
-                Live Simulator
+                {t.apps.services.liveSim}
               </span>
             </div>
             <button
               onClick={() => setActiveSandbox(null)}
               className="text-slate-400 hover:text-white px-2 py-1 rounded bg-white/5 hover:bg-white/10 text-xs font-mono"
             >
-              [ Close Sandbox ]
+              {t.apps.services.closeSandbox}
             </button>
           </div>
 
