@@ -24,7 +24,7 @@ interface HardwareSpecs {
 export function FastfetchBanner() {
   const [specs, setSpecs] = useState<HardwareSpecs>({
     os: 'Caelestia Hyprland Linux x86_64 [SILVESTRIKE WebOS]',
-    host: 'HUIT Workstation (B.Eng in IT)',
+    host: 'Van Trong Duong \u2014 B.Eng in IT, HCMUTE',
     kernel: 'Linux 6.8.0-silvestrike-c1',
     uptime: '22 years (Est. 2004)',
     packages: '143 (npm), 8 (sandboxes), 10 (microservices)',
@@ -110,15 +110,13 @@ export function FastfetchBanner() {
           // Format Host Model
           const hostModel = sys.hostModel
             ? sys.hostModel
-            : 'HUIT Workstation (B.Eng in IT)';
+            : 'Van Trong Duong — B.Eng in IT, HCMUTE';
 
           // Format Kernel
           const kernel = sys.kernel ? `Linux ${sys.kernel}` : 'Linux 7.0.0-31-generic';
 
           // Format OS
-          const osName = sys.osName
-            ? `${sys.osName} x86_64 [SILVESTRIKE WebOS]`
-            : detectedOs;
+          const osName = sys.osName ?? detectedOs;
 
           // Format GPU
           const gpu = sys.gpuModel || detectedGpu;
