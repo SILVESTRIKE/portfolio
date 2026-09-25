@@ -1,0 +1,80 @@
+/*
+Reason for existence: Global CSS rules and Tailwind CSS v4 design tokens including dark obsidian palette, glassmorphism, scrollbars, and window animations.
+System impact if absent: Application renders without dark server styling, glassmorphic blur, or custom animations.
+*/
+
+@import "tailwindcss";
+
+@theme inline {
+  --font-mono: 'JetBrains Mono', monospace;
+  --font-sans: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+
+  --color-obsidian-950: #080a0f;
+  --color-obsidian-900: #0e121a;
+  --color-obsidian-850: #131824;
+  --color-obsidian-800: #192030;
+  --color-obsidian-700: #222b40;
+
+  --color-neon-cyan: #38bdf8;
+  --color-neon-green: #10b981;
+  --color-neon-amber: #f59e0b;
+  --color-neon-rose: #f43f5e;
+}
+
+:root {
+  --background: #080a0f;
+  --foreground: #f1f5f9;
+}
+
+* {
+  box-sizing: border-box;
+  user-select: none;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans), sans-serif;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+  position: relative;
+  background-image: 
+    radial-gradient(circle at 15% 15%, rgba(56, 189, 248, 0.04) 0%, transparent 40%),
+    radial-gradient(circle at 85% 80%, rgba(16, 185, 129, 0.04) 0%, transparent 45%),
+    linear-gradient(to bottom, rgba(8, 10, 15, 0.96), rgba(8, 10, 15, 0.98)),
+    repeating-linear-gradient(0deg, transparent, transparent 24px, rgba(255, 255, 255, 0.015) 24px, rgba(255, 255, 255, 0.015) 25px),
+    repeating-linear-gradient(90deg, transparent, transparent 24px, rgba(255, 255, 255, 0.015) 24px, rgba(255, 255, 255, 0.015) 25px);
+}
+
+/* Glassmorphism helpers */
+.glass-panel {
+  background: rgba(14, 18, 26, 0.78);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.glass-panel-active {
+  background: rgba(19, 24, 36, 0.88);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-color: rgba(56, 189, 248, 0.38);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8), 0 0 20px rgba(56, 189, 248, 0.12);
+}
+
+/* Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.25);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
