@@ -1,6 +1,6 @@
 /*
-Reason for existence: Native WebOS conversational AI assistant application answering user queries about Linux administration and SILVESTRIKE portfolio projects.
-System impact if absent: WebOS lacks an interactive native AI assistant for sysadmin queries and project walkthroughs.
+Reason for existence: Native WebOS conversational AI assistant application utilizing Google Gemini API (/api/ai) to guide visitors through Duong's portfolio, skills, and projects.
+System Impact of Absence: WebOS lacks an interactive, live AI guide conversant in Duong's technical background and flagship repositories.
 */
 
 'use client';
@@ -10,7 +10,7 @@ import { AIChatMessage } from '@/types';
 import { useI18n } from '@/lib/i18n';
 
 export function AIAssistantApp() {
-  const { t, locale } = useI18n();
+  const { t } = useI18n();
   const [messages, setMessages] = useState<AIChatMessage[]>([
     {
       id: 'init',
@@ -21,11 +21,12 @@ export function AIAssistantApp() {
   ]);
   const [input, setInput] = useState('');
   const [isThinking, setIsThinking] = useState(false);
+  const [activeModel, setActiveModel] = useState<string>('gemini-2.0-flash');
   const scrollRef = useRef<HTMLDivElement>(null);
 
   // Update initial message when locale toggles
   useEffect(() => {
-    setMessages(prev => {
+    setMessages((prev) => {
       if (prev.length === 1 && prev[0].id === 'init') {
         return [{ ...prev[0], content: t.apps.ai.initMsg }];
       }
@@ -46,9 +47,9 @@ export function AIAssistantApp() {
     t.apps.ai.quickPrompt4
   ];
 
-  const handleSend = (textToSend?: string) => {
+  const handleSend = async (textToSend?: string) => {
     const q = (textToSend || input).trim();
-    if (!q) return;
+    if (!q || isThinking) return;
 
     const userMsg: AIChatMessage = {
       id: `usr-${Date.now()}`,
@@ -57,96 +58,82 @@ export function AIAssistantApp() {
       timestamp: new Date().toTimeString().substring(0, 5)
     };
 
-    setMessages(prev => [...prev, userMsg]);
+    const nextMessages = [...messages, userMsg];
+    setMessages(nextMessages);
     if (!textToSend) setInput('');
     setIsThinking(true);
 
-    setTimeout(() => {
-      const reply = generateAIResponse(q);
+    try {
+      const historyPayload = nextMessages.slice(-6).map((m) => ({
+        role: m.sender === 'user' ? ('user' as const) : ('assistant' as const),
+        content: m.content
+      }));
+
+      const res = await fetch('/api/ai', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: q,
+          history: historyPayload
+        })
+      });
+
+      if (!res.ok) {
+        throw new Error(`HTTP ${res.status}`);
+      }
+
+      const data = await res.json();
+      const reply = data.reply || 'Toi da nhan thong tin cua ban.';
+      if (data.model) setActiveModel(data.model);
+
       const aiMsg: AIChatMessage = {
         id: `ai-${Date.now()}`,
         sender: 'assistant',
         content: reply,
         timestamp: new Date().toTimeString().substring(0, 5)
       };
-      setMessages(prev => [...prev, aiMsg]);
+
+      setMessages((prev) => [...prev, aiMsg]);
+    } catch {
+      const fallbackMsg: AIChatMessage = {
+        id: `ai-err-${Date.now()}`,
+        sender: 'assistant',
+        content: `Tôi đã nhận được câu hỏi về "${q}".
+Hiện tại kết nối mạng của Doru AI đang tạm thời gián đoạn. Bạn có thể khám phá trực tiếp các dự án của Dương:
+- Samco VinFast EV E-Commerce (Next.js 14, Prisma, PostgreSQL).
+- Veritas AI: Pipeline RAG pháp lý Việt Nam.
+- DogDexx AI: Mô hình CNN phân loại giống chó (dogdexx.vercel.app).
+Hoặc liên hệ trực tiếp với Dương qua email: vtduong04@gmail.com!`,
+        timestamp: new Date().toTimeString().substring(0, 5)
+      };
+      setMessages((prev) => [...prev, fallbackMsg]);
+    } finally {
       setIsThinking(false);
-    }, 700);
-  };
-
-  const generateAIResponse = (query: string): string => {
-    const lower = query.toLowerCase();
-
-    if (lower.includes('doru') || lower.includes('voice') || lower.includes('trợ lý')) {
-      return `Doru AI là hệ thống trợ lý ảo cá nhân chạy nền trên Linux Hyprland:
-- Kiến trúc gồm 8 node LangGraph kết nối pipeline: VAD -> STT (faster-whisper) -> Router -> [Desktop Tools / LLM] -> TTS (Kokoro ONNX / edge-tts).
-- Sử dụng Silero VAD để lọc tiếng ồn và RepCNN ONNX phát hiện wakeword cục bộ không gửi âm thanh lên cloud.
-- Hai tầng suy luận: Groq LPU (gpt-oss-20b siêu tốc 1000 t/s) và Agnes 2.0 làm fallback dự phòng.`;
     }
-
-    if (lower.includes('dogdexx') || lower.includes('chó') || lower.includes('breed')) {
-      return `DogDexx là nền tảng nhận diện giống chó và quản lý sổ theo dõi sức khỏe thú cưng bằng AI:
-- Công nghệ: PyTorch (Deep Learning Convolutional Neural Network) kết hợp Next.js và Vercel Edge.
-- Trạng thái: Đã deploy trực tiếp tại https://dogdexx.vercel.app.
-- Tính năng: Tải ảnh chó để phân loại giống với độ chính xác cao và quản lý lịch tiêm chủng, hồ sơ y tế.`;
-    }
-
-    if (lower.includes('odoo') || lower.includes('erp') || lower.includes('crm')) {
-      return `Odoo Sandbox trên WebOS mô phỏng hệ thống quản trị doanh nghiệp toàn diện Odoo 18:
-- Phân hệ CRM: Theo dõi phễu khách hàng tiềm năng qua các giai đoạn (New -> Qualified -> Proposition -> Won).
-- Bán hàng & Hóa đơn: Theo dõi doanh thu, tạo hóa đơn bán lẻ, quản lý trạng thái thanh toán.
-- Kho vận: Quản lý số lượng tồn kho và cảnh báo mức hàng thấp.
-- Backend: Chạy qua unit odoo-erp.service với kết nối PostgreSQL connection pool.`;
-    }
-
-    if (lower.includes('server') || lower.includes('tình trạng') || lower.includes('srv-doru')) {
-      return `Báo cáo trạng thái server srv-doru.internal:
-- Kernel: Linux 6.8.0-45-generic x86_64 (Ubuntu 24.04 LTS).
-- CPU: Intel Xeon Platinum 8480+ (8 cores) đang tải ~12%.
-- Memory: Đã cấp phát ~3.4 GB / 16.0 GB (21%).
-- Mạng: Cổng eth0 IP 192.168.1.100, các port 22, 80, 443, 5432 và 3000 đang LISTEN.
-- Tường lửa UFW: ACTIVE.`;
-    }
-
-    if (lower.includes('danhgiacamxuc') || lower.includes('cảm xúc') || lower.includes('sentiment')) {
-      return `DanhGiaCamXuc là mô hình NLP xử lý ngôn ngữ tự nhiên tiếng Việt:
-- Sử dụng underthesea để tách từ (word tokenization) và PyTorch huấn luyện phân loại sắc thái bình luận.
-- Bạn có thể mở tab Sandbox trong ứng dụng Services để gõ thử câu tiếng Việt và xem điểm xác suất Cảm xúc Tích cực / Tiêu cực.`;
-    }
-
-    if (lower.includes('quiz') || lower.includes('document')) {
-      return `document_to_quiz là công cụ tự động hóa biến tài liệu PDF/DOCX thành bộ câu hỏi ôn tập:
-- Công nghệ: Node.js Express kết hợp Google Gemini Pro API để phân tích cấu trúc bài giảng.
-- Hỗ trợ xuất đề trắc nghiệm có giải thích đáp án chi tiết.`;
-    }
-
-    return `Tôi đã ghi nhận yêu cầu: "${query}". Bạn có thể sử dụng thanh công cụ hoặc dock để mở các ứng dụng tương ứng như Terminal, Activity Monitor, Odoo ERP Sandbox hoặc danh mục Services của SILVESTRIKE.`;
   };
 
   return (
-    <div className="h-full w-full flex flex-col font-sans text-xs bg-[#090c12] select-text">
+    <div className="h-full w-full flex flex-col font-sans text-xs bg-[#080c14] select-text">
       {/* Header bar */}
-      <div className="h-9 px-3 bg-black/50 border-b border-white/10 flex items-center justify-between select-none">
+      <div className="h-9 px-3 bg-[#0a0e18] border-b border-white/10 flex items-center justify-between select-none">
         <div className="flex items-center gap-2 font-mono text-xs">
-          <span className="w-2 h-2 rounded-full bg-sky-400 shadow-[0_0_8px_rgba(56,189,248,0.6)]" />
+          <span className="w-2 h-2 rounded-full bg-[#7aa2f7] shadow-[0_0_8px_rgba(122,162,247,0.6)]" />
           <span className="font-bold text-slate-100">{t.apps.ai.headerTitle}</span>
-          <span className="text-[10px] text-slate-500 font-normal">v2.4-fast</span>
-        </div>
-        <div className="font-mono text-[10px] text-slate-400">
-          {t.apps.ai.backendLabel}
         </div>
       </div>
 
       {/* Chat scroll area */}
-      <div ref={scrollRef} className="flex-1 overflow-y-auto p-3.5 flex flex-col gap-3">
+      <div ref={scrollRef} className="flex-1 overflow-y-auto p-3.5 flex flex-col gap-3 font-mono">
         {messages.map((m) => {
           const isUser = m.sender === 'user';
           return (
             <div
               key={m.id}
-              className={`flex flex-col max-w-[85%] ${isUser ? 'ml-auto items-end' : 'mr-auto items-start'}`}
+              className={`flex flex-col max-w-[85%] ${
+                isUser ? 'ml-auto items-end' : 'mr-auto items-start'
+              }`}
             >
-              <div className="flex items-center gap-1.5 text-[10px] font-mono text-slate-500 mb-1">
+              <div className="flex items-center gap-1.5 text-[10px] text-slate-500 mb-1">
                 <span>{isUser ? 'user@silvestrike.dev' : 'doru-ai'}</span>
                 <span>•</span>
                 <span>{m.timestamp}</span>
@@ -154,7 +141,7 @@ export function AIAssistantApp() {
               <div
                 className={`p-3 rounded-lg leading-relaxed whitespace-pre-wrap ${
                   isUser
-                    ? 'bg-sky-500/20 text-sky-100 border border-sky-400/30'
+                    ? 'bg-[#7aa2f7]/20 text-[#89b4fa] border border-[#7aa2f7]/30'
                     : 'bg-white/[0.04] text-slate-200 border border-white/10'
                 }`}
               >
@@ -166,19 +153,19 @@ export function AIAssistantApp() {
 
         {isThinking && (
           <div className="mr-auto flex items-center gap-2 text-slate-400 font-mono text-[11px] bg-white/[0.02] p-2 rounded border border-white/5">
-            <span className="w-1.5 h-1.5 rounded-full bg-sky-400 animate-ping" />
+            <span className="w-1.5 h-1.5 rounded-full bg-[#7aa2f7] animate-ping" />
             <span>{t.apps.ai.thinkingMsg}</span>
           </div>
         )}
       </div>
 
       {/* Quick Prompts */}
-      <div className="px-3 py-1.5 bg-black/40 border-t border-white/5 flex gap-1.5 overflow-x-auto select-none">
+      <div className="px-3 py-1.5 bg-[#060910] border-t border-white/5 flex gap-1.5 overflow-x-auto select-none font-mono">
         {quickPrompts.map((p, i) => (
           <button
             key={i}
             onClick={() => handleSend(p)}
-            className="whitespace-nowrap bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 text-[10px] px-2.5 py-1 rounded transition-colors"
+            className="whitespace-nowrap bg-white/5 hover:bg-[#7aa2f7]/15 border border-white/10 hover:border-[#7aa2f7]/30 text-slate-300 hover:text-[#7aa2f7] text-[10px] px-2.5 py-1 rounded transition-colors"
           >
             {p}
           </button>
@@ -186,18 +173,19 @@ export function AIAssistantApp() {
       </div>
 
       {/* Input bar */}
-      <div className="p-2.5 bg-black/60 border-t border-white/10 flex items-center gap-2 select-none">
+      <div className="p-2.5 bg-[#090d16] border-t border-white/10 flex items-center gap-2 select-none">
         <input
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && handleSend()}
           placeholder={t.apps.ai.inputPlaceholder}
-          className="flex-1 bg-white/5 border border-white/10 rounded px-3 py-1.5 text-xs text-slate-100 outline-none focus:border-sky-400"
+          className="flex-1 bg-white/5 border border-white/10 rounded px-3 py-1.5 text-xs text-slate-100 outline-none focus:border-[#7aa2f7] font-mono placeholder-slate-500"
         />
         <button
           onClick={() => handleSend()}
-          className="bg-sky-500 hover:bg-sky-400 text-black font-semibold font-mono text-xs px-3.5 py-1.5 rounded transition-colors"
+          disabled={isThinking}
+          className="bg-[#7aa2f7] hover:bg-[#89b4fa] disabled:opacity-50 text-black font-semibold font-mono text-xs px-3.5 py-1.5 rounded transition-colors"
         >
           {t.apps.ai.sendBtn}
         </button>

@@ -1,15 +1,20 @@
 /*
-Reason for existence: GitKraken Visual Git Studio application rendering real commit graphs, branch hierarchy, and unified diff viewer.
+Reason for existence: Git Visual Git Studio application rendering real commit graphs, branch hierarchy, and unified diff viewer.
 System impact if absent: WebOS workspace cannot display visual Git commit history or source control diff inspection.
 */
 
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { GitBranchInfo, GitCommitNode, GitFileDiff, GitRepoData } from '@/types';
+import { GitBranchInfo, GitCommitNode, GitFileDiff, GitRepoData, GitRepoItem } from '@/types';
 
 export function GitKrakenApp() {
   const [repoData, setRepoData] = useState<GitRepoData | null>(null);
+  const [selectedRepo, setSelectedRepo] = useState('SILVESTRIKE/portfolio');
+  const [isRepoDropdownOpen, setIsRepoDropdownOpen] = useState(false);
+  const [repoList, setRepoList] = useState<GitRepoItem[]>([]);
+  const [repoSearchQuery, setRepoSearchQuery] = useState('');
+  const [customRepoInput, setCustomRepoInput] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCommit, setSelectedCommit] = useState<GitCommitNode | null>(null);
@@ -19,15 +24,19 @@ export function GitKrakenApp() {
   const [copiedHash, setCopiedHash] = useState<string | null>(null);
 
   // Fetch repository commits and branch data
-  const loadRepo = async () => {
+  const loadRepo = async (targetRepo = selectedRepo, branch?: string) => {
     setIsLoading(true);
+    setSelectedCommit(null);
+    setCommitDiffs([]);
     try {
-      const res = await fetch('/api/git?action=repo');
+      const url = `/api/git?action=repo&repo=${encodeURIComponent(targetRepo)}${branch ? `&branch=${encodeURIComponent(branch)}` : ''
+        }`;
+      const res = await fetch(url);
       if (res.ok) {
         const data = (await res.json()) as GitRepoData;
         setRepoData(data);
         if (data.commits && data.commits.length > 0) {
-          handleSelectCommit(data.commits[0]);
+          handleSelectCommit(data.commits[0], targetRepo);
         }
       }
     } catch {
@@ -38,16 +47,25 @@ export function GitKrakenApp() {
   };
 
   useEffect(() => {
-    loadRepo();
+    loadRepo(selectedRepo);
+    // Fetch available repositories
+    fetch('/api/git?action=repos')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data?.repos) setRepoList(data.repos);
+      })
+      .catch(() => { });
   }, []);
 
   // Fetch diffs when a commit is selected
-  const handleSelectCommit = async (commit: GitCommitNode) => {
+  const handleSelectCommit = async (commit: GitCommitNode, targetRepo = selectedRepo) => {
     setSelectedCommit(commit);
     setSelectedFileIndex(0);
     setIsLoadingDiff(true);
     try {
-      const res = await fetch(`/api/git?action=diff&hash=${commit.hash}`);
+      const res = await fetch(
+        `/api/git?action=diff&repo=${encodeURIComponent(targetRepo)}&hash=${commit.hash}`
+      );
       if (res.ok) {
         const data = await res.json();
         setCommitDiffs(data.diffs || []);
@@ -66,6 +84,13 @@ export function GitKrakenApp() {
     setCopiedHash(hash);
     setTimeout(() => setCopiedHash(null), 2000);
   };
+
+  // Filter repositories
+  const filteredRepoList = repoList.filter((r) => {
+    if (!repoSearchQuery.trim()) return true;
+    const q = repoSearchQuery.toLowerCase();
+    return r.fullName.toLowerCase().includes(q) || r.description?.toLowerCase().includes(q);
+  });
 
   // Filter commits
   const filteredCommits = (repoData?.commits || []).filter(c => {
@@ -101,19 +126,134 @@ export function GitKrakenApp() {
           {/* Logo */}
           <div className="flex items-center gap-2">
             <div className="w-5 h-5 rounded-md bg-[#1cd0a5] flex items-center justify-center text-black font-black text-[10px]">
-              GK
+              Git
             </div>
             <span className="font-bold text-slate-100 hidden sm:inline tracking-tight text-sm">
-              GitKraken Visual Studio
+              Git Studio
             </span>
           </div>
 
-          {/* Repo Badge */}
-          <div className="flex items-center gap-1.5 bg-black/40 px-2.5 py-1 rounded-md border border-white/10 font-mono text-[11px]">
-            <svg className="w-3.5 h-3.5 text-[#1cd0a5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
-            </svg>
-            <span className="text-white font-semibold">{repoData?.repoName || 'Loading repo...'}</span>
+          {/* Repo Switcher Dropdown */}
+          <div className="relative">
+            <button
+              onClick={() => setIsRepoDropdownOpen(!isRepoDropdownOpen)}
+              className="flex items-center gap-1.5 bg-black/50 hover:bg-black/80 px-2.5 py-1 rounded-md border border-white/10 hover:border-[#1cd0a5]/50 transition-all font-mono text-[11px] text-white focus:outline-none"
+              title="Click to switch repository (via GitHub API)"
+            >
+              <svg className="w-3.5 h-3.5 text-[#1cd0a5] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
+              </svg>
+              <span className="font-semibold">{repoData?.repoName || selectedRepo}</span>
+              <svg
+                className={`w-3 h-3 text-slate-400 transition-transform ${isRepoDropdownOpen ? 'rotate-180' : ''}`}
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+
+            {/* Click outside backdrop */}
+            {isRepoDropdownOpen && (
+              <div
+                className="fixed inset-0 z-40"
+                onClick={() => setIsRepoDropdownOpen(false)}
+              />
+            )}
+
+            {/* Dropdown Popover */}
+            {isRepoDropdownOpen && (
+              <div className="absolute left-0 top-full mt-1.5 w-72 sm:w-80 bg-[#141923] border border-white/15 rounded-lg shadow-2xl p-2.5 z-50 flex flex-col gap-2 font-mono text-xs">
+                <div className="flex items-center justify-between text-[10px] text-slate-400 font-bold uppercase tracking-wider px-1">
+                  <span>Switch Repository</span>
+                  <span className="text-[#1cd0a5]">GitHub API</span>
+                </div>
+
+                {/* Filter input */}
+                <input
+                  type="text"
+                  placeholder="Filter repos..."
+                  value={repoSearchQuery}
+                  onChange={(e) => setRepoSearchQuery(e.target.value)}
+                  className="bg-black/50 border border-white/10 rounded px-2 py-1 text-[11px] text-white placeholder-slate-500 focus:outline-none focus:border-[#1cd0a5]"
+                  autoFocus
+                />
+
+                {/* Repos list */}
+                <div className="max-h-56 overflow-y-auto space-y-1 pr-1">
+                  {filteredRepoList.map((r) => {
+                    const isSelected = r.fullName === (repoData?.repoName || selectedRepo);
+                    return (
+                      <button
+                        key={r.fullName}
+                        onClick={() => {
+                          setSelectedRepo(r.fullName);
+                          setIsRepoDropdownOpen(false);
+                          loadRepo(r.fullName);
+                        }}
+                        className={`w-full text-left px-2 py-1.5 rounded flex items-center justify-between gap-2 transition-colors ${isSelected
+                          ? 'bg-[#1cd0a5]/20 text-[#1cd0a5] font-semibold border border-[#1cd0a5]/30'
+                          : 'text-slate-300 hover:text-white hover:bg-white/5 border border-transparent'
+                          }`}
+                      >
+                        <div className="truncate flex-1">
+                          <div className="truncate text-[11px]">{r.fullName}</div>
+                          {r.description && (
+                            <div className="text-[9.5px] text-slate-500 truncate">{r.description}</div>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-1 shrink-0">
+                          {r.isLocal ? (
+                            <span className="text-[9px] px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                              Local
+                            </span>
+                          ) : (
+                            <span className="text-[9px] px-1.5 py-0.2 rounded bg-sky-500/20 text-sky-300 border border-sky-500/30">
+                              Cloud
+                            </span>
+                          )}
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* Custom repo write-in */}
+                <div className="pt-2 border-t border-white/10 flex items-center gap-1.5">
+                  <input
+                    type="text"
+                    placeholder="Enter owner/repo"
+                    value={customRepoInput}
+                    onChange={(e) => setCustomRepoInput(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && customRepoInput.trim()) {
+                        const target = customRepoInput.trim();
+                        setSelectedRepo(target);
+                        setIsRepoDropdownOpen(false);
+                        loadRepo(target);
+                        setCustomRepoInput('');
+                      }
+                    }}
+                    className="flex-1 bg-black/50 border border-white/10 rounded px-2 py-1 text-[11px] text-white placeholder-slate-500 focus:outline-none focus:border-[#1cd0a5]"
+                  />
+                  <button
+                    onClick={() => {
+                      if (customRepoInput.trim()) {
+                        const target = customRepoInput.trim();
+                        setSelectedRepo(target);
+                        setIsRepoDropdownOpen(false);
+                        loadRepo(target);
+                        setCustomRepoInput('');
+                      }
+                    }}
+                    className="px-2 py-1 bg-[#1cd0a5]/20 hover:bg-[#1cd0a5]/30 text-[#1cd0a5] border border-[#1cd0a5]/40 rounded text-[11px] font-bold"
+                  >
+                    Go
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Active Branch */}
@@ -123,6 +263,7 @@ export function GitKrakenApp() {
             </svg>
             <span>{repoData?.currentBranch || 'main'}</span>
           </div>
+
         </div>
 
         {/* Search & Actions */}
@@ -146,7 +287,7 @@ export function GitKrakenApp() {
           </div>
 
           <button
-            onClick={loadRepo}
+            onClick={() => loadRepo(selectedRepo)}
             className="px-2.5 py-1 bg-white/5 hover:bg-white/10 border border-white/10 rounded text-[11px] font-mono text-slate-300 transition-colors flex items-center gap-1"
             title="Refresh Git commits"
           >
@@ -176,11 +317,11 @@ export function GitKrakenApp() {
                 {(repoData?.branches || []).filter(b => !b.isRemote).map(b => (
                   <div
                     key={b.name}
-                    className={`flex items-center gap-2 px-2 py-1.5 rounded cursor-pointer ${
-                      b.isCurrent
-                        ? 'bg-[#1cd0a5]/15 text-[#1cd0a5] font-semibold'
-                        : 'text-slate-400 hover:bg-white/5'
-                    }`}
+                    onClick={() => loadRepo(selectedRepo, b.name)}
+                    className={`flex items-center gap-2 px-2 py-1.5 rounded cursor-pointer ${b.isCurrent
+                      ? 'bg-[#1cd0a5]/15 text-[#1cd0a5] font-semibold'
+                      : 'text-slate-400 hover:bg-white/5'
+                      }`}
                   >
                     <span className={`w-1.5 h-1.5 rounded-full ${b.isCurrent ? 'bg-[#1cd0a5]' : 'bg-slate-600'}`} />
                     <span className="truncate">{b.name}</span>
@@ -249,11 +390,10 @@ export function GitKrakenApp() {
                   <div
                     key={c.hash}
                     onClick={() => handleSelectCommit(c)}
-                    className={`h-10 px-3 flex items-center cursor-pointer border-b border-white/[0.04] transition-colors ${
-                      isSelected
-                        ? 'bg-[#1e2638] text-white shadow-inner border-l-2 border-l-[#1cd0a5]'
-                        : 'hover:bg-white/[0.03] text-slate-300'
-                    }`}
+                    className={`h-10 px-3 flex items-center cursor-pointer border-b border-white/[0.04] transition-colors ${isSelected
+                      ? 'bg-[#1e2638] text-white shadow-inner border-l-2 border-l-[#1cd0a5]'
+                      : 'hover:bg-white/[0.03] text-slate-300'
+                      }`}
                   >
                     {/* Visual Commit Graph Node */}
                     <div className="w-14 relative h-full flex items-center justify-center shrink-0">
@@ -364,16 +504,14 @@ export function GitKrakenApp() {
                     <button
                       key={file.path}
                       onClick={() => setSelectedFileIndex(idx)}
-                      className={`w-full text-left px-2 py-1 rounded font-mono text-[10px] flex items-center justify-between transition-colors ${
-                        selectedFileIndex === idx
-                          ? 'bg-[#1cd0a5]/20 text-[#1cd0a5] font-semibold'
-                          : 'text-slate-300 hover:bg-white/5'
-                      }`}
+                      className={`w-full text-left px-2 py-1 rounded font-mono text-[10px] flex items-center justify-between transition-colors ${selectedFileIndex === idx
+                        ? 'bg-[#1cd0a5]/20 text-[#1cd0a5] font-semibold'
+                        : 'text-slate-300 hover:bg-white/5'
+                        }`}
                     >
                       <span className="truncate pr-2">{file.path}</span>
-                      <span className={`uppercase font-bold text-[9px] px-1 rounded ${
-                        file.status === 'added' ? 'text-emerald-400' : file.status === 'deleted' ? 'text-rose-400' : 'text-amber-400'
-                      }`}>
+                      <span className={`uppercase font-bold text-[9px] px-1 rounded ${file.status === 'added' ? 'text-emerald-400' : file.status === 'deleted' ? 'text-rose-400' : 'text-amber-400'
+                        }`}>
                         {file.status}
                       </span>
                     </button>
@@ -400,15 +538,14 @@ export function GitKrakenApp() {
                       return (
                         <div
                           key={lIdx}
-                          className={`px-1 py-0.5 rounded whitespace-pre-wrap break-all ${
-                            isAdd
-                              ? 'bg-emerald-950/40 text-emerald-300 font-semibold'
-                              : isDel
+                          className={`px-1 py-0.5 rounded whitespace-pre-wrap break-all ${isAdd
+                            ? 'bg-emerald-950/40 text-emerald-300 font-semibold'
+                            : isDel
                               ? 'bg-rose-950/40 text-rose-300'
                               : isHunk
-                              ? 'bg-blue-950/30 text-blue-300 font-bold my-1'
-                              : 'text-slate-400'
-                          }`}
+                                ? 'bg-blue-950/30 text-blue-300 font-bold my-1'
+                                : 'text-slate-400'
+                            }`}
                         >
                           {line}
                         </div>

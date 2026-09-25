@@ -102,7 +102,7 @@ export const viApps = {
     filterBusiness: 'DOANH NGHIỆP',
     filterWeb: 'WEB',
     openLiveSite: 'Mở Trang Trực Tiếp',
-    openGitKraken: 'GitKraken Studio',
+    openGitKraken: 'Git Studio',
     openOdoo: 'Mở Odoo ERP',
     launchSandbox: 'Khởi chạy Sandbox',
     closeSandbox: '[ Đóng Sandbox ]',
@@ -120,16 +120,16 @@ export const viApps = {
 
   // AIAssistantApp
   ai: {
-    headerTitle: 'Doru AI Native Engine',
-    backendLabel: 'Backend: Hybrid LPU Cục bộ',
-    thinkingMsg: 'Doru AI đang suy nghĩ phản hồi...',
-    inputPlaceholder: 'Hỏi Doru AI về máy chủ, dự án hoặc lệnh Linux...',
+    headerTitle: 'Doru AI Assistant',
+    backendLabel: 'Động cơ suy luận Doru AI',
+    thinkingMsg: 'Doru AI đang suy nghĩ...',
+    inputPlaceholder: 'Hỏi Doru AI về dự án, kỹ năng, khóa luận tốt nghiệp...',
     sendBtn: 'Gửi',
-    quickPrompt1: 'Doru AI hoạt động thế nào?',
-    quickPrompt2: 'Dự án DogDexx có gì đặc biệt?',
-    quickPrompt3: 'Tình trạng server silvestrike.dev hiện tại?',
-    quickPrompt4: 'Odoo Sandbox quản lý những gì?',
-    initMsg: 'Chào bạn! Tôi là Doru AI Native Assistant trên SILVESTRIKE Portfolio OS. Tôi có thể hỗ trợ giải đáp về các dự án trong portfolio của SILVESTRIKE, lệnh Linux server, hoặc phân tích trạng thái hệ thống.'
+    quickPrompt1: 'Các dự án nổi bật của Dương trên GitHub?',
+    quickPrompt2: 'Khóa luận Veritas AI giải quyết bài toán gì?',
+    quickPrompt3: 'Dương có những kỹ năng Full-Stack & AI nào?',
+    quickPrompt4: 'Nền tảng xe điện Samco Bình Tân hoạt động ra sao?',
+    initMsg: 'Chào bạn! Tôi là Doru AI - Trợ lý ảo hướng dẫn WebOS Portfolio của Văn Trọng Dương (SILVESTRIKE). Tôi có thể giới thiệu chi tiết về các dự án thực tế trên GitHub, kỹ năng lập trình, kinh nghiệm và thông tin liên hệ của Dương!'
   },
 
   // TilingPane / WM
@@ -152,7 +152,7 @@ export const viApps = {
     activityExplorer: 'Trình duyệt Tệp',
     activitySearch: 'Tìm kiếm Hồ sơ',
     activityGit: 'Quản lý Git',
-    activitySysinfo: 'Cấu hình Neofetch',
+    activitySysinfo: 'Cấu hình Fetch',
     sidebarTitle: 'TRÌNH DUYỆT: SILVESTRIKE',
     searchTitle: 'TÌM KIẾM: GREP HỒ SƠ',
     searchPlaceholder: 'Tìm trong các tệp (vd: PyTorch, Next.js, Veritas)...',
@@ -168,5 +168,76 @@ export const viApps = {
     statusBranch: 'main',
     statusEncoding: 'UTF-8',
     statusSpaces: 'Cách: 2'
+  },
+
+  // ContactApp
+  contact: {
+    title: 'Liên hệ',
+    headerTitle: 'VĂN TRỌNG DƯƠNG (SILVESTRIKE)',
+    headerSub: 'Kỹ sư Phần mềm (Full-Stack / Backend) | Kỹ sư Hệ thống AI/ML',
+    headerEdu: 'HUIT CNTT (Năm cuối) | GPA: 3.2 / 4.0 | IELTS: 6.5 Academic | TP. Hồ Chí Minh',
+    openForHire: 'SẴN SÀNG NHẬN VIỆC',
+    downloadCvBtn: 'Tải xuống CV',
+    downloadingCvToast: 'Đang tải xuống CV_VanTrongDuong.docx...',
+
+    // Direct Gmail action
+    openGmailBtn: 'Mở Gmail',
+
+    // Leave Contact Info
+    leaveInfoTitle: 'ĐỂ LẠI THÔNG TIN LIÊN HỆ',
+    leaveInfoSubtitle: 'Để lại thông tin liên hệ, vị trí hoặc lời nhắn bên dưới. Dương sẽ chủ động liên hệ lại trong vòng 24 giờ.',
+    inputPlaceholder: 'Nhập bất kỳ thông tin nào bạn muốn (Họ tên, Email/SĐT, lời nhắn, vị trí công việc)...',
+    submitBtn: 'Gửi thông tin',
+    submittingBtn: 'Đang gửi...',
+    submitSuccess: 'Đã ghi nhận thông tin! Dương sẽ liên hệ lại với bạn sớm nhất.',
+    submitAnotherBtn: 'Gửi thông tin khác',
+    errorRequired: 'Vui lòng nhập nội dung hoặc thông tin liên hệ.',
+    errorGeneral: 'Không thể gửi thông tin. Vui lòng gửi email trực tiếp.',
+
+    copiedToast: 'Đã sao chép vào bộ nhớ tạm'
+  },
+
+  // AdminDashboardApp
+  admin: {
+    authTitle: '[XÁC THỰC QUẢN TRỊ VIÊN]',
+    authSubtitle: 'Hệ Thống Theo Dõi Khách & Nhà Tuyển Dụng',
+    tokenLabel: 'Master Access Token:',
+    tokenPlaceholder: 'Nhập master access token...',
+    unlockBtn: 'Mở Khóa Bảng Theo Dõi',
+    authDesc: 'Hệ thống theo dõi chuyên biệt dành riêng cho Văn Trọng Dương để nhận diện các tổ chức / nhà tuyển dụng truy cập portfolio.',
+    headerTitle: 'THEO DÕI NHÀ TUYỂN DỤNG & KHÁCH TRUY CẬP',
+    headerSubtitle: 'Theo dõi tổ chức và nhà tuyển dụng để chủ động liên hệ ứng tuyển',
+    liveBadge: 'LIVE TELEMETRY',
+    refreshBtn: 'Làm mới',
+    refreshingBtn: 'Đang đồng bộ...',
+    lockBtn: 'Khóa lại',
+    leadsCardTitle: 'NHÀ TUYỂN DỤNG TIỀM NĂNG',
+    leadsCardDesc: 'Từ mạng tổ chức hoặc link LinkedIn/CV',
+    visitorsCardTitle: 'TỔNG KHÁCH TRUY CẬP',
+    visitorsCardDesc: 'Định danh qua Fingerprint duy nhất',
+    pageviewsCardTitle: 'TỔNG LƯỢT XEM TRANG',
+    pageviewsCardDesc: 'Theo dõi toàn bộ sub-routes WebOS',
+    sessionsCardTitle: 'PHIÊN HOẠT ĐỘNG',
+    sessionsCardDesc: 'Trong 10 phút vừa qua',
+    searchPlaceholder: 'Lọc theo tổ chức, thành phố, IP, nguồn vào, ghi chú...',
+    filterAll: 'Tất cả',
+    filterLeads: 'Nhà tuyển dụng',
+    filterContacted: 'Đã liên hệ',
+    filterInterviewing: 'Đang phỏng vấn',
+    tableTitle: 'DANH SÁCH KHÁCH TRUY CẬP',
+    tableTip: 'Click "Sửa ghi chú" để cập nhật tiến độ ứng tuyển',
+    colOrg: 'TỔ CHỨC / MẠNG ISP',
+    colLocation: 'VỊ TRÍ',
+    colReferrer: 'NGUỒN VÀO',
+    colDevice: 'THIẾT BỊ & OS',
+    colVisits: 'PHIÊN / LƯỢT XEM',
+    colPages: 'TRANG ĐÃ XEM',
+    colNotes: 'GHI CHÚ & TRẠNG THÁI',
+    colActions: 'THAO TÁC',
+    editNotesBtn: 'Sửa ghi chú',
+    copyLeadBtn: 'Sao chép lead',
+    saveBtn: 'Lưu',
+    cancelBtn: 'Hủy',
+    noData: 'Không tìm thấy dữ liệu khách truy cập phù hợp với bộ lọc.'
   }
 };

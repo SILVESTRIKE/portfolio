@@ -17,7 +17,7 @@ SILVESTRIKE Portfolio OS simulates an interactive Unix-like desktop environment 
 - **Hyprland/i3 Tiling Window Manager**: Multi-workspace layout switching (Split, Grid, Stack, Single) with drag-and-drop pane swapping.
 - **Terminal Emulator (bash)**: Built-in virtual filesystem (VFS) with standard commands (`ls`, `cat`, `cd`, `whoami`, `neofetch`, `htop`, `portfolio`).
 - **Live System Telemetry**: CPU, RAM, and load averages streaming with sparklines and process management.
-- **GitKraken Studio**: Interactive git graph visualizer tracking commit history and file diffs.
+- **Git Studio**: Interactive git graph visualizer tracking commit history and file diffs.
 - **Doru AI Assistant**: Native conversational assistant explaining portfolio architecture and sysadmin workflows.
 - **Music Telemetry**: Spotify and Last.fm real-time playback integration with Web Audio frequency spectrum visualizer and synth fallback.
 - **Bilingual i18n**: Instant EN / VI locale switching with persistent preferences.

@@ -16,14 +16,18 @@ interface FilesAppProps {
 
 export function FilesApp({ onNotify }: FilesAppProps) {
   const { t } = useI18n();
-  const [currentPath, setCurrentPath] = useState('/home/doru');
+  const [currentPath, setCurrentPath] = useState('/home/silvestrike');
   const [items, setItems] = useState<FileNode[]>([]);
   const [editingFile, setEditingFile] = useState<{ path: string; content: string } | null>(null);
 
   const loadDir = (path: string) => {
-    const norm = vfs.normalizePath(path);
+    let norm = vfs.normalizePath(path);
     setCurrentPath(norm);
-    const list = vfs.listDir(norm) || [];
+    let list = vfs.listDir(norm) || [];
+    if (list.length === 0 && norm === '/home/silvestrike') {
+      vfs.ensureEssentialFiles();
+      list = vfs.listDir(norm) || [];
+    }
     list.sort((a, b) => {
       if (a.type !== b.type) return a.type === 'dir' ? -1 : 1;
       return a.name.localeCompare(b.name);
@@ -35,6 +39,22 @@ export function FilesApp({ onNotify }: FilesAppProps) {
     loadDir(currentPath);
   }, []);
 
+  const downloadBlob = (filename: string, content: string) => {
+    try {
+      const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch {
+      // Fallback
+    }
+  };
+
   const handleOpenItem = (item: FileNode) => {
     const full = vfs.resolvePath(currentPath, item.name);
     if (item.type === 'dir') {
@@ -43,6 +63,15 @@ export function FilesApp({ onNotify }: FilesAppProps) {
       const content = vfs.readFile(full) || '';
       setEditingFile({ path: full, content });
     }
+  };
+
+  const handleSaveAndDownload = () => {
+    if (!editingFile) return;
+    vfs.writeFile(editingFile.path, editingFile.content, 'root', '644');
+    const filename = editingFile.path.split('/').pop() || 'document.txt';
+    downloadBlob(filename, editingFile.content);
+    if (onNotify) onNotify(`Saved & downloaded ${filename} to your device`, 'info');
+    loadDir(currentPath);
   };
 
   const handleSaveEditor = () => {
@@ -54,12 +83,15 @@ export function FilesApp({ onNotify }: FilesAppProps) {
   };
 
   const handleCreateFile = () => {
-    const name = window.prompt(t.apps.files.newFilePrompt);
-    if (name) {
-      const p = vfs.resolvePath(currentPath, name);
-      vfs.writeFile(p, '# Created on ' + new Date().toISOString() + '\n', 'root', '644');
-      if (onNotify) onNotify(`${t.apps.files.createdFileToast} ${name}`, 'info');
+    const name = window.prompt(t.apps.files.newFilePrompt, 'untitled.txt');
+    if (name && name.trim()) {
+      const cleanName = name.trim();
+      const p = vfs.resolvePath(currentPath, cleanName);
+      const initialContent = `# Created on ${new Date().toLocaleDateString()}\n\n`;
+      vfs.writeFile(p, initialContent, 'root', '644');
       loadDir(currentPath);
+      setEditingFile({ path: p, content: initialContent });
+      if (onNotify) onNotify(`${t.apps.files.createdFileToast} ${cleanName}`, 'info');
     }
   };
 
@@ -73,18 +105,28 @@ export function FilesApp({ onNotify }: FilesAppProps) {
     }
   };
 
-  const handleDelete = (name: string, e: React.MouseEvent) => {
+  const handleDownloadItem = (item: FileNode, e: React.MouseEvent) => {
     e.stopPropagation();
-    if (window.confirm(`Are you sure you want to delete '${name}'?`)) {
-      const p = vfs.resolvePath(currentPath, name);
-      vfs.deleteNode(p);
-      if (onNotify) onNotify(`${t.apps.files.deletedToast} ${name}`, 'warn');
-      loadDir(currentPath);
+    if (item.type === 'file') {
+      if (item.name.toLowerCase().includes('.docx') || item.name.toLowerCase().includes('cv')) {
+        const a = document.createElement('a');
+        a.href = '/CV_VanTrongDuong.docx';
+        a.download = 'CV_VanTrongDuong.docx';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        if (onNotify) onNotify('Downloaded CV_VanTrongDuong.docx to your device', 'info');
+        return;
+      }
+      const full = vfs.resolvePath(currentPath, item.name);
+      const content = vfs.readFile(full) || '';
+      downloadBlob(item.name, content);
+      if (onNotify) onNotify(`Downloaded ${item.name} to your device`, 'info');
     }
   };
 
   const shortcuts = [
-    { label: '/home/doru', path: '/home/doru' },
+    { label: '/home/silvestrike', path: '/home/silvestrike' },
     { label: '/ (Root)', path: '/' },
     { label: '/etc', path: '/etc' },
     { label: '/etc/nginx', path: '/etc/nginx' },
@@ -106,12 +148,12 @@ export function FilesApp({ onNotify }: FilesAppProps) {
           {t.apps.files.upBtn}
         </button>
         <button
-          onClick={() => loadDir('/home/doru')}
+          onClick={() => loadDir('/home/silvestrike')}
           className="bg-white/5 border border-white/10 hover:bg-white/10 text-slate-300 px-2.5 py-1 rounded font-mono text-[11px] shrink-0"
         >
           {t.apps.files.homeBtn}
         </button>
-        <div className="flex-1 min-w-[120px] bg-white/5 border border-white/10 rounded px-2.5 py-1 font-mono text-sky-400 truncate">
+        <div className="flex-1 min-w-[120px] bg-white/5 border border-white/10 rounded px-2.5 py-1 font-mono text-[#7aa2f7] truncate">
           {currentPath}
         </div>
         <button
@@ -145,11 +187,10 @@ export function FilesApp({ onNotify }: FilesAppProps) {
             <button
               key={sc.path}
               onClick={() => loadDir(sc.path)}
-              className={`text-left px-2 py-1.5 rounded font-mono text-[11px] truncate transition-colors ${
-                currentPath === sc.path
-                  ? 'bg-sky-500/20 text-sky-300 border border-sky-500/30'
-                  : 'text-slate-400 hover:text-slate-200 hover:bg-white/5'
-              }`}
+              className={`text-left px-2 py-1.5 rounded font-mono text-[11px] truncate transition-colors ${currentPath === sc.path
+                ? 'bg-sky-500/20 text-sky-300 border border-sky-500/30'
+                : 'text-slate-400 hover:text-slate-200 hover:bg-white/5'
+                }`}
             >
               {sc.label}
             </button>
@@ -165,7 +206,6 @@ export function FilesApp({ onNotify }: FilesAppProps) {
                 <th className="py-2 px-3 w-1/5">{t.apps.files.colPermissions}</th>
                 <th className="py-2 px-3 w-1/6">{t.apps.files.colOwner}</th>
                 <th className="py-2 px-3 w-1/8">{t.apps.files.colSize}</th>
-                <th className="py-2 px-3">{t.apps.files.colActions}</th>
               </tr>
             </thead>
             <tbody>
@@ -194,27 +234,16 @@ export function FilesApp({ onNotify }: FilesAppProps) {
                       </td>
                       <td className="py-2 px-3 text-slate-400">{it.permissions}</td>
                       <td className="py-2 px-3 text-slate-500">{it.owner}:{it.group}</td>
-                      <td className="py-2 px-3 text-slate-400">{isDir ? '-' : (it.size || 0) + ' B'}</td>
                       <td className="py-2 px-3">
-                        <div className="flex items-center gap-1.5">
-                          {!isDir && (
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleOpenItem(it);
-                              }}
-                              className="bg-white/10 hover:bg-white/20 text-slate-300 px-2 py-0.5 rounded text-[10px]"
-                            >
-                              Edit
-                            </button>
-                          )}
+                        {!isDir && it.name.toLowerCase().includes('cv') && (
                           <button
-                            onClick={(e) => handleDelete(it.name, e)}
-                            className="bg-rose-500/20 text-rose-400 hover:bg-rose-500 hover:text-white px-2 py-0.5 rounded text-[10px] border border-rose-500/30"
+                            onClick={(e) => handleDownloadItem(it, e)}
+                            className="bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500 hover:text-black px-2.5 py-0.5 rounded text-[10px] border border-emerald-500/30 font-semibold transition-colors"
+                            title="Download CV to your device"
                           >
-                            Del
+                            Download CV
                           </button>
-                        </div>
+                        )}
                       </td>
                     </tr>
                   );
@@ -227,19 +256,30 @@ export function FilesApp({ onNotify }: FilesAppProps) {
 
       {/* Integrated Text Editor Modal */}
       {editingFile && (
-        <div className="absolute inset-0 bg-obsidian-950 flex flex-col z-30 select-text">
-          <div className="h-10 bg-black/60 border-b border-white/10 px-4 flex items-center justify-between font-mono text-xs">
-            <span className="text-slate-200 font-semibold">nano {editingFile.path}</span>
-            <div className="flex gap-2">
+        <div className="absolute inset-0 bg-[#0d1117] flex flex-col z-30 select-text font-mono">
+          <div className="h-10 bg-black/70 border-b border-white/10 px-4 flex items-center justify-between text-xs shrink-0">
+            <div className="flex items-center gap-2">
+              <span className="text-[#7aa2f7] font-bold">nano</span>
+              <span className="text-slate-300 font-semibold">{editingFile.path}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={handleSaveAndDownload}
+                className="bg-emerald-500 hover:bg-emerald-400 text-black font-bold px-3 py-1 rounded text-xs transition-colors flex items-center gap-1.5 shadow-sm"
+                title="Save file to virtual workspace and download directly to your computer"
+              >
+                <span>Save & Download</span>
+              </button>
               <button
                 onClick={handleSaveEditor}
-                className="bg-emerald-500 hover:bg-emerald-400 text-black font-bold px-3 py-1 rounded text-xs transition-colors"
+                className="bg-white/10 hover:bg-white/20 text-slate-200 px-2.5 py-1 rounded text-xs transition-colors"
+                title="Save to WebOS Virtual Filesystem"
               >
                 Save
               </button>
               <button
                 onClick={() => setEditingFile(null)}
-                className="bg-white/10 hover:bg-white/20 text-slate-200 px-3 py-1 rounded text-xs transition-colors"
+                className="bg-white/5 hover:bg-white/10 text-slate-400 hover:text-slate-200 px-2.5 py-1 rounded text-xs transition-colors"
               >
                 Close
               </button>
@@ -248,9 +288,18 @@ export function FilesApp({ onNotify }: FilesAppProps) {
           <textarea
             value={editingFile.content}
             onChange={(e) => setEditingFile({ ...editingFile, content: e.target.value })}
-            className="flex-1 bg-obsidian-950 text-slate-100 p-4 font-mono text-xs outline-none border-none resize-none leading-relaxed"
+            className="flex-1 bg-[#090d13] text-slate-100 p-4 font-mono text-xs outline-none border-none resize-none leading-relaxed"
             spellCheck={false}
+            autoFocus
           />
+          <div className="h-7 bg-black/60 border-t border-white/10 px-4 flex items-center justify-between text-[11px] text-slate-400 shrink-0">
+            <span>
+              Lines: {editingFile.content.split('\n').length} | Chars: {editingFile.content.length}
+            </span>
+            <span className="text-slate-500 hidden sm:inline">
+              UTF-8 | Click &apos;Save &amp; Download&apos; to download to your device
+            </span>
+          </div>
         </div>
       )}
     </div>

@@ -1,5 +1,5 @@
 /*
-Reason for existence: Systemd service daemon manager maintaining state, execution logs, and lifecycle transitions for server services (nginx, docker, postgresql, doru-daemon).
+Reason for existence: Systemd service daemon manager maintaining state, execution logs, and lifecycle transitions for server services and verified portfolio AI/ML projects.
 System impact if absent: Systemd management application and terminal systemctl commands cannot control or query server services.
 */
 
@@ -10,61 +10,8 @@ export class ServiceManager {
   private listeners: Array<(services: ServiceUnit[]) => void>;
 
   constructor() {
+    this.listeners = [];
     this.services = {
-      'nginx.service': {
-        name: 'nginx.service',
-        displayName: 'NGINX HTTP & Reverse Proxy',
-        status: 'running',
-        pid: 1420,
-        memory: '38.4 MB',
-        uptime: '14d 06h',
-        description: 'High performance web server and reverse proxy for internal services',
-        logs: [
-          'Starting A high performance web server and a reverse proxy...',
-          'Configuration file /etc/nginx/nginx.conf test is successful',
-          'Started A high performance web server and a reverse proxy.'
-        ]
-      },
-      'docker.service': {
-        name: 'docker.service',
-        displayName: 'Docker Application Container Engine',
-        status: 'running',
-        pid: 1102,
-        memory: '284.1 MB',
-        uptime: '14d 06h',
-        description: 'Container virtualization engine managing microservices and sidecars',
-        logs: [
-          'Loading daemon configuration from /etc/docker/daemon.json',
-          'API listen on /var/run/docker.sock',
-          'Daemon has completed initialization'
-        ]
-      },
-      'sshd.service': {
-        name: 'sshd.service',
-        displayName: 'OpenSSH Daemon',
-        status: 'running',
-        pid: 924,
-        memory: '12.8 MB',
-        uptime: '14d 06h',
-        description: 'Secure shell server listening on port 22 for sysadmin remote sessions',
-        logs: [
-          'Server listening on 0.0.0.0 port 22.',
-          'Server listening on :: port 22.'
-        ]
-      },
-      'postgresql.service': {
-        name: 'postgresql.service',
-        displayName: 'PostgreSQL Database Server',
-        status: 'running',
-        pid: 1530,
-        memory: '142.6 MB',
-        uptime: '9d 18h',
-        description: 'Relational database storing user metadata, logs, and telemetry',
-        logs: [
-          'database system was shut down at 2026-09-15 20:59:01 UTC',
-          'database system is ready to accept connections'
-        ]
-      },
       'doru-daemon.service': {
         name: 'doru-daemon.service',
         displayName: 'Doru AI Desktop Assistant Daemon',
@@ -72,54 +19,85 @@ export class ServiceManager {
         pid: 2145,
         memory: '185.0 MB',
         uptime: '3d 12h',
-        description: 'Core voice assistant daemon running Silero VAD, wakeword, and audio loop',
+        description: 'Core voice assistant daemon running Silero VAD, wakeword, and LangGraph audio loop',
         logs: [
           'WakeWordDetector initialized [ok]',
           'Audio capture stream active on default input',
           'LangGraph engine preloaded and warm'
-        ]
+        ],
+        repoUrl: 'https://github.com/SILVESTRIKE/doru-ai',
+        language: 'Python',
+        category: 'ai'
       },
-      'ufw.service': {
-        name: 'ufw.service',
-        displayName: 'Uncomplicated Firewall',
+      'dogdexx.service': {
+        name: 'dogdexx.service',
+        displayName: 'DogDexx AI Breed Classifier & Vet Care',
+        status: 'deployed',
+        pid: 3012,
+        memory: '124.0 MB',
+        uptime: 'Live on Vercel',
+        description: 'Deep Learning Convolutional Neural Network dog breed recognition platform with medical tracking',
+        logs: [
+          'Model weights loaded: PyTorch ResNet-50 backbone',
+          'Edge inference pipeline ready at https://dogdexx.vercel.app'
+        ],
+        repoUrl: 'https://github.com/SILVESTRIKE/dogdexx',
+        deployUrl: 'https://dogdexx.vercel.app',
+        language: 'Python / PyTorch',
+        category: 'ai'
+      },
+      'sentiment-nlp.service': {
+        name: 'sentiment-nlp.service',
+        displayName: 'Vietnamese Sentiment Analysis NLP Model',
         status: 'running',
-        pid: 742,
-        memory: '4.2 MB',
-        uptime: '14d 06h',
-        description: 'Packet filtering firewall securing ingress and egress network ports',
+        pid: 4120,
+        memory: '96.5 MB',
+        uptime: 'Live Service',
+        description: 'Natural Language Processing sentiment classifier trained for Vietnamese social comments',
         logs: [
-          'Firewall is active and enabled on system startup',
-          'Rules reloaded successfully'
-        ]
+          'Underthesea word tokenizer initialized',
+          'Sentiment vocabulary: 45,000 tokens loaded'
+        ],
+        repoUrl: 'https://github.com/SILVESTRIKE/DanhGiaCamXuc',
+        language: 'Python / NLP',
+        category: 'ai'
       },
-      'redis.service': {
-        name: 'redis.service',
-        displayName: 'Redis In-Memory Cache Store',
-        status: 'stopped',
-        pid: 0,
-        memory: '0 MB',
-        uptime: '0s',
-        description: 'Key-value cache database used for quick session state and pubsub',
-        logs: [
-          'Stopping Redis In-Memory Data Store...',
-          'Stopped Redis In-Memory Data Store.'
-        ]
-      },
-      'cron.service': {
-        name: 'cron.service',
-        displayName: 'Regular Background Job Daemon',
+      'odoo-erp.service': {
+        name: 'odoo-erp.service',
+        displayName: 'Odoo 19 ERP Business Suite & PostgreSQL HA',
         status: 'running',
-        pid: 884,
-        memory: '6.1 MB',
-        uptime: '14d 06h',
-        description: 'Automated periodic scheduling daemon for backup and maintenance scripts',
+        pid: 5432,
+        memory: '380.0 MB',
+        uptime: 'Container Up',
+        description: 'Enterprise ERP management platform connected to pgvector PostgreSQL 15 container cluster',
         logs: [
-          'cron daemon initialized and running periodic jobs'
-        ]
+          'PostgreSQL 15 pgvector initialized on port 5432',
+          'pgweb web database manager active on port 8081',
+          'CRM pipeline & Sales invoice engines online'
+        ],
+        category: 'business'
       }
     };
 
-    this.listeners = [];
+    this.fetchLiveServices();
+  }
+
+  private async fetchLiveServices(): Promise<void> {
+    if (typeof window === 'undefined') return;
+    try {
+      const res = await fetch('/api/services');
+      if (res.ok) {
+        const data = await res.json();
+        if (Array.isArray(data.services)) {
+          for (const s of data.services) {
+            this.services[s.name] = s;
+          }
+          this.notify();
+        }
+      }
+    } catch {
+      // Fallback
+    }
   }
 
   public onChange(listener: (services: ServiceUnit[]) => void): () => void {
@@ -139,8 +117,8 @@ export class ServiceManager {
   }
 
   public get(name: string): ServiceUnit | null {
-    const key = name.endsWith('.service') ? name : `${name}.service`;
-    return this.services[key] || null;
+    const key = name.endsWith('.service') || name.endsWith('.container') ? name : `${name}.service`;
+    return this.services[key] || this.services[name] || null;
   }
 
   public start(name: string): { success: boolean; msg: string } {

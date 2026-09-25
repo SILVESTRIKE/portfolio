@@ -15,28 +15,62 @@ import { ServicesApp } from '@/components/apps/ServicesApp';
 import { FilesApp } from '@/components/apps/FilesApp';
 import { LogsApp } from '@/components/apps/LogsApp';
 import { NetworkApp } from '@/components/apps/NetworkApp';
-import { SysInfoApp } from '@/components/apps/SysInfoApp';
 import { AIAssistantApp } from '@/components/apps/AIAssistantApp';
-import { OdooSandboxApp } from '@/components/apps/OdooSandboxApp';
 import { SpotifyPlayer } from '@/components/SpotifyPlayer';
 import { GitKrakenApp } from '@/components/apps/GitKrakenApp';
 import { AboutMeTerminalApp } from '@/components/apps/AboutMeTerminalApp';
 import { PortfolioHubApp, PortfolioTab } from '@/components/apps/PortfolioHubApp';
 import { SystemHubApp, SystemTab } from '@/components/apps/SystemHubApp';
 import { WorkspaceHubApp, WorkspaceTab } from '@/components/apps/WorkspaceHubApp';
+import { ContactApp } from '@/components/apps/ContactApp';
+import { AdminDashboardApp } from '@/components/apps/AdminDashboardApp';
+import { sendVisitorTelemetry } from '@/lib/fingerprint';
 import { ToastContainer, ToastMessage } from '@/components/ToastContainer';
 import { CommandPalette } from '@/components/CommandPalette';
 import { globalAudio } from '@/lib/audioManager';
 import { WebOSPersistence } from '@/lib/persistence';
 import { useI18n } from '@/lib/i18n';
+import { BootSequence } from '@/components/BootSequence';
 import { AppId, WorkspaceId, WorkspaceState, TilingLayoutMode, WindowState } from '@/types';
 
 export default function WebOSPage() {
   const { t } = useI18n();
+  const [hasBooted, setHasBooted] = useState<boolean>(true);
+  const [bootKey, setBootKey] = useState<number>(0);
   const [currentWsId, setCurrentWsId] = useState<WorkspaceId>(1);
   const [activePaneId, setActivePaneId] = useState<AppId | null>('app-terminal');
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
+
+  // Check if initial cinematic boot sequence has run
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const alreadyBooted = sessionStorage.getItem('silves_boot_complete');
+      if (!alreadyBooted) {
+        setHasBooted(false);
+      }
+    }
+  }, []);
+
+  // Allow replaying boot sequence via terminal command 'boot' or custom event
+  useEffect(() => {
+    const handleReplay = () => {
+      if (typeof window !== 'undefined') {
+        sessionStorage.removeItem('silves_boot_complete');
+      }
+      setBootKey(prev => prev + 1);
+      setHasBooted(false);
+    };
+    window.addEventListener('replay_boot_sequence', handleReplay);
+    return () => window.removeEventListener('replay_boot_sequence', handleReplay);
+  }, []);
+
+  const handleBootComplete = useCallback(() => {
+    if (typeof window !== 'undefined') {
+      sessionStorage.setItem('silves_boot_complete', 'true');
+    }
+    setHasBooted(true);
+  }, []);
 
   // Sub-tab selection state inside each Hub
   const [portfolioTab, setPortfolioTab] = useState<PortfolioTab>('about');
@@ -47,7 +81,7 @@ export default function WebOSPage() {
     1: {
       id: 1,
       name: 'term',
-      activeAppIds: ['app-terminal', 'hub-workspace'],
+      activeAppIds: ['app-terminal'],
       layout: 'master-stack',
       maximizedAppId: null
     },
@@ -68,7 +102,7 @@ export default function WebOSPage() {
     4: {
       id: 4,
       name: 'hub',
-      activeAppIds: ['hub-portfolio', 'hub-system'],
+      activeAppIds: ['hub-workspace'],
       layout: 'master-stack',
       maximizedAppId: null
     }
@@ -78,11 +112,27 @@ export default function WebOSPage() {
   useEffect(() => {
     const savedWs = WebOSPersistence.loadWorkspaces();
     if (savedWs) {
-      setWorkspaces(savedWs);
+      setWorkspaces(prev => {
+        const merged: Record<WorkspaceId, WorkspaceState> = { ...savedWs };
+        for (const k of [1, 2, 3, 4] as WorkspaceId[]) {
+          if (!merged[k] || !Array.isArray(merged[k].activeAppIds) || merged[k].activeAppIds.length === 0) {
+            merged[k] = prev[k];
+          }
+        }
+        return merged;
+      });
     }
     const savedActiveWs = WebOSPersistence.loadActiveWorkspace();
     if (savedActiveWs) {
       setCurrentWsId(savedActiveWs);
+    }
+
+    // Trigger Web Visitor Analytics Telemetry with Client Fingerprint
+    try {
+      const currentPath = typeof window !== 'undefined' ? window.location.pathname : '/';
+      sendVisitorTelemetry(currentPath);
+    } catch {
+      // Safe noop
     }
   }, []);
 
@@ -127,50 +177,65 @@ export default function WebOSPage() {
 
   // Toggle app pane in current workspace (with smart Hub mapping)
   const handleToggleApp = (appId: AppId) => {
+    let targetWsId: WorkspaceId = currentWsId;
     let targetId: AppId = appId;
 
     if (appId === 'app-about') {
+      targetWsId = 2;
       setPortfolioTab('about');
       targetId = 'hub-portfolio';
+      setCurrentWsId(2);
     } else if (appId === 'app-services') {
+      targetWsId = 2;
       setPortfolioTab('services');
       targetId = 'hub-portfolio';
-    } else if (appId === 'app-gitkraken') {
-      setPortfolioTab('gitkraken');
+      setCurrentWsId(2);
+    } else if (appId === 'app-git') {
+      targetWsId = 2;
+      setPortfolioTab('git');
       targetId = 'hub-portfolio';
-    } else if (appId === 'app-odoo') {
-      setPortfolioTab('odoo');
-      targetId = 'hub-portfolio';
+      setCurrentWsId(2);
     } else if (appId === 'app-monitor') {
+      targetWsId = 3;
       setSystemTab('monitor');
       targetId = 'hub-system';
+      setCurrentWsId(3);
     } else if (appId === 'app-logs') {
+      targetWsId = 3;
       setSystemTab('logs');
       targetId = 'hub-system';
+      setCurrentWsId(3);
     } else if (appId === 'app-network') {
+      targetWsId = 3;
       setSystemTab('network');
       targetId = 'hub-system';
-    } else if (appId === 'app-settings') {
-      setSystemTab('specs');
-      targetId = 'hub-system';
+      setCurrentWsId(3);
     } else if (appId === 'app-ai') {
+      targetWsId = 4;
       setWorkspaceTab('ai');
       targetId = 'hub-workspace';
+      setCurrentWsId(4);
     } else if (appId === 'app-files') {
+      targetWsId = 4;
       setWorkspaceTab('files');
       targetId = 'hub-workspace';
+      setCurrentWsId(4);
     }
 
     setWorkspaces(prev => {
-      const ws = prev[currentWsId];
+      const ws = prev[targetWsId];
       const exists = ws.activeAppIds.includes(targetId);
 
       let nextIds: AppId[];
       if (exists) {
-        // If already open and clicked same sub-item, keep open or toggle focus
-        nextIds = ws.activeAppIds.filter(id => id !== targetId);
-        if (activePaneId === targetId) {
-          setActivePaneId(nextIds[0] || null);
+        if (targetWsId !== currentWsId) {
+          nextIds = ws.activeAppIds;
+          setActivePaneId(targetId);
+        } else {
+          nextIds = ws.activeAppIds.filter(id => id !== targetId);
+          if (activePaneId === targetId) {
+            setActivePaneId(nextIds[0] || null);
+          }
         }
       } else {
         // Insert pane
@@ -180,7 +245,7 @@ export default function WebOSPage() {
 
       return {
         ...prev,
-        [currentWsId]: {
+        [targetWsId]: {
           ...ws,
           activeAppIds: nextIds,
           maximizedAppId: ws.maximizedAppId === targetId ? null : ws.maximizedAppId
@@ -295,7 +360,7 @@ export default function WebOSPage() {
         };
       case 'hub-system':
         return {
-          title: 'Server Operations Center (srv-doru)',
+          title: 'Server Operations Center (srv-silvestrike)',
           component: (
             <SystemHubApp
               initialTab={systemTab}
@@ -305,7 +370,7 @@ export default function WebOSPage() {
         };
       case 'hub-workspace':
         return {
-          title: 'AI & File Workbench (/home/doru)',
+          title: 'AI & File Workbench (/home/silvestrike)',
           component: (
             <WorkspaceHubApp
               initialTab={workspaceTab}
@@ -315,12 +380,12 @@ export default function WebOSPage() {
         };
       case 'app-terminal':
         return {
-          title: 'bash - root@srv-doru:~',
+          title: 'bash - duong@srv-silvestrike:~',
           component: <TerminalApp onOpenApp={(targetId) => handleToggleApp(targetId)} />
         };
       case 'app-monitor':
         return {
-          title: 'htop - System Activity Monitor',
+          title: 'Activity & Visitor Analytics',
           component: <MonitorApp onNotify={showToast} />
         };
       case 'app-services':
@@ -330,7 +395,7 @@ export default function WebOSPage() {
         };
       case 'app-files':
         return {
-          title: 'Server File Explorer (/home/doru)',
+          title: 'Server File Explorer (/home/silvestrike)',
           component: <FilesApp onNotify={showToast} />
         };
       case 'app-logs':
@@ -343,30 +408,30 @@ export default function WebOSPage() {
           title: 'Network & Port Diagnostics',
           component: <NetworkApp onNotify={showToast} />
         };
-      case 'app-settings':
-        return {
-          title: 'Server Specifications & Platform',
-          component: <SysInfoApp />
-        };
       case 'app-ai':
         return {
-          title: 'Doru AI Native Assistant',
+          title: 'Doru AI Virtual Guide',
           component: <AIAssistantApp />
-        };
-      case 'app-odoo':
-        return {
-          title: 'Odoo 18 ERP Enterprise Suite',
-          component: <OdooSandboxApp onNotify={showToast} />
         };
       case 'app-spotify':
         return {
           title: 'Spotify Live Stream & Player',
           component: <SpotifyPlayer mode="full" />
         };
-      case 'app-gitkraken':
+      case 'app-git':
         return {
-          title: 'GitKraken - Visual Git Studio',
+          title: 'Git - Visual Git Studio',
           component: <GitKrakenApp />
+        };
+      case 'app-contact':
+        return {
+          title: t.apps.contact.title,
+          component: <ContactApp onNotify={showToast} />
+        };
+      case 'app-admin':
+        return {
+          title: 'Recruiter Intelligence & Visitor Tracking',
+          component: <AdminDashboardApp onNotify={showToast} />
         };
       default:
         return {
@@ -478,16 +543,6 @@ export default function WebOSPage() {
       position: { x: 0, y: 0 },
       size: { width: 0, height: 0 }
     },
-    'app-odoo': {
-      id: 'app-odoo',
-      title: 'Odoo ERP',
-      isOpen: currentWorkspace.activeAppIds.includes('app-odoo'),
-      isMinimized: false,
-      isMaximized: currentWorkspace.maximizedAppId === 'app-odoo',
-      zIndex: 1,
-      position: { x: 0, y: 0 },
-      size: { width: 0, height: 0 }
-    },
     'app-spotify': {
       id: 'app-spotify',
       title: 'Spotify',
@@ -498,22 +553,12 @@ export default function WebOSPage() {
       position: { x: 0, y: 0 },
       size: { width: 0, height: 0 }
     },
-    'app-gitkraken': {
-      id: 'app-gitkraken',
-      title: 'GitKraken',
-      isOpen: currentWorkspace.activeAppIds.includes('app-gitkraken'),
+    'app-git': {
+      id: 'app-git',
+      title: 'Git',
+      isOpen: currentWorkspace.activeAppIds.includes('app-git'),
       isMinimized: false,
-      isMaximized: currentWorkspace.maximizedAppId === 'app-gitkraken',
-      zIndex: 1,
-      position: { x: 0, y: 0 },
-      size: { width: 0, height: 0 }
-    },
-    'app-settings': {
-      id: 'app-settings',
-      title: 'SysInfo',
-      isOpen: currentWorkspace.activeAppIds.includes('app-settings'),
-      isMinimized: false,
-      isMaximized: currentWorkspace.maximizedAppId === 'app-settings',
+      isMaximized: currentWorkspace.maximizedAppId === 'app-git',
       zIndex: 1,
       position: { x: 0, y: 0 },
       size: { width: 0, height: 0 }
@@ -524,6 +569,26 @@ export default function WebOSPage() {
       isOpen: currentWorkspace.activeAppIds.includes('app-about'),
       isMinimized: false,
       isMaximized: currentWorkspace.maximizedAppId === 'app-about',
+      zIndex: 1,
+      position: { x: 0, y: 0 },
+      size: { width: 0, height: 0 }
+    },
+    'app-contact': {
+      id: 'app-contact',
+      title: t.apps.contact.title,
+      isOpen: currentWorkspace.activeAppIds.includes('app-contact'),
+      isMinimized: false,
+      isMaximized: currentWorkspace.maximizedAppId === 'app-contact',
+      zIndex: 1,
+      position: { x: 0, y: 0 },
+      size: { width: 0, height: 0 }
+    },
+    'app-admin': {
+      id: 'app-admin',
+      title: 'Recruiter Admin',
+      isOpen: currentWorkspace.activeAppIds.includes('app-admin'),
+      isMinimized: false,
+      isMaximized: currentWorkspace.maximizedAppId === 'app-admin',
       zIndex: 1,
       position: { x: 0, y: 0 },
       size: { width: 0, height: 0 }
@@ -556,6 +621,7 @@ export default function WebOSPage() {
           activeId={activePaneId}
           maximizedAppId={currentWorkspace.maximizedAppId}
           layoutMode={currentWorkspace.layout}
+          sidebarAppId="hub-workspace"
           onFocus={(id) => setActivePaneId(id)}
           onToggleMaximize={handleToggleMaximize}
           onClose={handleClosePane}
@@ -602,6 +668,9 @@ export default function WebOSPage() {
         currentWorkspace={currentWsId}
         layoutMode={currentWorkspace.layout}
       />
+
+      {/* Cinematic eDEX-UI Boot Sequence Intro (First Login & Replay) */}
+      {!hasBooted && <BootSequence key={bootKey} onComplete={handleBootComplete} />}
     </div>
   );
 }

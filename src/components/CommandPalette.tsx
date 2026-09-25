@@ -71,10 +71,10 @@ export function CommandPalette({
       action: () => onLaunchApp('app-about')
     },
     {
-      id: 'app-gitkraken',
+      id: 'app-git',
       title: t.commands.openGitKraken,
       category: t.commands.categoryApps,
-      action: () => onLaunchApp('app-gitkraken')
+      action: () => onLaunchApp('app-git')
     },
     {
       id: 'hub-system',
@@ -120,22 +120,16 @@ export function CommandPalette({
       action: () => onLaunchApp('app-ai')
     },
     {
-      id: 'app-odoo',
-      title: t.commands.openOdoo,
-      category: t.commands.categoryApps,
-      action: () => onLaunchApp('app-odoo')
-    },
-    {
       id: 'app-spotify',
       title: t.commands.openSpotify,
       category: t.commands.categoryApps,
       action: () => onLaunchApp('app-spotify')
     },
     {
-      id: 'app-settings',
-      title: t.commands.openSysinfo,
+      id: 'app-contact',
+      title: t.apps.contact.title,
       category: t.commands.categoryApps,
-      action: () => onLaunchApp('app-settings')
+      action: () => onLaunchApp('app-contact')
     },
 
     // Workspaces
@@ -197,6 +191,19 @@ export function CommandPalette({
       title: t.commands.toggleAudio,
       category: t.commands.categoryControls,
       action: () => onToggleAudio()
+    },
+    {
+      id: 'replay-boot',
+      title: 'Replay Boot Sequence (eDEX-UI / TRON)',
+      category: t.commands.categoryControls,
+      shortcut: 'boot',
+      action: () => {
+        if (typeof window !== 'undefined') {
+          setTimeout(() => {
+            window.dispatchEvent(new CustomEvent('replay_boot_sequence'));
+          }, 50);
+        }
+      }
     }
   ], [
     t,
@@ -307,11 +314,10 @@ export function CommandPalette({
                     onClose();
                   }}
                   onMouseEnter={() => setSelectedIndex(idx)}
-                  className={`p-2.5 rounded-lg flex items-center justify-between cursor-pointer transition-colors ${
-                    isSelected
+                  className={`p-2.5 rounded-lg flex items-center justify-between cursor-pointer transition-colors ${isSelected
                       ? 'bg-sky-500/20 text-sky-200 border border-sky-500/40'
                       : 'text-slate-300 hover:bg-white/5 border border-transparent'
-                  }`}
+                    }`}
                 >
                   <div className="flex items-center gap-2 min-w-0">
                     <span className="text-[10px] text-slate-500 uppercase px-1.5 py-0.5 bg-black/40 rounded border border-white/5 shrink-0">

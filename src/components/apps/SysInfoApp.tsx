@@ -32,17 +32,20 @@ export function SysInfoApp() {
   };
 
   const hardwareDetails = [
-    { key: 'Hostname', val: snapshot?.hostname || 'srv-doru.internal' },
-    { key: 'Processor', val: snapshot?.cpuModel ? `${snapshot.cpuModel} (${snapshot.cores.length} cores)` : 'Intel Xeon / AMD Core (Live Host)' },
+    { key: 'Hostname', val: snapshot?.hostname || 'srv-silvestrike' },
+    { key: 'Hardware Model', val: snapshot?.hostModel || 'HUIT Workstation (B.Eng in IT)' },
+    { key: 'Processor', val: snapshot?.cpuModel ? `${snapshot.cpuModel} (${snapshot.physicalCores || 8} Cores, ${snapshot.threadCount || snapshot.cores.length} Threads)` : 'Intel Core i5-13420H (8 Cores, 12 Threads)' },
+    { key: 'CPU Topology', val: `${snapshot?.physicalCores || 8} Physical Cores / ${snapshot?.threadCount || snapshot?.cores.length || 12} Threads` },
+    { key: 'Graphics (GPU)', val: snapshot?.gpuModel || 'WebOS Accelerated GPU Engine' },
     { key: 'RAM Installed', val: snapshot ? `${snapshot.ramTotal.toLocaleString()} MB` : '16,384 MB' },
     { key: 'Swap Allocated', val: snapshot ? `${snapshot.swapTotal.toLocaleString()} MB` : '4,096 MB' },
-    { key: 'Core Threads', val: snapshot ? `${snapshot.cores.length} logical cores` : '8 cores' },
     { key: 'Load Average (1, 5, 15m)', val: snapshot?.loadAvg ? snapshot.loadAvg.join(' / ') : '0.12 / 0.18 / 0.22' }
   ];
 
   const osDetails = [
+    { key: 'Operating System', val: snapshot?.osName || 'Ubuntu 26.04.1 LTS x86_64' },
     { key: 'Platform', val: snapshot?.platform ? `${snapshot.platform.toUpperCase()} (POSIX)` : 'LINUX (POSIX)' },
-    { key: 'Kernel Version', val: snapshot?.kernel || '6.8.0-generic' },
+    { key: 'Kernel Version', val: snapshot?.kernel ? `Linux ${snapshot.kernel}` : 'Linux 7.0.0-31-generic' },
     { key: 'Architecture', val: snapshot?.arch ? `${snapshot.arch} (Native)` : 'x86_64' },
     { key: 'System Uptime', val: formatUptime(snapshot?.uptime) },
     { key: 'Network Inbound Rate', val: snapshot ? `${snapshot.rxRate} KB/s` : '0 KB/s' },

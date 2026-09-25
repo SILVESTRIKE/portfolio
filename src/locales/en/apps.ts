@@ -81,7 +81,6 @@ export const enApps = {
     colPermissions: 'Permissions',
     colOwner: 'Owner',
     colSize: 'Size',
-    colActions: 'Actions',
     saveBtn: 'Save',
     closeBtn: 'Close',
     savedToast: 'Saved changes to',
@@ -102,7 +101,7 @@ export const enApps = {
     filterBusiness: 'BIZ',
     filterWeb: 'WEB',
     openLiveSite: 'Open Live Site',
-    openGitKraken: 'GitKraken Studio',
+    openGitKraken: 'Git Studio',
     openOdoo: 'Open Odoo ERP',
     launchSandbox: 'Launch Sandbox',
     closeSandbox: '[ Close Sandbox ]',
@@ -120,16 +119,16 @@ export const enApps = {
 
   // AIAssistantApp
   ai: {
-    headerTitle: 'Doru AI Native Engine',
-    backendLabel: 'Backend: Local Hybrid LPU',
+    headerTitle: 'Doru AI Assistant',
+    backendLabel: 'Doru AI Inference Engine',
     thinkingMsg: 'Doru AI is generating response...',
-    inputPlaceholder: 'Ask Doru AI about server, projects, or Linux commands...',
+    inputPlaceholder: 'Ask Doru AI about projects, skills, graduation thesis...',
     sendBtn: 'Send',
-    quickPrompt1: 'How does Doru AI work?',
-    quickPrompt2: 'What is special about DogDexx?',
-    quickPrompt3: 'Current status of silvestrike.dev server?',
-    quickPrompt4: 'What does Odoo Sandbox manage?',
-    initMsg: 'Hello! I am Doru AI Native Assistant on SILVESTRIKE Portfolio OS. I can help answer questions about SILVESTRIKE portfolio projects, Linux server commands, or system status analysis.'
+    quickPrompt1: 'What are Duong\'s flagship GitHub projects?',
+    quickPrompt2: 'Tell me about the Veritas AI thesis pipeline.',
+    quickPrompt3: 'What Full-Stack & AI skills does Duong have?',
+    quickPrompt4: 'How does Samco Binh Tan WebApp work?',
+    initMsg: 'Hello! I am Doru AI - the virtual guide for Van Trong Duong\'s (SILVESTRIKE) WebOS Portfolio. I can walk you through his GitHub projects, technical stack, thesis research, and contact channels!'
   },
 
   // TilingPane / WM
@@ -152,7 +151,7 @@ export const enApps = {
     activityExplorer: 'Explorer',
     activitySearch: 'Search Dossier',
     activityGit: 'Source Control',
-    activitySysinfo: 'Neofetch Specs',
+    activitySysinfo: 'Fetch Specs',
     sidebarTitle: 'EXPLORER: SILVESTRIKE',
     searchTitle: 'SEARCH: DOSSIER GREP',
     searchPlaceholder: 'Search files (e.g. PyTorch, Next.js, Veritas)...',
@@ -168,5 +167,76 @@ export const enApps = {
     statusBranch: 'main',
     statusEncoding: 'UTF-8',
     statusSpaces: 'Spaces: 2'
+  },
+
+  // ContactApp
+  contact: {
+    title: 'Contact Me',
+    headerTitle: 'VAN TRONG DUONG (SILVESTRIKE)',
+    headerSub: 'Software Engineer (Full-Stack / Backend) | AI/ML Systems Engineer',
+    headerEdu: 'HUIT IT (Final Year) | GPA: 3.2 / 4.0 | IELTS: 6.5 Academic | Ho Chi Minh City',
+    openForHire: 'OPEN FOR HIRE',
+    downloadCvBtn: 'Download CV',
+    downloadingCvToast: 'Downloading CV_VanTrongDuong.docx...',
+
+    // Direct Gmail action
+    openGmailBtn: 'Open in Gmail',
+
+    // Leave Contact Info
+    leaveInfoTitle: 'LEAVE CONTACT INFO',
+    leaveInfoSubtitle: 'Leave your contact info, job role, or inquiry below. Duong will reach out within 24 hours.',
+    inputPlaceholder: 'Type your message, name, email/phone, or notes here...',
+    submitBtn: 'Submit',
+    submittingBtn: 'Submitting...',
+    submitSuccess: 'Your message has been recorded. Duong will reach out shortly.',
+    submitAnotherBtn: 'Send Another Note',
+    errorRequired: 'Please enter your message or contact info.',
+    errorGeneral: 'Failed to record details. Please try emailing directly.',
+
+    copiedToast: 'Copied to clipboard'
+  },
+
+  // AdminDashboardApp
+  admin: {
+    authTitle: '[ADMINISTRATOR AUTHENTICATION]',
+    authSubtitle: 'Recruiter Intelligence & Visitor Tracking System',
+    tokenLabel: 'Master Access Token:',
+    tokenPlaceholder: 'Enter master access token...',
+    unlockBtn: 'Unlock Tracking Dashboard',
+    authDesc: 'Proprietary monitoring dashboard for Van Trong Duong to trace corporate and recruiter visitors viewing portfolio.',
+    headerTitle: 'RECRUITER & VISITOR INTELLIGENCE',
+    headerSubtitle: 'Track corporate and recruiter visits to proactively outreach for employment',
+    liveBadge: 'LIVE TELEMETRY',
+    refreshBtn: 'Refresh',
+    refreshingBtn: 'Syncing...',
+    lockBtn: 'Lock',
+    leadsCardTitle: 'POTENTIAL RECRUITERS',
+    leadsCardDesc: 'From corporate ISP or LinkedIn/CV link',
+    visitorsCardTitle: 'TOTAL UNIQUE VISITORS',
+    visitorsCardDesc: 'Identified via unique browser fingerprint',
+    pageviewsCardTitle: 'TOTAL PAGEVIEWS',
+    pageviewsCardDesc: 'Aggregated across all WebOS views',
+    sessionsCardTitle: 'ACTIVE SESSIONS',
+    sessionsCardDesc: 'Within the last 10 minutes',
+    searchPlaceholder: 'Filter by organization, city, IP, source, notes...',
+    filterAll: 'All',
+    filterLeads: 'Recruiters',
+    filterContacted: 'Contacted',
+    filterInterviewing: 'Interviewing',
+    tableTitle: 'VISITOR ACCESS STREAM',
+    tableTip: 'Click "Edit notes" to record interview follow-ups',
+    colOrg: 'ORGANIZATION / ISP',
+    colLocation: 'LOCATION',
+    colReferrer: 'SOURCE',
+    colDevice: 'DEVICE & OS',
+    colVisits: 'SESSIONS / VIEWS',
+    colPages: 'PAGES EXPLORED',
+    colNotes: 'NOTES & STATUS',
+    colActions: 'ACTIONS',
+    editNotesBtn: 'Edit notes',
+    copyLeadBtn: 'Copy lead',
+    saveBtn: 'Save',
+    cancelBtn: 'Cancel',
+    noData: 'No visitor telemetry matches current filters.'
   }
 };

@@ -26,13 +26,11 @@ export function WorkspaceHubApp({
     {
       id: 'ai',
       label: 'Doru AI Assistant',
-      badge: 'Hybrid LPU',
       desc: 'Native Intelligent Voice & Text Assistant'
     },
     {
       id: 'files',
       label: 'File Explorer',
-      badge: '/home/doru',
       desc: 'Virtual Linux Filesystem & File Editor'
     }
   ];
@@ -48,21 +46,19 @@ export function WorkspaceHubApp({
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`px-3 py-1 rounded-md text-xs font-mono transition-all flex items-center gap-2 shrink-0 ${
-                  isActive
-                    ? 'bg-purple-500/20 text-purple-300 font-bold border border-purple-400/40 shadow-sm'
-                    : 'text-slate-400 hover:text-slate-200 hover:bg-white/5 border border-transparent'
-                }`}
+                className={`px-3 py-1 rounded-md text-xs font-mono transition-all flex items-center gap-2 shrink-0 ${isActive
+                  ? 'bg-purple-500/20 text-purple-300 font-bold border border-purple-400/40 shadow-sm'
+                  : 'text-slate-400 hover:text-slate-200 hover:bg-white/5 border border-transparent'
+                  }`}
                 title={tab.desc}
               >
                 <span>{tab.label}</span>
                 {tab.badge && (
                   <span
-                    className={`text-[9px] px-1.5 py-0.2 rounded font-bold uppercase ${
-                      isActive
-                        ? 'bg-purple-400/30 text-purple-200'
-                        : 'bg-white/10 text-slate-400'
-                    }`}
+                    className={`text-[9px] px-1.5 py-0.2 rounded font-bold uppercase ${isActive
+                      ? 'bg-purple-400/30 text-purple-200'
+                      : 'bg-white/10 text-slate-400'
+                      }`}
                   >
                     {tab.badge}
                   </span>
@@ -70,12 +66,6 @@ export function WorkspaceHubApp({
               </button>
             );
           })}
-        </div>
-
-        {/* Status indicator on top right */}
-        <div className="hidden sm:flex items-center gap-2 font-mono text-[10px] text-slate-400">
-          <span className="w-1.5 h-1.5 rounded-full bg-purple-400 animate-pulse" />
-          <span>AI WORKBENCH READY</span>
         </div>
       </div>
 

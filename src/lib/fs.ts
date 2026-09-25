@@ -1,5 +1,5 @@
 /*
-Reason for existence: In-memory virtual Linux filesystem providing hierarchical file operations (/etc, /var/log, /proc, /home/doru), path resolution, and read/write methods.
+Reason for existence: In-memory virtual Linux filesystem providing hierarchical file operations (/etc, /var/log, /proc, /home/silvestrike), path resolution, and read/write methods.
 System impact if absent: Terminal bash commands and server file explorer have no filesystem to read, edit, or execute.
 */
 
@@ -23,7 +23,19 @@ export class VirtualFileSystem {
     const savedChildren = WebOSPersistence.loadVFS();
     if (savedChildren && Object.keys(savedChildren).length > 0) {
       this.root.children = savedChildren;
+      this.ensureEssentialFiles();
     } else {
+      this.initializeDefaultHierarchy();
+    }
+  }
+
+  public ensureEssentialFiles(): void {
+    const homeNode = this.getNode('/home/silvestrike');
+    if (!homeNode || !homeNode.children || Object.keys(homeNode.children).length === 0) {
+      this.initializeDefaultHierarchy();
+      return;
+    }
+    if (!this.getNode('/home/silvestrike/welcome.txt')) {
       this.initializeDefaultHierarchy();
     }
   }
@@ -35,16 +47,15 @@ export class VirtualFileSystem {
     }
 
     this.createDir('/home/silvestrike', 'silvestrike', 'silvestrike', 'drwxr-xr-x');
-    this.createDir('/home/doru', 'doru', 'doru', 'drwxr-xr-x');
     this.createDir('/var/log', 'root', 'root', 'drwxr-xr-x');
     this.createDir('/etc/nginx', 'root', 'root', 'drwxr-xr-x');
     this.createDir('/etc/ssh', 'root', 'root', 'drwxr-xr-x');
     this.createDir('/etc/systemd', 'root', 'root', 'drwxr-xr-x');
 
     this.writeFile('/etc/hostname', 'srv-silvestrike\n', 'root', '644');
-    
-    this.writeFile('/etc/os-release', 
-`NAME="Ubuntu"
+
+    this.writeFile('/etc/os-release',
+      `NAME="Ubuntu"
 VERSION="24.04 LTS (Noble Numbat)"
 ID=ubuntu
 ID_LIKE=debian
@@ -54,8 +65,8 @@ HOME_URL="https://www.ubuntu.com/"
 SUPPORT_URL="https://help.ubuntu.com/"
 `, 'root', '644');
 
-    this.writeFile('/etc/hosts', 
-`127.0.0.1 localhost
+    this.writeFile('/etc/hosts',
+      `127.0.0.1 localhost
 127.0.1.1 srv-silvestrike
 192.168.1.100 srv-silvestrike.internal
 
@@ -66,7 +77,7 @@ ff02::2 ip6-allrouters
 `, 'root', '644');
 
     this.writeFile('/etc/nginx/nginx.conf',
-`user www-data;
+      `user www-data;
 worker_processes auto;
 pid /run/nginx.pid;
 error_log /var/log/nginx/error.log;
@@ -81,7 +92,7 @@ http {
     
     server {
         listen 80 default_server;
-        server_name srv-doru.internal;
+        server_name srv-silvestrike.internal;
         
         location / {
             proxy_pass http://127.0.0.1:3000;
@@ -93,7 +104,7 @@ http {
 `, 'root', '644');
 
     this.writeFile('/etc/ssh/sshd_config',
-`Port 22
+      `Port 22
 PermitRootLogin prohibit-password
 PasswordAuthentication no
 PubkeyAuthentication yes
@@ -102,8 +113,8 @@ Subsystem sftp /usr/lib/openssh/sftp-server
 `, 'root', '600');
 
     this.writeFile('/proc/version', 'Linux version 6.8.0-45-generic (buildd@lcy02-amd64-072) (gcc 13.2.0) #45-Ubuntu SMP PREEMPT_DYNAMIC\n', 'root', '444');
-    this.writeFile('/proc/cpuinfo', 
-`processor   : 0
+    this.writeFile('/proc/cpuinfo',
+      `processor   : 0
 model name  : Intel(R) Xeon(R) Platinum 8480+ @ 3.80GHz
 cpu MHz     : 3799.988
 cache size  : 107520 KB
@@ -111,7 +122,7 @@ cpu cores   : 8
 `, 'root', '444');
 
     this.writeFile('/proc/meminfo',
-`MemTotal:       16384000 kB
+      `MemTotal:       16384000 kB
 MemFree:        12592000 kB
 MemAvailable:   13800000 kB
 Buffers:          340000 kB
@@ -120,29 +131,59 @@ SwapTotal:       4194304 kB
 SwapFree:        4194304 kB
 `, 'root', '444');
 
-    this.writeFile('/home/doru/welcome.txt',
-`============================================================
+    this.writeFile('/home/silvestrike/welcome.txt',
+      `============================================================
 Welcome to SILVESTRIKE Portfolio OS (silvestrike.dev)
-Environment: Next.js 15 + Tailwind CSS v4 + TypeScript
+Environment: Next.js 16 + Tailwind CSS v4 + TypeScript
 Default User: duong / root
 ============================================================
 
 Quick Commands:
   help          - List all available terminal commands
-  neofetch      - Display server hardware and OS specifications
-  htop          - Launch or inspect active CPU and RAM processes
-  portfolio     - View featured projects and services
-  whoami        - Display developer biography and dossiers
-  systemctl     - Inspect and manage server daemons
-  journalctl -f - Stream server logs
-  df -h         - Check disk filesystem utilization
-  free -m       - View physical and swap memory allocation
+  fastfetch      - Display server hardware and OS specifications
+  about         - Display developer biography and dossiers
+  skills        - View core languages, AI/ML models, and frameworks
+  projects      - Inspect flagship production repositories
+  monitor       - Open WebOS Activity & Visitor Analytics
+  services      - View featured projects and microservices
+  git     - Visual Git commit graph & diff studio
+  network       - Inspect active network sockets and firewall
+  odoo          - Launch Odoo ERP business sandbox
 
 Enjoy exploring the interactive portfolio workstation!
-`, 'doru', '644');
+`, 'duong', '644');
 
-    this.writeFile('/home/doru/deploy.sh',
-`#!/bin/bash
+    this.writeFile('/home/silvestrike/profile.yml',
+      `# profile.yml - Canonical developer configuration
+developer:
+  name: "Van Trong Duong"
+  alias: "SILVESTRIKE"
+  title: "Full-Stack Developer | AI/ML Engineer | Solutions Architect"
+  location: "Ho Chi Minh City, Vietnam"
+  education:
+    university: "Ho Chi Minh City University of Industry and Trade (HUIT)"
+    degree: "Bachelor of Engineering in Information Technology"
+    gpa: "3.2 / 4.0"
+    ielts: "6.5 Academic"
+    timeline: "2022 - 2026 (Final-year thesis & R&D)"
+  engineering_philosophy:
+    - "Clean Architecture & strictly decoupled services over ad-hoc scripts"
+    - "High test coverage with clear bounded contexts and validation schemas"
+    - "Bridging deep learning models with high-throughput production infrastructure"
+`, 'duong', '644');
+
+    this.writeFile('/home/silvestrike/skills.json',
+      `{
+  "languages": ["Python", "TypeScript", "JavaScript", "C#", "SQL", "HTML/CSS"],
+  "ai_ml": ["PyTorch", "TensorFlow", "OpenCV", "MediaPipe", "YOLO", "LangGraph", "Whisper", "Kokoro"],
+  "web": ["Next.js 15/16", "React 19", "Node.js", "Express", "ASP.NET Core", "Tailwind CSS v4"],
+  "databases": ["PostgreSQL", "pgvector", "MongoDB", "SQL Server", "Redis", "Prisma ORM"],
+  "devops_system": ["Linux (Arch/Ubuntu)", "Docker", "Git", "Nginx", "Systemd", "CI/CD"]
+}
+`, 'duong', '644');
+
+    this.writeFile('/home/silvestrike/deploy.sh',
+      `#!/bin/bash
 set -e
 echo "Starting deployment sequence for api-gateway..."
 systemctl stop nginx
@@ -151,10 +192,10 @@ docker pull internal.registry/api-gateway:latest
 echo "Restarting service..."
 systemctl start nginx
 echo "Deployment verified healthy."
-`, 'doru', '755');
+`, 'duong', '755');
 
-    this.writeFile('/home/doru/README.md',
-`# VAN TRONG DUONG (SILVESTRIKE)
+    this.writeFile('/home/silvestrike/README.md',
+      `# VAN TRONG DUONG (SILVESTRIKE)
 Full-Stack Developer | AI/ML Engineer | Aspiring Solutions Architect
 
 ## About Me
@@ -167,8 +208,8 @@ Full-Stack Developer | AI/ML Engineer | Aspiring Solutions Architect
 ## Tech Stack
 - Languages: Python, TypeScript, JavaScript, C#, PHP, SQL
 - AI/ML: PyTorch, TensorFlow, OpenCV, MediaPipe, YOLO, LangGraph, LangChain, Whisper, Kokoro
-- Web: Next.js 14/15, React, Node.js, Express, ASP.NET Core, .NET WinForms, Laravel
-- Databases & DevOps: PostgreSQL, MongoDB, SQL Server, Prisma, Docker, Linux, CI/CD
+- Web: Next.js 15/16, React 19, Node.js, Express, ASP.NET Core, .NET WinForms
+- Databases & DevOps: PostgreSQL, MongoDB, SQL Server, Redis, Prisma, Docker, Linux, CI/CD
 
 ## Featured Projects
 - samco-binhtan-webapp: EV Sales CMS & E-commerce (Next.js 14, Prisma, Node)
@@ -182,7 +223,38 @@ Full-Stack Developer | AI/ML Engineer | Aspiring Solutions Architect
 - Email: vtduong04@gmail.com
 - Facebook: fb.com/hakudevon
 - GitHub: https://github.com/SILVESTRIKE
-`, 'doru', '644');
+`, 'duong', '644');
+
+    this.writeFile('/home/silvestrike/CV_VanTrongDuong.md',
+      `# Curriculum Vitae — Van Trong Duong (SILVESTRIKE)
+Contact: vtduong04@gmail.com | github.com/SILVESTRIKE
+
+## Professional Summary
+Full-Stack Developer and AI/ML Engineer with strong foundation in Software Engineering and Distributed Systems.
+Final-year student at Ho Chi Minh City University of Industry and Trade (HUIT), IT Department.
+GPA: 3.2 / 4.0 | IELTS: 6.5 Academic
+
+## Education
+- B.Eng in Information Technology, HUIT (2022 - 2026)
+- Thesis: Veritas — AI-powered Vietnamese Land & Legal Document Digitization (RAG + Multimodal LLM)
+
+## Core Technical Skills
+- Languages: Python, TypeScript, JavaScript, C#, SQL, HTML/CSS
+- AI & Deep Learning: PyTorch, TensorFlow, OpenCV, MediaPipe, YOLO, LangGraph, Whisper, Kokoro
+- Web & Services: Next.js 15/16, React 19, Node.js, Express, ASP.NET Core, Tailwind CSS
+- Databases & Infrastructure: PostgreSQL (pgvector), MongoDB, SQL Server, Redis, Docker, Linux, Git
+
+## Featured Projects
+- SAMCO Binh Tan: Full-stack vehicle inventory and customer quotation CMS (Next.js, Prisma, PostgreSQL)
+- DogDexx: Canine breed visual recognition & health tracking platform (PyTorch ResNet, Next.js)
+- Doru AI: Personal desktop AI voice assistant running on Linux Hyprland (LangGraph, Silero VAD, Groq)
+- Veritas RAG: Document digitization pipeline for Vietnamese legal records
+`, 'duong', '644');
+
+    this.writeFile('/home/silvestrike/CV_VanTrongDuong.docx',
+      `[Microsoft Word Binary Document: CV_VanTrongDuong.docx]
+Click 'Download CV' to download the canonical styled resume.
+`, 'duong', '644');
   }
 
   public normalizePath(path: string): string {
@@ -200,7 +272,7 @@ Full-Stack Developer | AI/ML Engineer | Aspiring Solutions Architect
   }
 
   public resolvePath(currentDir: string, targetPath: string): string {
-    const home = this.getNode('/home/silvestrike') ? '/home/silvestrike' : '/home/doru';
+    const home = '/home/silvestrike';
     if (!targetPath || targetPath === '~') {
       return home;
     }

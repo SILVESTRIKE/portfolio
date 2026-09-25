@@ -1,5 +1,5 @@
 /*
-Reason for existence: Unified Developer and Portfolio Studio Hub aggregating Microservices catalog, GitKraken Visual Git, and Odoo 18 ERP sandbox into a single tabbed workstation.
+Reason for existence: Unified Developer and Portfolio Studio Hub aggregating Developer Dossier (About), Microservices catalog (Projects), and Git Visual Git into a single tabbed workstation.
 System impact if absent: Developer applications will be scattered across multiple separate windows causing tiling clutter.
 */
 
@@ -9,9 +9,8 @@ import React, { useState } from 'react';
 import { AboutMeTerminalApp } from './AboutMeTerminalApp';
 import { ServicesApp } from './ServicesApp';
 import { GitKrakenApp } from './GitKrakenApp';
-import { OdooSandboxApp } from './OdooSandboxApp';
 
-export type PortfolioTab = 'about' | 'services' | 'gitkraken' | 'odoo';
+export type PortfolioTab = 'about' | 'services' | 'git';
 
 interface PortfolioHubAppProps {
   initialTab?: PortfolioTab;
@@ -29,27 +28,18 @@ export function PortfolioHubApp({
   const tabs: Array<{ id: PortfolioTab; label: string; badge?: string; desc: string }> = [
     {
       id: 'about',
-      label: 'About Me',
-      badge: 'CLI',
-      desc: 'Van Trong Duong (SILVESTRIKE) Dossier in Terminal Format'
+      label: 'About',
+      desc: 'Developer Profile, Skills & Interactive Dossier'
     },
     {
       id: 'services',
-      label: 'Portfolio & Services',
-      badge: '10 Units',
-      desc: 'SILVESTRIKE Repositories & Live Sandboxes'
+      label: 'Projects',
+      desc: 'SILVESTRIKE Repositories & Live Workstations'
     },
     {
-      id: 'gitkraken',
-      label: 'GitKraken Studio',
-      badge: 'Real Git',
+      id: 'git',
+      label: 'Git',
       desc: 'Commit Graph & Unified Diff Inspector'
-    },
-    {
-      id: 'odoo',
-      label: 'Odoo 18 ERP',
-      badge: 'Sandbox',
-      desc: 'Enterprise CRM, Sales, Invoicing & Inventory'
     }
   ];
 
@@ -64,21 +54,19 @@ export function PortfolioHubApp({
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`px-3 py-1 rounded-md text-xs font-mono transition-all flex items-center gap-2 shrink-0 ${
-                  isActive
-                    ? 'bg-sky-500/20 text-sky-300 font-bold border border-sky-400/40 shadow-sm'
-                    : 'text-slate-400 hover:text-slate-200 hover:bg-white/5 border border-transparent'
-                }`}
+                className={`px-3 py-1 rounded-md text-xs font-mono transition-all flex items-center gap-2 shrink-0 ${isActive
+                  ? 'bg-sky-500/20 text-sky-300 font-bold border border-sky-400/40 shadow-sm'
+                  : 'text-slate-400 hover:text-slate-200 hover:bg-white/5 border border-transparent'
+                  }`}
                 title={tab.desc}
               >
                 <span>{tab.label}</span>
                 {tab.badge && (
                   <span
-                    className={`text-[9px] px-1.5 py-0.2 rounded font-bold uppercase ${
-                      isActive
-                        ? 'bg-sky-400/30 text-sky-200'
-                        : 'bg-white/10 text-slate-400'
-                    }`}
+                    className={`text-[9px] px-1.5 py-0.2 rounded font-bold uppercase ${isActive
+                      ? 'bg-sky-400/30 text-sky-200'
+                      : 'bg-white/10 text-slate-400'
+                      }`}
                   >
                     {tab.badge}
                   </span>
@@ -87,12 +75,6 @@ export function PortfolioHubApp({
             );
           })}
         </div>
-
-        {/* Status indicator on top right */}
-        <div className="hidden sm:flex items-center gap-2 font-mono text-[10px] text-slate-400">
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-          <span>DEV HUB ONLINE</span>
-        </div>
       </div>
 
       {/* Main Tab Content */}
@@ -100,17 +82,7 @@ export function PortfolioHubApp({
         {activeTab === 'about' && (
           <AboutMeTerminalApp
             onNotify={onNotify}
-            onOpenApp={(appId) => {
-              if (appId === 'app-gitkraken') {
-                setActiveTab('gitkraken');
-              } else if (appId === 'app-services') {
-                setActiveTab('services');
-              } else if (appId === 'app-odoo') {
-                setActiveTab('odoo');
-              } else if (onOpenApp) {
-                onOpenApp(appId);
-              }
-            }}
+            onOpenApp={onOpenApp}
           />
         )}
 
@@ -118,10 +90,8 @@ export function PortfolioHubApp({
           <ServicesApp
             onNotify={onNotify}
             onOpenApp={(appId) => {
-              if (appId === 'app-gitkraken') {
-                setActiveTab('gitkraken');
-              } else if (appId === 'app-odoo') {
-                setActiveTab('odoo');
+              if (appId === 'app-git') {
+                setActiveTab('git');
               } else if (onOpenApp) {
                 onOpenApp(appId);
               }
@@ -129,9 +99,7 @@ export function PortfolioHubApp({
           />
         )}
 
-        {activeTab === 'gitkraken' && <GitKrakenApp />}
-
-        {activeTab === 'odoo' && <OdooSandboxApp onNotify={onNotify} />}
+        {activeTab === 'git' && <GitKrakenApp />}
       </div>
     </div>
   );

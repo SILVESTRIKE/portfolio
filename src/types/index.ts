@@ -3,22 +3,22 @@ Reason for existence: Central TypeScript interfaces and data contracts for WebOS
 System impact if absent: Type safety is compromised and type errors occur across all WebOS components.
 */
 
-export type AppId = 
-  | 'app-terminal' 
+export type AppId =
+  | 'app-terminal'
   | 'hub-portfolio'
   | 'hub-system'
   | 'hub-workspace'
-  | 'app-monitor' 
-  | 'app-services' 
-  | 'app-files' 
-  | 'app-logs' 
-  | 'app-network' 
-  | 'app-settings'
+  | 'app-monitor'
+  | 'app-services'
+  | 'app-files'
+  | 'app-logs'
+  | 'app-network'
   | 'app-ai'
-  | 'app-odoo'
   | 'app-spotify'
-  | 'app-gitkraken'
-  | 'app-about';
+  | 'app-git'
+  | 'app-about'
+  | 'app-contact'
+  | 'app-admin';
 
 export type WorkspaceId = 1 | 2 | 3 | 4;
 
@@ -111,6 +111,11 @@ export interface SystemSnapshot {
   processes: ProcessItem[];
   hostname?: string;
   cpuModel?: string;
+  physicalCores?: number;
+  threadCount?: number;
+  gpuModel?: string;
+  hostModel?: string;
+  osName?: string;
   kernel?: string;
   platform?: string;
   arch?: string;
@@ -183,11 +188,23 @@ export interface GitFileDiff {
   diff: string;
 }
 
+export interface GitRepoItem {
+  name: string;
+  fullName: string;
+  description: string;
+  language: string;
+  stars?: number;
+  forks?: number;
+  updatedAt?: string;
+  isLocal?: boolean;
+}
+
 export interface GitRepoData {
   repoName: string;
   currentBranch: string;
   branches: GitBranchInfo[];
   commits: GitCommitNode[];
   totalCommits: number;
+  isReadOnly?: boolean;
 }
 

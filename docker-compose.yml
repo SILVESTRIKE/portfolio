@@ -1,0 +1,29 @@
+# =============================================================================
+# Reason for existence: Local dev/staging deployment of SILVESTRIKE Portfolio OS.
+# System Impact of Absence: Cannot spin up the full stack locally with one command.
+# =============================================================================
+
+services:
+  portfolio:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runner
+    image: silvestrike/portfolio:latest
+    container_name: silvestrike-portfolio
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      # GEMINI_KEY is loaded from .env file — never hardcoded here
+      GEMINI_KEY: ${GEMINI_KEY}
+    env_file:
+      - .env
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
