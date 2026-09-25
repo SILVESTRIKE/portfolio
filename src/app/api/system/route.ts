@@ -167,7 +167,7 @@ function getCpuTopology(): { physicalCores: number; threadCount: number } {
 
 function getHostHardwareInfo(): { hostModel: string; gpuModel: string; osName: string } {
   return {
-    hostModel: 'Van Trong Duong — B.Eng in IT, HCMUTE',
+    hostModel: 'VAN TRONG DUONG',
     gpuModel: 'WebOS Accelerated GPU Engine',
     osName: 'Caelestia Hyprland Linux x86_64 [SILVESTRIKE WebOS]'
   };

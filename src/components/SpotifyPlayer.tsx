@@ -114,7 +114,7 @@ export function SpotifyPlayer({ mode = 'panel', onOpenFullPlayer, onClose }: Spo
       <div
         onClick={onOpenFullPlayer}
         className="flex items-center gap-1.5 sm:gap-2 bg-[#1db954]/10 hover:bg-[#1db954]/15 border border-[#1db954]/30 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded text-xs font-mono select-none sm:max-w-[200px] md:max-w-[240px] shrink-0 cursor-pointer transition-colors"
-        title="Click to toggle Spotify Music Deck"
+        title="Click to open NCT Music Player"
       >
 
         <div className="hidden sm:flex items-end gap-0.5 h-3 shrink-0">
@@ -157,7 +157,7 @@ export function SpotifyPlayer({ mode = 'panel', onOpenFullPlayer, onClose }: Spo
           <div className="flex items-center gap-1.5">
             <span className="w-2 h-2 rounded-full bg-[#1db954] animate-ping" />
             <span className="text-[#1db954] font-mono font-bold text-[10px] tracking-wider uppercase">
-              {track?.isPlaying ? 'LIVE STREAMING' : 'AUDIO DECK'}
+              {track?.isPlaying ? 'LIVE STREAMING' : 'NCT MUSIC'}
             </span>
           </div>
 
@@ -259,7 +259,7 @@ export function SpotifyPlayer({ mode = 'panel', onOpenFullPlayer, onClose }: Spo
             rel="noreferrer"
             className="text-center bg-white/5 hover:bg-white/10 border border-white/10 text-slate-400 hover:text-slate-200 py-1 px-2 rounded-lg font-mono text-[10px] transition-colors truncate relative z-10"
           >
-            View Track on Spotify / Last.fm
+            View on NCT Music
           </a>
         )}
       </div>
@@ -308,7 +308,7 @@ export function SpotifyPlayer({ mode = 'panel', onOpenFullPlayer, onClose }: Spo
               LIVE AUDIO FEED
             </span>
             <span className="text-slate-400 font-mono text-[10px]">
-              Spotify & Last.fm Telemetry Hub
+            NCT Music / Last.fm
             </span>
           </div>
 
@@ -370,7 +370,7 @@ export function SpotifyPlayer({ mode = 'panel', onOpenFullPlayer, onClose }: Spo
               rel="noreferrer"
               className="w-full text-center bg-white/5 hover:bg-white/10 border border-white/10 text-slate-200 py-2 px-3 rounded-xl font-mono text-[11px] transition-colors truncate"
             >
-              Open Track Page
+              Open on NCT Music
             </a>
           )}
 

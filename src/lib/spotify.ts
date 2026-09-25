@@ -181,7 +181,7 @@ async function fetchFromLastFm(): Promise<SpotifyTrackInfo | null> {
     const isNowPlaying = current['@attr']?.nowplaying === 'true';
     const artistName = typeof current.artist === 'object' ? current.artist['#text'] : current.artist;
     const albumName = typeof current.album === 'object' ? current.album['#text'] : current.album;
-    
+
     let artUrl = '';
     if (Array.isArray(current.image) && current.image.length > 0) {
       const extraLarge = current.image.find(img => img.size === 'extralarge');
