@@ -8,12 +8,14 @@ System impact if absent: Server File Explorer application cannot browse director
 import React, { useState, useEffect } from 'react';
 import { vfs } from '@/lib/fs';
 import { FileNode } from '@/types';
+import { useI18n } from '@/lib/i18n';
 
 interface FilesAppProps {
   onNotify?: (msg: string, type?: 'info' | 'warn' | 'error') => void;
 }
 
 export function FilesApp({ onNotify }: FilesAppProps) {
+  const { t } = useI18n();
   const [currentPath, setCurrentPath] = useState('/home/doru');
   const [items, setItems] = useState<FileNode[]>([]);
   const [editingFile, setEditingFile] = useState<{ path: string; content: string } | null>(null);
@@ -46,27 +48,27 @@ export function FilesApp({ onNotify }: FilesAppProps) {
   const handleSaveEditor = () => {
     if (!editingFile) return;
     vfs.writeFile(editingFile.path, editingFile.content, 'root', '644');
-    if (onNotify) onNotify(`Saved changes to ${editingFile.path}`, 'info');
+    if (onNotify) onNotify(`${t.apps.files.savedToast} ${editingFile.path}`, 'info');
     loadDir(currentPath);
     setEditingFile(null);
   };
 
   const handleCreateFile = () => {
-    const name = window.prompt('Enter new file name:');
+    const name = window.prompt(t.apps.files.newFilePrompt);
     if (name) {
       const p = vfs.resolvePath(currentPath, name);
       vfs.writeFile(p, '# Created on ' + new Date().toISOString() + '\n', 'root', '644');
-      if (onNotify) onNotify(`Created file ${name}`, 'info');
+      if (onNotify) onNotify(`${t.apps.files.createdFileToast} ${name}`, 'info');
       loadDir(currentPath);
     }
   };
 
   const handleCreateDir = () => {
-    const name = window.prompt('Enter new directory name:');
+    const name = window.prompt(t.apps.files.newFolderPrompt);
     if (name) {
       const p = vfs.resolvePath(currentPath, name);
       vfs.createDir(p, 'root', 'root');
-      if (onNotify) onNotify(`Created directory ${name}`, 'info');
+      if (onNotify) onNotify(`${t.apps.files.createdDirToast} ${name}`, 'info');
       loadDir(currentPath);
     }
   };
@@ -76,7 +78,7 @@ export function FilesApp({ onNotify }: FilesAppProps) {
     if (window.confirm(`Are you sure you want to delete '${name}'?`)) {
       const p = vfs.resolvePath(currentPath, name);
       vfs.deleteNode(p);
-      if (onNotify) onNotify(`Deleted ${name}`, 'warn');
+      if (onNotify) onNotify(`${t.apps.files.deletedToast} ${name}`, 'warn');
       loadDir(currentPath);
     }
   };
@@ -101,13 +103,13 @@ export function FilesApp({ onNotify }: FilesAppProps) {
           }}
           className="bg-white/5 border border-white/10 hover:bg-white/10 text-slate-300 px-2.5 py-1 rounded font-mono text-[11px] shrink-0"
         >
-          .. (Up)
+          {t.apps.files.upBtn}
         </button>
         <button
           onClick={() => loadDir('/home/doru')}
           className="bg-white/5 border border-white/10 hover:bg-white/10 text-slate-300 px-2.5 py-1 rounded font-mono text-[11px] shrink-0"
         >
-          Home
+          {t.apps.files.homeBtn}
         </button>
         <div className="flex-1 min-w-[120px] bg-white/5 border border-white/10 rounded px-2.5 py-1 font-mono text-sky-400 truncate">
           {currentPath}
@@ -116,19 +118,19 @@ export function FilesApp({ onNotify }: FilesAppProps) {
           onClick={handleCreateFile}
           className="bg-white/5 border border-white/10 hover:bg-white/10 text-slate-300 px-2.5 py-1 rounded font-mono text-[11px] shrink-0"
         >
-          + File
+          {t.apps.files.newFileBtn}
         </button>
         <button
           onClick={handleCreateDir}
           className="bg-white/5 border border-white/10 hover:bg-white/10 text-slate-300 px-2.5 py-1 rounded font-mono text-[11px] shrink-0"
         >
-          + Folder
+          {t.apps.files.newFolderBtn}
         </button>
         <button
           onClick={() => loadDir(currentPath)}
           className="bg-white/5 border border-white/10 hover:bg-white/10 text-slate-300 px-2.5 py-1 rounded font-mono text-[11px] shrink-0"
         >
-          Refresh
+          {t.apps.files.refreshBtn}
         </button>
       </div>
 
@@ -137,7 +139,7 @@ export function FilesApp({ onNotify }: FilesAppProps) {
         {/* Sidebar */}
         <aside className="w-36 sm:w-44 border-r border-white/10 p-2 flex flex-col gap-1 bg-black/20 shrink-0 hidden sm:flex">
           <div className="text-[10px] font-mono text-slate-500 uppercase px-2 py-1 font-bold">
-            Places
+            {t.apps.files.placesLabel}
           </div>
           {shortcuts.map((sc) => (
             <button
@@ -159,18 +161,18 @@ export function FilesApp({ onNotify }: FilesAppProps) {
           <table className="w-full text-left font-mono text-[11px] border-collapse">
             <thead className="sticky top-0 bg-obsidian-900 border-b border-white/10 text-slate-400">
               <tr>
-                <th className="py-2 px-3 w-2/5">Name</th>
-                <th className="py-2 px-3 w-1/5">Permissions</th>
-                <th className="py-2 px-3 w-1/6">Owner</th>
-                <th className="py-2 px-3 w-1/8">Size</th>
-                <th className="py-2 px-3">Actions</th>
+                <th className="py-2 px-3 w-2/5">{t.apps.files.colName}</th>
+                <th className="py-2 px-3 w-1/5">{t.apps.files.colPermissions}</th>
+                <th className="py-2 px-3 w-1/6">{t.apps.files.colOwner}</th>
+                <th className="py-2 px-3 w-1/8">{t.apps.files.colSize}</th>
+                <th className="py-2 px-3">{t.apps.files.colActions}</th>
               </tr>
             </thead>
             <tbody>
               {items.length === 0 ? (
                 <tr>
                   <td colSpan={5} className="text-center py-8 text-slate-500">
-                    Directory is empty
+                    {t.apps.files.emptyDir}
                   </td>
                 </tr>
               ) : (
