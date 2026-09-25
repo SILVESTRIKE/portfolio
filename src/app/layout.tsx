@@ -20,8 +20,17 @@ const outfit = Outfit({
 });
 
 export const metadata: Metadata = {
-  title: 'Linux Server WebOS (srv-doru)',
-  description: 'Interactive browser-based Linux Server WebOS featuring bash terminal, htop activity monitor, systemd service manager, and live syslog stream.',
+  title: 'SILVESTRIKE Portfolio OS',
+  description: 'Interactive browser-based developer portfolio and Linux workstation for Van Trong Duong (SILVESTRIKE) featuring live telemetry, bash terminal, services catalog, and AI assistant.',
+  metadataBase: new URL('https://silvestrike.dev'),
+  openGraph: {
+    title: 'SILVESTRIKE Portfolio OS',
+    description: 'Interactive browser-based developer portfolio and Linux workstation for Van Trong Duong (SILVESTRIKE)',
+    url: 'https://silvestrike.dev',
+    siteName: 'SILVESTRIKE Portfolio OS',
+    locale: 'en_US',
+    type: 'website',
+  },
 };
 
 import { I18nProvider } from '@/lib/i18n';

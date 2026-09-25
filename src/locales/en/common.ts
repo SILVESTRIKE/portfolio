@@ -21,5 +21,7 @@ export const enCommon = {
   navigate: 'Navigate',
   language: 'Language',
   english: 'English',
-  vietnamese: 'Tieng Viet'
+  vietnamese: 'Tieng Viet',
+  ownerName: 'Van Trong Duong',
+  ownerAlias: 'SILVESTRIKE'
 };

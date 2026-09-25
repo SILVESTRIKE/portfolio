@@ -158,7 +158,7 @@ export function AboutMeTerminalApp({ onNotify, onOpenApp }: AboutMeTerminalAppPr
         {(activeSection === 'all' || activeSection === 'bio') && (
           <div className="space-y-3">
             <div className="flex items-center gap-2 text-emerald-400 font-bold border-b border-emerald-500/20 pb-1">
-              <span>root@srv-doru:~/about#</span>
+              <span>duong@silvestrike:~/about$</span>
               <span>whoami --verbose</span>
             </div>
 
@@ -185,7 +185,7 @@ objective: Solutions Architect & Production AI Systems`}
         {(activeSection === 'all' || activeSection === 'skills') && (
           <div className="space-y-3">
             <div className="flex items-center gap-2 text-emerald-400 font-bold border-b border-emerald-500/20 pb-1">
-              <span>root@srv-doru:~/about#</span>
+              <span>duong@silvestrike:~/about$</span>
               <span>cat /etc/profile.d/tech-stack.yml</span>
             </div>
 
@@ -277,7 +277,7 @@ objective: Solutions Architect & Production AI Systems`}
         {(activeSection === 'all' || activeSection === 'projects') && (
           <div className="space-y-3">
             <div className="flex items-center gap-2 text-emerald-400 font-bold border-b border-emerald-500/20 pb-1">
-              <span>root@srv-doru:~/about#</span>
+              <span>duong@silvestrike:~/about$</span>
               <span>ls -la --sort=time ~/projects/</span>
             </div>
 
@@ -410,7 +410,7 @@ objective: Solutions Architect & Production AI Systems`}
         {(activeSection === 'all' || activeSection === 'thesis') && (
           <div className="space-y-3">
             <div className="flex items-center gap-2 text-emerald-400 font-bold border-b border-emerald-500/20 pb-1">
-              <span>root@srv-doru:~/about#</span>
+              <span>duong@silvestrike:~/about$</span>
               <span>cat /opt/research/thesis.md</span>
             </div>
 
@@ -450,7 +450,7 @@ objective: Solutions Architect & Production AI Systems`}
         {(activeSection === 'all' || activeSection === 'contact') && (
           <div className="space-y-3">
             <div className="flex items-center gap-2 text-emerald-400 font-bold border-b border-emerald-500/20 pb-1">
-              <span>root@srv-doru:~/about#</span>
+              <span>duong@silvestrike:~/about$</span>
               <span>cat /etc/motd.contact</span>
             </div>
 
@@ -522,7 +522,7 @@ objective: Solutions Architect & Production AI Systems`}
         {activeSection === 'man' && (
           <div className="space-y-3 font-mono text-[11px] leading-relaxed">
             <div className="flex items-center gap-2 text-emerald-400 font-bold border-b border-emerald-500/20 pb-1">
-              <span>root@srv-doru:~/about#</span>
+              <span>duong@silvestrike:~/about$</span>
               <span>man 1 silvestrike</span>
             </div>
 

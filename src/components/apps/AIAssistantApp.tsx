@@ -13,7 +13,7 @@ export function AIAssistantApp() {
     {
       id: 'init',
       sender: 'assistant',
-      content: 'Chào bạn! Tôi là Doru AI Native Assistant trên WebOS. Tôi có thể hỗ trợ giải đáp về các dự án trong portfolio của SILVESTRIKE, lệnh Linux server, hoặc phân tích trạng thái hệ thống.',
+      content: 'Chào bạn! Tôi là Doru AI Native Assistant trên SILVESTRIKE Portfolio OS. Tôi có thể hỗ trợ giải đáp về các dự án trong portfolio của SILVESTRIKE, lệnh Linux server, hoặc phân tích trạng thái hệ thống.',
       timestamp: '16:00'
     }
   ]);
@@ -30,7 +30,7 @@ export function AIAssistantApp() {
   const quickPrompts = [
     'Doru AI hoạt động thế nào?',
     'Dự án DogDexx có gì đặc biệt?',
-    'Tình trạng server srv-doru hiện tại?',
+    'Tình trạng server silvestrike.dev hiện tại?',
     'Odoo Sandbox quản lý những gì?'
   ];
 

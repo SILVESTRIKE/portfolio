@@ -55,7 +55,7 @@ export function TopPanel({
   const load1 = metrics?.loadAvg?.[0] !== undefined ? metrics.loadAvg[0].toFixed(2) : (0.2 + totalCpu / 80).toFixed(2);
   const load2 = metrics?.loadAvg?.[1] !== undefined ? metrics.loadAvg[1].toFixed(2) : (0.3 + totalCpu / 100).toFixed(2);
   const load3 = metrics?.loadAvg?.[2] !== undefined ? metrics.loadAvg[2].toFixed(2) : '0.25';
-  const hostname = metrics?.hostname || 'srv-doru.internal';
+  const hostname = 'silvestrike.dev';
 
   const workspaces: Array<{ id: WorkspaceId; label: string }> = [
     { id: 1, label: '1:term' },
@@ -163,10 +163,10 @@ export function TopPanel({
         </button>
 
         <div className="flex items-center gap-1.5">
-          <span className="bg-rose-500/20 text-rose-400 border border-rose-500/30 px-1.5 py-0.5 rounded text-[10px] font-bold uppercase">
-            root
+          <span className="bg-sky-500/20 text-sky-400 border border-sky-500/30 px-1.5 py-0.5 rounded text-[10px] font-bold uppercase">
+            duong
           </span>
-          <span className="text-slate-300 hidden sm:inline">root@{hostname.split('.')[0]}</span>
+          <span className="text-slate-300 hidden sm:inline">duong@{hostname.split('.')[0]}</span>
         </div>
 
         <div className="flex items-center gap-1.5 bg-white/5 px-2 py-0.5 rounded border border-white/10 text-slate-200 font-semibold">

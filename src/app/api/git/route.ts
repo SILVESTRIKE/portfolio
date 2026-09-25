@@ -11,8 +11,8 @@ import { GitBranchInfo, GitCommitNode, GitFileDiff, GitRepoData } from '@/types'
 
 const execFileAsync = promisify(execFile);
 
-// Target repository root (Doru_AI workspace or current working directory)
-const REPO_ROOT = path.resolve(process.cwd(), '..');
+// Target repository root (SILVESTRIKE/portfolio workspace)
+const REPO_ROOT = process.cwd();
 
 interface GitHubCommitResponse {
   sha: string;
@@ -36,8 +36,8 @@ async function runGit(args: string[]): Promise<string> {
 async function fetchFromGitHub(hash?: string): Promise<{ commits?: GitCommitNode[]; diffs?: GitFileDiff[] } | null> {
   try {
     if (hash) {
-      const res = await fetch(`https://api.github.com/repos/SILVESTRIKE/Doru_AI/commits/${hash}`, {
-        headers: { 'User-Agent': 'WebOS-GitKraken' },
+      const res = await fetch(`https://api.github.com/repos/SILVESTRIKE/portfolio/commits/${hash}`, {
+        headers: { 'User-Agent': 'SILVESTRIKE-Portfolio-GitKraken' },
         cache: 'no-store'
       });
       if (!res.ok) return null;
@@ -50,8 +50,8 @@ async function fetchFromGitHub(hash?: string): Promise<{ commits?: GitCommitNode
       return { diffs };
     }
 
-    const res = await fetch('https://api.github.com/repos/SILVESTRIKE/Doru_AI/commits?per_page=30', {
-      headers: { 'User-Agent': 'WebOS-GitKraken' },
+    const res = await fetch('https://api.github.com/repos/SILVESTRIKE/portfolio/commits?per_page=30', {
+      headers: { 'User-Agent': 'SILVESTRIKE-Portfolio-GitKraken' },
       cache: 'no-store'
     });
     if (!res.ok) return null;
@@ -186,7 +186,7 @@ export async function GET(request: NextRequest) {
       });
 
     const repoData: GitRepoData = {
-      repoName: 'SILVESTRIKE/Doru_AI',
+      repoName: 'SILVESTRIKE/portfolio',
       currentBranch: currentBranch || 'main',
       branches: branches.length > 0 ? branches : [{ name: 'main', isCurrent: true, isRemote: false, commitHash: '' }],
       commits,
@@ -203,7 +203,7 @@ export async function GET(request: NextRequest) {
     const ghData = await fetchFromGitHub();
     if (ghData?.commits) {
       return NextResponse.json({
-        repoName: 'SILVESTRIKE/Doru_AI (GitHub Cloud)',
+        repoName: 'SILVESTRIKE/portfolio (GitHub Cloud)',
         currentBranch: 'main',
         branches: [{ name: 'main', isCurrent: true, isRemote: false, commitHash: '' }],
         commits: ghData.commits,

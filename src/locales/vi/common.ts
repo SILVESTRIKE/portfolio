@@ -21,5 +21,7 @@ export const viCommon = {
   navigate: 'Điều hướng',
   language: 'Ngôn ngữ',
   english: 'English',
-  vietnamese: 'Tiếng Việt'
+  vietnamese: 'Tiếng Việt',
+  ownerName: 'Văn Trọng Dương',
+  ownerAlias: 'SILVESTRIKE'
 };

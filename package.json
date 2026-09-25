@@ -1,6 +1,8 @@
 {
-  "name": "webos",
+  "name": "portfolio",
   "version": "0.1.0",
+  "description": "SILVESTRIKE Portfolio OS - Interactive browser-based developer portfolio and Linux workstation",
+  "author": "Van Trong Duong (SILVESTRIKE)",
   "private": true,
   "scripts": {
     "dev": "next dev",

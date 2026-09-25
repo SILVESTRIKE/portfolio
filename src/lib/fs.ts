@@ -121,21 +121,23 @@ SwapFree:        4194304 kB
 
     this.writeFile('/home/doru/welcome.txt',
 `============================================================
-Welcome to Linux Server WebOS (srv-doru)
+Welcome to SILVESTRIKE Portfolio OS (silvestrike.dev)
 Environment: Next.js 15 + Tailwind CSS v4 + TypeScript
-Default User: root / doru
+Default User: duong / root
 ============================================================
 
 Quick Commands:
   help          - List all available terminal commands
   neofetch      - Display server hardware and OS specifications
   htop          - Launch or inspect active CPU and RAM processes
+  portfolio     - View featured projects and services
+  whoami        - Display developer biography and dossiers
   systemctl     - Inspect and manage server daemons
   journalctl -f - Stream server logs
   df -h         - Check disk filesystem utilization
   free -m       - View physical and swap memory allocation
 
-Enjoy administering your virtual Linux server environment!
+Enjoy exploring the interactive portfolio workstation!
 `, 'doru', '644');
 
     this.writeFile('/home/doru/deploy.sh',
