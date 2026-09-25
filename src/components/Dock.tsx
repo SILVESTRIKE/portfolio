@@ -21,7 +21,7 @@ export function Dock({ windows, activeId, onToggleApp }: DockProps) {
   const dockApps: Array<{ id: AppId; label: string; icon: React.ReactNode }> = [
     {
       id: 'app-terminal',
-      label: t.dock.terminal.split(' ')[0],
+      label: t.dock.terminalShort,
       icon: (
         <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2">
           <polyline points="4 17 10 11 4 5" />
@@ -31,7 +31,7 @@ export function Dock({ windows, activeId, onToggleApp }: DockProps) {
     },
     {
       id: 'hub-portfolio',
-      label: t.dock.devPortfolio.split(' ')[0] + ' & ' + (t.dock.devPortfolio.split(' ')[2] || 'Dev'),
+      label: t.dock.devPortfolioShort,
       icon: (
         <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2">
           <polygon points="12 2 2 7 12 12 22 7 12 2" />
@@ -42,7 +42,7 @@ export function Dock({ windows, activeId, onToggleApp }: DockProps) {
     },
     {
       id: 'hub-system',
-      label: t.dock.serverOps.split(' ')[0] + ' ' + (t.dock.serverOps.split(' ')[1] || 'Ops'),
+      label: t.dock.serverOpsShort,
       icon: (
         <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2">
           <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
@@ -54,7 +54,7 @@ export function Dock({ windows, activeId, onToggleApp }: DockProps) {
     },
     {
       id: 'hub-workspace',
-      label: t.dock.aiWorkbench.split(' ')[0] + ' & ' + (t.dock.aiWorkbench.split(' ')[2] || 'Files'),
+      label: t.dock.aiWorkbenchShort,
       icon: (
         <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2">
           <path d="M12 2a10 10 0 0 1 10 10c0 5.523-4.477 10-10 10a9.96 9.96 0 0 1-4.587-1.11L3 22l1.11-4.413A9.96 9.96 0 0 1 2 12C2 6.477 6.477 2 12 2z" />
@@ -64,7 +64,7 @@ export function Dock({ windows, activeId, onToggleApp }: DockProps) {
     },
     {
       id: 'app-spotify',
-      label: t.dock.spotify.split(' ')[0],
+      label: t.dock.spotifyShort,
       icon: (
         <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2">
           <circle cx="12" cy="12" r="10" />

@@ -8,11 +8,13 @@ import { enPanel } from './panel';
 import { enDock } from './dock';
 import { enCommands } from './commands';
 import { enWorkspace } from './workspace';
+import { enApps } from './apps';
 
 export const enLocale = {
   common: enCommon,
   panel: enPanel,
   dock: enDock,
   commands: enCommands,
-  workspace: enWorkspace
+  workspace: enWorkspace,
+  apps: enApps
 };

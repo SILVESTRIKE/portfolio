@@ -28,9 +28,11 @@ import { ToastContainer, ToastMessage } from '@/components/ToastContainer';
 import { CommandPalette } from '@/components/CommandPalette';
 import { globalAudio } from '@/lib/audioManager';
 import { WebOSPersistence } from '@/lib/persistence';
+import { useI18n } from '@/lib/i18n';
 import { AppId, WorkspaceId, WorkspaceState, TilingLayoutMode, WindowState } from '@/types';
 
 export default function WebOSPage() {
+  const { t } = useI18n();
   const [currentWsId, setCurrentWsId] = useState<WorkspaceId>(1);
   const [activePaneId, setActivePaneId] = useState<AppId | null>('app-terminal');
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
@@ -120,7 +122,7 @@ export default function WebOSPage() {
         layout: nextMode
       }
     }));
-    showToast(`Switched layout to ${nextMode.toUpperCase()}`, 'info');
+    showToast(`${t.apps.toast.switchedLayout} ${nextMode.toUpperCase()}`, 'info');
   };
 
   // Toggle app pane in current workspace (with smart Hub mapping)
@@ -595,7 +597,7 @@ export default function WebOSPage() {
         }}
         onToggleAudio={() => {
           globalAudio.toggle();
-          showToast('Toggled audio stream', 'info');
+          showToast(t.apps.toast.toggledAudio, 'info');
         }}
         currentWorkspace={currentWsId}
         layoutMode={currentWorkspace.layout}

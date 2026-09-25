@@ -24,11 +24,12 @@ const I18nContext = createContext<I18nContextValue>({
 export function I18nProvider({ children }: { children: React.ReactNode }) {
   const [locale, setLocaleState] = useState<LocaleId>('en');
 
-  // Load saved locale from localStorage on mount
   useEffect(() => {
     const saved = WebOSPersistence.loadLocale();
     if (saved && (saved === 'en' || saved === 'vi')) {
       setLocaleState(saved);
+    } else if (typeof navigator !== 'undefined' && navigator.language?.toLowerCase().startsWith('vi')) {
+      setLocaleState('vi');
     }
   }, []);
 

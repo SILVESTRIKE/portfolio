@@ -8,11 +8,13 @@ import { viPanel } from './panel';
 import { viDock } from './dock';
 import { viCommands } from './commands';
 import { viWorkspace } from './workspace';
+import { viApps } from './apps';
 
 export const viLocale = {
   common: viCommon,
   panel: viPanel,
   dock: viDock,
   commands: viCommands,
-  workspace: viWorkspace
+  workspace: viWorkspace,
+  apps: viApps
 };

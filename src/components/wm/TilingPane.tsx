@@ -6,6 +6,7 @@ System impact if absent: Tiling layout will lack window chrome, active focus bor
 'use client';
 
 import React, { useState } from 'react';
+import { useI18n } from '@/lib/i18n';
 
 interface TilingPaneProps {
   paneId?: string;
@@ -30,6 +31,7 @@ export function TilingPane({
   onSwapWith,
   children
 }: TilingPaneProps) {
+  const { t } = useI18n();
   const [isDragging, setIsDragging] = useState(false);
   const [isDragOver, setIsDragOver] = useState(false);
 
@@ -83,7 +85,7 @@ export function TilingPane({
         className={`h-8 px-3 bg-black/50 border-b border-white/10 flex items-center justify-between select-none ${
           !isMaximized ? 'cursor-grab active:cursor-grabbing' : 'cursor-default'
         } ${isDragOver ? 'bg-sky-500/20' : ''}`}
-        title={!isMaximized ? 'Drag header to swap window position' : undefined}
+        title={!isMaximized ? t.apps.pane.swapTooltip : undefined}
       >
         <div className="flex items-center gap-2 font-mono text-xs font-medium min-w-0 pointer-events-none">
           {/* Drag Handle Icon (6 dots) */}
@@ -110,7 +112,7 @@ export function TilingPane({
               onToggleMaximize();
             }}
             className="w-5 h-5 flex items-center justify-center rounded text-slate-400 hover:text-white hover:bg-white/10 text-[10px] font-mono transition-colors cursor-pointer"
-            title={isMaximized ? 'Restore tiling layout' : 'Toggle monocle / full pane'}
+            title={isMaximized ? t.apps.pane.restoreTooltip : t.apps.pane.maximizeTooltip}
             aria-label="Toggle Fullscreen"
           >
             {isMaximized ? '[-]' : '[+]'}
@@ -124,7 +126,7 @@ export function TilingPane({
               onClose();
             }}
             className="w-5 h-5 flex items-center justify-center rounded text-slate-400 hover:text-rose-400 hover:bg-rose-500/20 text-[10px] font-mono transition-colors cursor-pointer"
-            title="Close pane"
+            title={t.apps.pane.closeTooltip}
             aria-label="Close"
           >
             [x]

@@ -43,6 +43,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${jetbrainsMono.variable} ${outfit.variable} h-full dark`}>
       <body className="h-full w-full overflow-hidden font-sans text-slate-100 antialiased flex flex-col bg-obsidian-950">
+        <div className="crt-scanline" />
         <I18nProvider>
           {children}
         </I18nProvider>

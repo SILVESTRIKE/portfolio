@@ -78,3 +78,63 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.25);
 }
+
+/* CRT Scanlines, Vignette & Ambient Effects (I1 - I5) */
+body::before {
+  content: " ";
+  display: block;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0, 0, 0, 0.08) 2px, rgba(0, 0, 0, 0.08) 4px);
+  pointer-events: none;
+  z-index: 9998;
+}
+
+body::after {
+  content: " ";
+  display: block;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background: radial-gradient(ellipse at center, transparent 65%, rgba(0, 0, 0, 0.55) 100%);
+  pointer-events: none;
+  z-index: 9997;
+}
+
+.crt-scanline {
+  position: fixed;
+  left: 0;
+  right: 0;
+  height: 6px;
+  background: linear-gradient(180deg, transparent, rgba(56, 189, 248, 0.09), transparent);
+  pointer-events: none;
+  z-index: 9999;
+  animation: scanline 6s linear infinite;
+}
+
+@keyframes scanline {
+  0% { top: -10px; opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { top: 100vh; opacity: 0; }
+}
+
+body.light::before,
+body.light::after,
+body.light .crt-scanline {
+  display: none;
+}
+
+@media (hover: none) and (pointer: coarse) {
+  body::before,
+  body::after,
+  .crt-scanline {
+    display: none;
+  }
+}
+

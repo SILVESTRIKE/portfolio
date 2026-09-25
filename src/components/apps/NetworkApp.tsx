@@ -6,16 +6,18 @@ System impact if absent: Server network connections, open ports, and latency dia
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
+import { useI18n } from '@/lib/i18n';
 
 interface NetworkAppProps {
   onNotify?: (msg: string, type?: 'info' | 'warn' | 'error') => void;
 }
 
 export function NetworkApp({ onNotify }: NetworkAppProps) {
+  const { t } = useI18n();
   const [ufwActive, setUfwActive] = useState(true);
   const [pingTarget, setPingTarget] = useState('1.1.1.1');
   const [pingRunning, setPingRunning] = useState(false);
-  const [pingLogs, setPingLogs] = useState<string[]>(['Ready to diagnose network connectivity.']);
+  const [pingLogs, setPingLogs] = useState<string[]>([t.apps.network.pingReady]);
   const pingIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
@@ -28,7 +30,7 @@ export function NetworkApp({ onNotify }: NetworkAppProps) {
     const next = !ufwActive;
     setUfwActive(next);
     if (onNotify) {
-      onNotify(`UFW Firewall ${next ? 'Enabled' : 'Disabled'}`, next ? 'info' : 'warn');
+      onNotify(next ? t.apps.network.ufwEnabledToast : t.apps.network.ufwDisabledToast, next ? 'info' : 'warn');
     }
   };
 
@@ -74,7 +76,7 @@ export function NetworkApp({ onNotify }: NetworkAppProps) {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
         <div className="bg-white/[0.03] border border-white/10 rounded-lg p-3">
           <div className="flex justify-between items-center mb-1">
-            <span className="text-slate-400 font-mono text-[11px]">INTERFACE (eth0)</span>
+            <span className="text-slate-400 font-mono text-[11px]">{t.apps.network.interfaceLabel}</span>
             <span className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.5)]" />
           </div>
           <div className="font-mono text-sm font-bold text-white">192.168.1.100/24</div>
@@ -85,22 +87,22 @@ export function NetworkApp({ onNotify }: NetworkAppProps) {
 
         <div className="bg-white/[0.03] border border-white/10 rounded-lg p-3">
           <div className="flex justify-between items-center mb-1">
-            <span className="text-slate-400 font-mono text-[11px]">FIREWALL (UFW)</span>
+            <span className="text-slate-400 font-mono text-[11px]">{t.apps.network.firewallLabel}</span>
             <span className={`w-2 h-2 rounded-full ${ufwActive ? 'bg-emerald-400' : 'bg-amber-400'}`} />
           </div>
           <div className="font-mono text-sm font-bold text-white">
-            Status: {ufwActive ? 'Active' : 'Disabled'}
+            Status: {ufwActive ? t.apps.network.statusActive : t.apps.network.statusDisabled}
           </div>
           <button
             onClick={handleToggleUfw}
             className="mt-2 bg-white/10 hover:bg-white/20 text-slate-200 px-2 py-0.5 rounded font-mono text-[10px] transition-colors"
           >
-            {ufwActive ? 'Disable UFW' : 'Enable UFW'}
+            {ufwActive ? t.apps.network.disableUfw : t.apps.network.enableUfw}
           </button>
         </div>
 
         <div className="bg-white/[0.03] border border-white/10 rounded-lg p-3">
-          <div className="text-slate-400 font-mono text-[11px] mb-1">GATEWAY & NAMESERVERS</div>
+          <div className="text-slate-400 font-mono text-[11px] mb-1">{t.apps.network.gatewayLabel}</div>
           <div className="font-mono text-sm font-bold text-white">192.168.1.1</div>
           <div className="text-[10px] text-slate-500 font-mono mt-1">
             DNS: 1.1.1.1, 8.8.8.8
@@ -111,19 +113,19 @@ export function NetworkApp({ onNotify }: NetworkAppProps) {
       {/* Listening sockets table */}
       <div className="bg-white/[0.02] border border-white/10 rounded-lg p-3 flex flex-col gap-2">
         <div className="flex justify-between items-center font-mono">
-          <span className="font-semibold text-sky-400 text-xs">ACTIVE LISTENING SOCKETS (netstat -tuln)</span>
-          <span className="text-slate-500 text-[11px]">{ports.length} Open Sockets</span>
+          <span className="font-semibold text-sky-400 text-xs">{t.apps.network.socketsTitle}</span>
+          <span className="text-slate-500 text-[11px]">{ports.length} {t.apps.network.openSockets}</span>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-left font-mono text-[11px] border-collapse">
             <thead className="border-b border-white/10 text-slate-400">
               <tr>
-                <th className="py-1 px-2">Proto</th>
-                <th className="py-1 px-2">Local Address</th>
-                <th className="py-1 px-2">Foreign Address</th>
-                <th className="py-1 px-2">State</th>
-                <th className="py-1 px-2">Service</th>
-                <th className="py-1 px-2">PID</th>
+                <th className="py-1 px-2">{t.apps.network.colProto}</th>
+                <th className="py-1 px-2">{t.apps.network.colLocal}</th>
+                <th className="py-1 px-2">{t.apps.network.colForeign}</th>
+                <th className="py-1 px-2">{t.apps.network.colState}</th>
+                <th className="py-1 px-2">{t.apps.network.colService}</th>
+                <th className="py-1 px-2">{t.apps.network.colPid}</th>
               </tr>
             </thead>
             <tbody>
@@ -145,7 +147,7 @@ export function NetworkApp({ onNotify }: NetworkAppProps) {
       {/* Ping tool */}
       <div className="bg-white/[0.02] border border-white/10 rounded-lg p-3 flex flex-col gap-2">
         <div className="font-mono font-semibold text-sky-400 text-xs">
-          NETWORK LATENCY DIAGNOSTICS (ping)
+          {t.apps.network.diagTitle}
         </div>
         <div className="flex items-center gap-2">
           <input
@@ -153,7 +155,7 @@ export function NetworkApp({ onNotify }: NetworkAppProps) {
             value={pingTarget}
             onChange={(e) => setPingTarget(e.target.value)}
             disabled={pingRunning}
-            placeholder="Host or IP (e.g. 1.1.1.1)"
+            placeholder={t.apps.network.pingPlaceholder}
             className="bg-white/5 border border-white/10 rounded px-2.5 py-1 text-xs text-slate-200 outline-none focus:border-sky-400 w-48 font-mono"
           />
           {!pingRunning ? (
@@ -161,14 +163,14 @@ export function NetworkApp({ onNotify }: NetworkAppProps) {
               onClick={handleStartPing}
               className="bg-sky-500/20 text-sky-300 border border-sky-500/30 hover:bg-sky-500 hover:text-black px-3 py-1 rounded font-mono text-xs transition-colors"
             >
-              Start Ping
+              {t.apps.network.startPing}
             </button>
           ) : (
             <button
               onClick={handleStopPing}
               className="bg-rose-500/20 text-rose-300 border border-rose-500/30 hover:bg-rose-500 hover:text-white px-3 py-1 rounded font-mono text-xs transition-colors"
             >
-              Stop Ping
+              {t.apps.network.stopPing}
             </button>
           )}
         </div>

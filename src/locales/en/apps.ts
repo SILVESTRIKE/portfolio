@@ -127,9 +127,9 @@ export const enApps = {
     sendBtn: 'Send',
     quickPrompt1: 'How does Doru AI work?',
     quickPrompt2: 'What is special about DogDexx?',
-    quickPrompt3: 'Current status of srv-doru server?',
+    quickPrompt3: 'Current status of silvestrike.dev server?',
     quickPrompt4: 'What does Odoo Sandbox manage?',
-    initMsg: 'Hello! I am Doru AI Native Assistant on WebOS. I can help answer questions about SILVESTRIKE portfolio projects, Linux server commands, or system status analysis.'
+    initMsg: 'Hello! I am Doru AI Native Assistant on SILVESTRIKE Portfolio OS. I can help answer questions about SILVESTRIKE portfolio projects, Linux server commands, or system status analysis.'
   },
 
   // TilingPane / WM

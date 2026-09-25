@@ -8,12 +8,14 @@ System impact if absent: System telemetry and journal logs cannot be viewed or i
 import React, { useState, useEffect, useRef } from 'react';
 import { logManager } from '@/lib/logs';
 import { LogItem } from '@/types';
+import { useI18n } from '@/lib/i18n';
 
 interface LogsAppProps {
   onNotify?: (msg: string, type?: 'info' | 'warn' | 'error') => void;
 }
 
 export function LogsApp({ onNotify }: LogsAppProps) {
+  const { t } = useI18n();
   const [logs, setLogs] = useState<LogItem[]>([]);
   const [search, setSearch] = useState('');
   const [level, setLevel] = useState('ALL');
@@ -38,7 +40,7 @@ export function LogsApp({ onNotify }: LogsAppProps) {
     const paused = logManager.togglePause();
     setIsPaused(paused);
     if (onNotify) {
-      onNotify(paused ? 'Log stream paused' : 'Log stream resumed', 'info');
+      onNotify(paused ? t.apps.logs.pauseToast : t.apps.logs.resumeToast, 'info');
     }
   };
 
@@ -62,7 +64,7 @@ export function LogsApp({ onNotify }: LogsAppProps) {
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Filter message or service..."
+            placeholder={t.apps.logs.filterPlaceholder}
             className="bg-white/5 border border-white/10 rounded px-2.5 py-1 text-xs text-slate-200 outline-none focus:border-sky-400 w-52"
           />
           <select
@@ -70,10 +72,10 @@ export function LogsApp({ onNotify }: LogsAppProps) {
             onChange={(e) => setLevel(e.target.value)}
             className="bg-white/5 border border-white/10 rounded px-2 py-1 text-xs text-slate-200 outline-none focus:border-sky-400 cursor-pointer"
           >
-            <option value="ALL">ALL LEVELS</option>
-            <option value="INFO">INFO</option>
-            <option value="WARN">WARN</option>
-            <option value="ERROR">ERROR</option>
+            <option value="ALL">{t.apps.logs.levelAll}</option>
+            <option value="INFO">{t.apps.logs.levelInfo}</option>
+            <option value="WARN">{t.apps.logs.levelWarn}</option>
+            <option value="ERROR">{t.apps.logs.levelError}</option>
           </select>
         </div>
 
@@ -86,13 +88,13 @@ export function LogsApp({ onNotify }: LogsAppProps) {
                 : 'bg-white/5 text-slate-300 hover:bg-white/10 border border-white/10'
             }`}
           >
-            {isPaused ? 'Resume Stream' : 'Pause Stream'}
+            {isPaused ? t.apps.logs.resumeBtn : t.apps.logs.pauseBtn}
           </button>
           <button
             onClick={handleClear}
             className="bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10 px-3 py-1 rounded text-xs transition-colors"
           >
-            Clear
+            {t.apps.logs.clearBtn}
           </button>
         </div>
       </div>
@@ -101,7 +103,7 @@ export function LogsApp({ onNotify }: LogsAppProps) {
       <div ref={streamRef} className="flex-1 overflow-y-auto p-3 flex flex-col gap-1 leading-relaxed">
         {filteredLogs.length === 0 ? (
           <div className="text-slate-500 text-center py-8 font-sans">
-            No logs matching filter criteria.
+            {t.apps.logs.emptyMsg}
           </div>
         ) : (
           filteredLogs.map((l) => {

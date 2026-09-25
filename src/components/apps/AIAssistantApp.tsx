@@ -7,19 +7,31 @@ System impact if absent: WebOS lacks an interactive native AI assistant for sysa
 
 import React, { useState, useRef, useEffect } from 'react';
 import { AIChatMessage } from '@/types';
+import { useI18n } from '@/lib/i18n';
 
 export function AIAssistantApp() {
+  const { t, locale } = useI18n();
   const [messages, setMessages] = useState<AIChatMessage[]>([
     {
       id: 'init',
       sender: 'assistant',
-      content: 'Chào bạn! Tôi là Doru AI Native Assistant trên SILVESTRIKE Portfolio OS. Tôi có thể hỗ trợ giải đáp về các dự án trong portfolio của SILVESTRIKE, lệnh Linux server, hoặc phân tích trạng thái hệ thống.',
+      content: t.apps.ai.initMsg,
       timestamp: '16:00'
     }
   ]);
   const [input, setInput] = useState('');
   const [isThinking, setIsThinking] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  // Update initial message when locale toggles
+  useEffect(() => {
+    setMessages(prev => {
+      if (prev.length === 1 && prev[0].id === 'init') {
+        return [{ ...prev[0], content: t.apps.ai.initMsg }];
+      }
+      return prev;
+    });
+  }, [t.apps.ai.initMsg]);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -28,10 +40,10 @@ export function AIAssistantApp() {
   }, [messages, isThinking]);
 
   const quickPrompts = [
-    'Doru AI hoạt động thế nào?',
-    'Dự án DogDexx có gì đặc biệt?',
-    'Tình trạng server silvestrike.dev hiện tại?',
-    'Odoo Sandbox quản lý những gì?'
+    t.apps.ai.quickPrompt1,
+    t.apps.ai.quickPrompt2,
+    t.apps.ai.quickPrompt3,
+    t.apps.ai.quickPrompt4
   ];
 
   const handleSend = (textToSend?: string) => {
@@ -117,11 +129,11 @@ export function AIAssistantApp() {
       <div className="h-9 px-3 bg-black/50 border-b border-white/10 flex items-center justify-between select-none">
         <div className="flex items-center gap-2 font-mono text-xs">
           <span className="w-2 h-2 rounded-full bg-sky-400 shadow-[0_0_8px_rgba(56,189,248,0.6)]" />
-          <span className="font-bold text-slate-100">Doru AI Native Engine</span>
+          <span className="font-bold text-slate-100">{t.apps.ai.headerTitle}</span>
           <span className="text-[10px] text-slate-500 font-normal">v2.4-fast</span>
         </div>
         <div className="font-mono text-[10px] text-slate-400">
-          Backend: Local Hybrid LPU
+          {t.apps.ai.backendLabel}
         </div>
       </div>
 
@@ -135,7 +147,7 @@ export function AIAssistantApp() {
               className={`flex flex-col max-w-[85%] ${isUser ? 'ml-auto items-end' : 'mr-auto items-start'}`}
             >
               <div className="flex items-center gap-1.5 text-[10px] font-mono text-slate-500 mb-1">
-                <span>{isUser ? 'user@srv-doru' : 'doru-ai'}</span>
+                <span>{isUser ? 'user@silvestrike.dev' : 'doru-ai'}</span>
                 <span>•</span>
                 <span>{m.timestamp}</span>
               </div>
@@ -155,7 +167,7 @@ export function AIAssistantApp() {
         {isThinking && (
           <div className="mr-auto flex items-center gap-2 text-slate-400 font-mono text-[11px] bg-white/[0.02] p-2 rounded border border-white/5">
             <span className="w-1.5 h-1.5 rounded-full bg-sky-400 animate-ping" />
-            <span>Doru AI is generating response...</span>
+            <span>{t.apps.ai.thinkingMsg}</span>
           </div>
         )}
       </div>
@@ -180,14 +192,14 @@ export function AIAssistantApp() {
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-          placeholder="Ask Doru AI about server, projects, or Linux commands..."
+          placeholder={t.apps.ai.inputPlaceholder}
           className="flex-1 bg-white/5 border border-white/10 rounded px-3 py-1.5 text-xs text-slate-100 outline-none focus:border-sky-400"
         />
         <button
           onClick={() => handleSend()}
           className="bg-sky-500 hover:bg-sky-400 text-black font-semibold font-mono text-xs px-3.5 py-1.5 rounded transition-colors"
         >
-          Send
+          {t.apps.ai.sendBtn}
         </button>
       </div>
     </div>

@@ -8,12 +8,14 @@ System impact if absent: System Activity Monitor (htop) cannot render or manage 
 import React, { useState, useEffect, useRef } from 'react';
 import { monitor } from '@/lib/monitor';
 import { SystemSnapshot } from '@/types';
+import { useI18n } from '@/lib/i18n';
 
 interface MonitorAppProps {
   onNotify?: (msg: string, type?: 'info' | 'warn' | 'error') => void;
 }
 
 export function MonitorApp({ onNotify }: MonitorAppProps) {
+  const { t } = useI18n();
   const [snapshot, setSnapshot] = useState<SystemSnapshot | null>(null);
   const [filterQuery, setFilterQuery] = useState('');
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -49,7 +51,7 @@ export function MonitorApp({ onNotify }: MonitorAppProps) {
         {/* CPU overview */}
         <div className="bg-white/[0.03] border border-white/10 rounded-lg p-3">
           <div className="flex justify-between items-center mb-2">
-            <span className="text-slate-400 font-medium">CPU UTILIZATION (8 Cores)</span>
+            <span className="text-slate-400 font-medium">{t.apps.monitor.cpuTitle} (8 Cores)</span>
             <span className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.5)]" />
           </div>
           <div className="text-xl font-bold font-mono text-white mb-2">
@@ -76,7 +78,7 @@ export function MonitorApp({ onNotify }: MonitorAppProps) {
         <div className="bg-white/[0.03] border border-white/10 rounded-lg p-3 flex flex-col justify-between">
           <div>
             <div className="flex justify-between items-center mb-2">
-              <span className="text-slate-400 font-medium">MEMORY ALLOCATION</span>
+              <span className="text-slate-400 font-medium">{t.apps.monitor.memoryTitle}</span>
               <span className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.5)]" />
             </div>
             <div className="text-xl font-bold font-mono text-white mb-2">
@@ -90,7 +92,7 @@ export function MonitorApp({ onNotify }: MonitorAppProps) {
             </div>
           </div>
           <div className="text-[11px] text-slate-400 font-mono mt-3">
-            Swap Allocation: {snapshot?.swapUsed ?? 128} MB / {snapshot?.swapTotal ?? 4096} MB (3%)
+            {t.apps.monitor.swapLabel}: {snapshot?.swapUsed ?? 128} MB / {snapshot?.swapTotal ?? 4096} MB (3%)
           </div>
         </div>
       </div>
@@ -98,8 +100,8 @@ export function MonitorApp({ onNotify }: MonitorAppProps) {
       {/* Telemetry Chart */}
       <div className="bg-white/[0.02] border border-white/10 rounded-lg p-3 flex flex-col gap-2">
         <div className="flex justify-between items-center text-slate-400">
-          <span className="font-mono font-semibold text-sky-400 text-xs">REAL-TIME LOAD TELEMETRY (CPU & MEMORY)</span>
-          <span className="text-[11px]">Interval: 1.5s</span>
+          <span className="font-mono font-semibold text-sky-400 text-xs">{t.apps.monitor.telemetryTitle}</span>
+          <span className="text-[11px]">{t.apps.monitor.intervalLabel}: 1.5s</span>
         </div>
         <div className="w-full h-24">
           <canvas ref={canvasRef} className="w-full h-full" />
@@ -113,11 +115,11 @@ export function MonitorApp({ onNotify }: MonitorAppProps) {
             type="text"
             value={filterQuery}
             onChange={(e) => setFilterQuery(e.target.value)}
-            placeholder="Filter processes by name, user, or PID..."
+            placeholder={t.apps.monitor.filterPlaceholder}
             className="bg-white/5 border border-white/10 rounded px-2.5 py-1 text-xs text-slate-200 outline-none focus:border-sky-400 w-64"
           />
           <span className="font-mono text-[11px] text-slate-400">
-            Active: {filteredProcesses.length}
+            {t.apps.monitor.activeLabel}: {filteredProcesses.length}
           </span>
         </div>
 
@@ -125,15 +127,15 @@ export function MonitorApp({ onNotify }: MonitorAppProps) {
           <table className="w-full text-left font-mono text-[11px] border-collapse">
             <thead className="sticky top-0 bg-obsidian-900 border-b border-white/10 text-slate-400">
               <tr>
-                <th className="py-1.5 px-2">PID</th>
-                <th className="py-1.5 px-2">USER</th>
-                <th className="py-1.5 px-2">%CPU</th>
-                <th className="py-1.5 px-2">%MEM</th>
-                <th className="py-1.5 px-2">VIRT</th>
-                <th className="py-1.5 px-2">RES</th>
-                <th className="py-1.5 px-2">TIME+</th>
-                <th className="py-1.5 px-2">COMMAND</th>
-                <th className="py-1.5 px-2">ACTION</th>
+                <th className="py-1.5 px-2">{t.apps.monitor.colPid}</th>
+                <th className="py-1.5 px-2">{t.apps.monitor.colUser}</th>
+                <th className="py-1.5 px-2">{t.apps.monitor.colCpu}</th>
+                <th className="py-1.5 px-2">{t.apps.monitor.colMem}</th>
+                <th className="py-1.5 px-2">{t.apps.monitor.colVirt}</th>
+                <th className="py-1.5 px-2">{t.apps.monitor.colRes}</th>
+                <th className="py-1.5 px-2">{t.apps.monitor.colTime}</th>
+                <th className="py-1.5 px-2">{t.apps.monitor.colCommand}</th>
+                <th className="py-1.5 px-2">{t.apps.monitor.colAction}</th>
               </tr>
             </thead>
             <tbody>
@@ -154,7 +156,7 @@ export function MonitorApp({ onNotify }: MonitorAppProps) {
                       onClick={() => handleKill(p.pid, p.cmd)}
                       className="bg-rose-500/20 text-rose-400 border border-rose-500/30 hover:bg-rose-500 hover:text-white px-2 py-0.5 rounded text-[10px] transition-colors"
                     >
-                      SIGTERM
+                      {t.apps.monitor.killBtn}
                     </button>
                   </td>
                 </tr>
