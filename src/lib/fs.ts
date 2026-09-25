@@ -34,13 +34,14 @@ export class VirtualFileSystem {
       this.createDir(`/${dir}`, 'root', 'root', 'drwxr-xr-x');
     }
 
+    this.createDir('/home/silvestrike', 'silvestrike', 'silvestrike', 'drwxr-xr-x');
     this.createDir('/home/doru', 'doru', 'doru', 'drwxr-xr-x');
     this.createDir('/var/log', 'root', 'root', 'drwxr-xr-x');
     this.createDir('/etc/nginx', 'root', 'root', 'drwxr-xr-x');
     this.createDir('/etc/ssh', 'root', 'root', 'drwxr-xr-x');
     this.createDir('/etc/systemd', 'root', 'root', 'drwxr-xr-x');
 
-    this.writeFile('/etc/hostname', 'srv-doru\n', 'root', '644');
+    this.writeFile('/etc/hostname', 'srv-silvestrike\n', 'root', '644');
     
     this.writeFile('/etc/os-release', 
 `NAME="Ubuntu"
@@ -55,8 +56,8 @@ SUPPORT_URL="https://help.ubuntu.com/"
 
     this.writeFile('/etc/hosts', 
 `127.0.0.1 localhost
-127.0.1.1 srv-doru
-192.168.1.100 srv-doru.internal
+127.0.1.1 srv-silvestrike
+192.168.1.100 srv-silvestrike.internal
 
 ::1     ip6-localhost ip6-loopback
 fe00::0 ip6-localnet
@@ -199,11 +200,12 @@ Full-Stack Developer | AI/ML Engineer | Aspiring Solutions Architect
   }
 
   public resolvePath(currentDir: string, targetPath: string): string {
+    const home = this.getNode('/home/silvestrike') ? '/home/silvestrike' : '/home/doru';
     if (!targetPath || targetPath === '~') {
-      return '/home/doru';
+      return home;
     }
     if (targetPath.startsWith('~/')) {
-      targetPath = '/home/doru/' + targetPath.slice(2);
+      targetPath = home + '/' + targetPath.slice(2);
     }
     if (targetPath.startsWith('/')) {
       return this.normalizePath(targetPath);
@@ -317,6 +319,45 @@ Full-Stack Developer | AI/ML Engineer | Aspiring Solutions Architect
     if (!node || node.type !== 'dir' || !node.children) return null;
 
     return Object.values(node.children);
+  }
+
+  public copyNode(srcPath: string, destPath: string): boolean {
+    const srcNode = this.getNode(srcPath);
+    if (!srcNode) return false;
+
+    const normDest = this.normalizePath(destPath);
+    const destNode = this.getNode(normDest);
+
+    let finalDest = normDest;
+    if (destNode && destNode.type === 'dir') {
+      finalDest = this.normalizePath(normDest + '/' + srcNode.name);
+    }
+
+    if (srcNode.type === 'file') {
+      return this.writeFile(
+        finalDest,
+        srcNode.content ?? '',
+        srcNode.owner,
+        srcNode.permissions
+      );
+    } else if (srcNode.type === 'dir') {
+      this.createDir(finalDest, srcNode.owner, srcNode.group, srcNode.permissions);
+      if (srcNode.children) {
+        for (const childName of Object.keys(srcNode.children)) {
+          this.copyNode(`${srcPath}/${childName}`, `${finalDest}/${childName}`);
+        }
+      }
+      return true;
+    }
+    return false;
+  }
+
+  public moveNode(srcPath: string, destPath: string): boolean {
+    const copied = this.copyNode(srcPath, destPath);
+    if (copied) {
+      return this.deleteNode(srcPath);
+    }
+    return false;
   }
 
   private persist(): void {
