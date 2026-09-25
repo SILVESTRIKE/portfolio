@@ -60,14 +60,22 @@ export function TilingPane({
           }
         }
       }}
-      className={`flex-1 min-w-0 min-h-0 flex flex-col rounded-lg overflow-hidden border transition-all duration-200 ${
+      className={`flex-1 min-w-0 min-h-0 flex flex-col rounded-lg overflow-hidden border transition-all duration-200 relative ${
         isDragOver
           ? 'border-sky-400 ring-2 ring-sky-400/50 shadow-[0_0_25px_rgba(56,189,248,0.3)] bg-sky-500/10'
           : isActive
-          ? 'glass-panel-active border-sky-400/50 shadow-[0_0_20px_rgba(56,189,248,0.15)]'
+          ? 'glass-panel-active border-sky-400/50 shadow-[0_0_20px_rgba(56,189,248,0.15)] ring-1 ring-sky-400/20'
           : 'glass-panel border-white/10 hover:border-white/20'
       } ${isDragging ? 'opacity-40 scale-[0.99]' : 'opacity-100'}`}
     >
+      {/* Ghost Snap Zone Overlay */}
+      {isDragOver && (
+        <div className="absolute inset-0 bg-sky-500/15 backdrop-blur-[1px] border-2 border-dashed border-sky-400 flex items-center justify-center pointer-events-none z-30 animate-pulse">
+          <div className="px-3 py-1.5 rounded bg-black/80 border border-sky-400/60 font-mono text-[11px] text-sky-300 font-bold shadow-lg">
+            [ SWAP / SNAP ZONE ]
+          </div>
+        </div>
+      )}
       {/* Tiling Pane Header (Draggable for reordering) */}
       <div
         draggable={!isMaximized}
