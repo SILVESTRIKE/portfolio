@@ -415,7 +415,7 @@ export default function WebOSPage() {
         };
       case 'app-spotify':
         return {
-          title: 'Spotify Live Stream & Player',
+          title: 'NCT Music Player',
           component: <SpotifyPlayer mode="full" />
         };
       case 'app-git':

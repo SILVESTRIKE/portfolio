@@ -23,6 +23,7 @@ export function Dock({ windows, activeId, onToggleApp }: DockProps) {
     { id: 'hub-portfolio', label: t.dock.devPortfolioShort || 'portfolio' },
     { id: 'hub-system', label: t.dock.serverOpsShort || 'system' },
     { id: 'hub-workspace', label: t.dock.aiWorkbenchShort || 'workbench' },
+    { id: 'app-spotify', label: 'music' },
     { id: 'app-contact', label: t.dock.contactShort || 'contact' }
   ];
 

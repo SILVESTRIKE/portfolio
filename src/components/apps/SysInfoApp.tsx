@@ -33,7 +33,7 @@ export function SysInfoApp() {
 
   const hardwareDetails = [
     { key: 'Hostname', val: snapshot?.hostname || 'srv-silvestrike' },
-    { key: 'Hardware Model', val: snapshot?.hostModel || 'Van Trong Duong \u2014 B.Eng in IT, HCMUTE' },
+    { key: 'Hardware Model', val: snapshot?.hostModel || 'VAN TRONG DUONG' },
     { key: 'Processor', val: snapshot?.cpuModel ? `${snapshot.cpuModel} (${snapshot.physicalCores || 8} Cores, ${snapshot.threadCount || snapshot.cores.length} Threads)` : 'Intel Core i5-13420H (8 Cores, 12 Threads)' },
     { key: 'CPU Topology', val: `${snapshot?.physicalCores || 8} Physical Cores / ${snapshot?.threadCount || snapshot?.cores.length || 12} Threads` },
     { key: 'Graphics (GPU)', val: snapshot?.gpuModel || 'WebOS Accelerated GPU Engine' },
