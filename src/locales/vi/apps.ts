@@ -145,5 +145,28 @@ export const viApps = {
     switchedLayout: 'Đã đổi bố cục sang',
     toggledAudio: 'Đã bật/tắt âm thanh',
     terminatedPid: 'Đã kết thúc tiến trình PID'
+  },
+
+  // AboutMeTerminalApp (IDE Dossier)
+  about: {
+    activityExplorer: 'Trình duyệt Tệp',
+    activitySearch: 'Tìm kiếm Hồ sơ',
+    activityGit: 'Quản lý Git',
+    activitySysinfo: 'Cấu hình Neofetch',
+    sidebarTitle: 'TRÌNH DUYỆT: SILVESTRIKE',
+    searchTitle: 'TÌM KIẾM: GREP HỒ SƠ',
+    searchPlaceholder: 'Tìm trong các tệp (vd: PyTorch, Next.js, Veritas)...',
+    gitTitle: 'QUẢN LÝ PHIÊN BẢN: GIT',
+    gitClean: 'Cây làm việc sạch sẽ. Nhánh main đã đồng bộ với GitHub.',
+    terminalTitle: 'TERMINAL TÍCH HỢP',
+    sendEmail: 'Gửi Email',
+    copyEmail: 'Sao chép',
+    copiedToast: 'Đã sao chép vào bộ nhớ tạm',
+    openRepo: 'Xem Repository',
+    openLive: 'Truy cập Ứng dụng',
+    noResults: 'Không tìm thấy kết quả phù hợp.',
+    statusBranch: 'main',
+    statusEncoding: 'UTF-8',
+    statusSpaces: 'Cách: 2'
   }
 };

@@ -145,5 +145,28 @@ export const enApps = {
     switchedLayout: 'Switched layout to',
     toggledAudio: 'Toggled audio stream',
     terminatedPid: 'Terminated PID'
+  },
+
+  // AboutMeTerminalApp (IDE Dossier)
+  about: {
+    activityExplorer: 'Explorer',
+    activitySearch: 'Search Dossier',
+    activityGit: 'Source Control',
+    activitySysinfo: 'Neofetch Specs',
+    sidebarTitle: 'EXPLORER: SILVESTRIKE',
+    searchTitle: 'SEARCH: DOSSIER GREP',
+    searchPlaceholder: 'Search files (e.g. PyTorch, Next.js, Veritas)...',
+    gitTitle: 'SOURCE CONTROL: GIT',
+    gitClean: 'Working tree clean. Branch main synced with origin.',
+    terminalTitle: 'INTEGRATED TERMINAL',
+    sendEmail: 'Send Email',
+    copyEmail: 'Copy',
+    copiedToast: 'Copied to clipboard',
+    openRepo: 'View Repository',
+    openLive: 'Visit Live Application',
+    noResults: 'No matches found.',
+    statusBranch: 'main',
+    statusEncoding: 'UTF-8',
+    statusSpaces: 'Spaces: 2'
   }
 };
