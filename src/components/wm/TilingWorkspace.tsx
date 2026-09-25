@@ -20,6 +20,8 @@ interface TilingWorkspaceProps {
   onClose: (id: AppId) => void;
   onReorderAppIds?: (newAppIds: AppId[]) => void;
   renderApp: (id: AppId) => { title: string; component: React.ReactNode };
+  /** When set, this app ID is always pinned to the right sidebar at fixed width */
+  sidebarAppId?: AppId;
 }
 
 export function TilingWorkspace({
@@ -31,10 +33,12 @@ export function TilingWorkspace({
   onToggleMaximize,
   onClose,
   onReorderAppIds,
-  renderApp
+  renderApp,
+  sidebarAppId
 }: TilingWorkspaceProps) {
   const { t } = useI18n();
-  const [masterRatio, setMasterRatio] = useState<number>(55);
+  const hasSidebar = !!(sidebarAppId && appIds.includes(sidebarAppId));
+  const [masterRatio, setMasterRatio] = useState<number>(hasSidebar ? 70 : 60);
   const containerRef = useRef<HTMLDivElement>(null);
   const isDraggingRef = useRef(false);
 
@@ -196,11 +200,15 @@ export function TilingWorkspace({
     );
   }
 
-  // Master-Stack Layout (Default Hyprland / tmux style)
-  // Left 55% = Master Pane (First app in list)
-  // Right 45% = Stacked Panes (Remaining apps)
-  const masterId = appIds[0];
-  const stackIds = appIds.slice(1);
+  const orderedIds = hasSidebar
+    ? [...appIds.filter((id) => id !== sidebarAppId), sidebarAppId as AppId]
+    : appIds;
+
+  // --- Master-Stack Layout (Hyprland / tmux style) ---
+  // When sidebar present: AI forced to stack (right), master gets 65%.
+  const masterId = orderedIds[0];
+  const stackIds = orderedIds.slice(1);
+
   const masterApp = renderApp(masterId);
 
   return (
@@ -228,7 +236,7 @@ export function TilingWorkspace({
       {stackIds.length > 0 && (
         <div
           onMouseDown={handleMouseDown}
-          onDoubleClick={() => setMasterRatio(55)}
+          onDoubleClick={() => setMasterRatio(60)}
           className="hidden md:flex w-2 items-center justify-center cursor-col-resize group select-none hover:bg-sky-500/20 rounded transition-colors -mx-1 z-10"
           title={t.workspace.splitterTooltip}
         >

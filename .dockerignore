@@ -1,0 +1,35 @@
+# Dependencies — reinstalled in build stage
+node_modules
+npm-debug.log*
+
+# Next.js build output (rebuilt inside container)
+.next
+out
+
+# Dev/CI artifacts
+.env
+.env.*
+!.env.example
+*.log
+coverage
+.nyc_output
+
+# Version control
+.git
+.gitignore
+
+# Editor artifacts
+.vscode
+.idea
+*.swp
+*.swo
+
+# OS artifacts
+.DS_Store
+Thumbs.db
+
+# Docs / non-runtime
+docs
+README.md
+CLAUDE.md
+AGENTS.md

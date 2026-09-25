@@ -12,8 +12,8 @@ export const enDock = {
   serverOpsShort: 'Server Ops',
   aiWorkbench: 'AI & File Workbench',
   aiWorkbenchShort: 'AI & Files',
-  gitkraken: 'GitKraken Git Studio',
-  gitkrakenShort: 'GitKraken',
+  git: 'Git Git Studio',
+  gitkrakenShort: 'Git',
   aboutMe: 'About Me Dossier',
   aboutMeShort: 'About Me',
   monitor: 'Resource Monitor (htop)',
@@ -33,5 +33,9 @@ export const enDock = {
   spotify: 'Spotify Player',
   spotifyShort: 'Spotify',
   sysinfo: 'System Specifications',
-  sysinfoShort: 'SysInfo'
+  sysinfoShort: 'SysInfo',
+  contact: 'Contact Me',
+  contactShort: 'Contact Me',
+  admin: 'Recruiter Intelligence (Admin)',
+  adminShort: 'Admin'
 };

@@ -43,3 +43,7 @@ next-env.d.ts
 
 # codegraph
 .codegraph/
+
+# runtime data
+data/*.json
+!data/.gitkeep

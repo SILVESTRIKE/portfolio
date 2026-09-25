@@ -12,8 +12,8 @@ export const viDock = {
   serverOpsShort: 'Vận hành',
   aiWorkbench: 'Bàn làm việc AI & Tệp tin',
   aiWorkbenchShort: 'AI & Tệp',
-  gitkraken: 'GitKraken Quản lý Git',
-  gitkrakenShort: 'GitKraken',
+  git: 'Git Quản lý Git',
+  gitkrakenShort: 'Git',
   aboutMe: 'Hồ sơ Cá nhân (Terminal)',
   aboutMeShort: 'Về tôi',
   monitor: 'Giám sát Tài nguyên (htop)',
@@ -33,5 +33,9 @@ export const viDock = {
   spotify: 'Trình phát Nhạc Spotify',
   spotifyShort: 'Spotify',
   sysinfo: 'Thông số Kỹ thuật Máy chủ',
-  sysinfoShort: 'Thông số'
+  sysinfoShort: 'Thông số',
+  contact: 'Liên hệ',
+  contactShort: 'Liên hệ',
+  admin: 'Theo dõi Nhà tuyển dụng (Admin)',
+  adminShort: 'Admin'
 };

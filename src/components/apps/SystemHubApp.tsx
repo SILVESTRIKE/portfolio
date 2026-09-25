@@ -8,10 +8,8 @@ System impact if absent: System administration tools will be split into multiple
 import React, { useState } from 'react';
 import { MonitorApp } from './MonitorApp';
 import { LogsApp } from './LogsApp';
-import { NetworkApp } from './NetworkApp';
-import { SysInfoApp } from './SysInfoApp';
 
-export type SystemTab = 'monitor' | 'logs' | 'network' | 'specs';
+export type SystemTab = 'monitor' | 'logs' | 'network';
 
 interface SystemHubAppProps {
   initialTab?: SystemTab;
@@ -36,18 +34,6 @@ export function SystemHubApp({
       label: 'journalctl Logs',
       badge: 'Syslog',
       desc: 'Live System Logging Stream & Event Filters'
-    },
-    {
-      id: 'network',
-      label: 'Network & Ports',
-      badge: 'Diagnostics',
-      desc: 'Listening Sockets, Ping Latency & Traffic'
-    },
-    {
-      id: 'specs',
-      label: 'Server Specifications',
-      badge: 'Neofetch',
-      desc: 'Kernel, OS Distribution & Hardware Specs'
     }
   ];
 
@@ -62,21 +48,19 @@ export function SystemHubApp({
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`px-3 py-1 rounded-md text-xs font-mono transition-all flex items-center gap-2 shrink-0 ${
-                  isActive
-                    ? 'bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-400/40 shadow-sm'
-                    : 'text-slate-400 hover:text-slate-200 hover:bg-white/5 border border-transparent'
-                }`}
+                className={`px-3 py-1 rounded-md text-xs font-mono transition-all flex items-center gap-2 shrink-0 ${isActive
+                  ? 'bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-400/40 shadow-sm'
+                  : 'text-slate-400 hover:text-slate-200 hover:bg-white/5 border border-transparent'
+                  }`}
                 title={tab.desc}
               >
                 <span>{tab.label}</span>
                 {tab.badge && (
                   <span
-                    className={`text-[9px] px-1.5 py-0.2 rounded font-bold uppercase ${
-                      isActive
-                        ? 'bg-emerald-400/30 text-emerald-200'
-                        : 'bg-white/10 text-slate-400'
-                    }`}
+                    className={`text-[9px] px-1.5 py-0.2 rounded font-bold uppercase ${isActive
+                      ? 'bg-emerald-400/30 text-emerald-200'
+                      : 'bg-white/10 text-slate-400'
+                      }`}
                   >
                     {tab.badge}
                   </span>
@@ -86,19 +70,13 @@ export function SystemHubApp({
           })}
         </div>
 
-        {/* Status indicator on top right */}
-        <div className="hidden sm:flex items-center gap-2 font-mono text-[10px] text-slate-400">
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-          <span>OPS CENTER ACTIVE</span>
-        </div>
       </div>
 
       {/* Main Tab Content */}
       <div className="flex-1 min-h-0 relative overflow-hidden">
         {activeTab === 'monitor' && <MonitorApp onNotify={onNotify} />}
         {activeTab === 'logs' && <LogsApp onNotify={onNotify} />}
-        {activeTab === 'network' && <NetworkApp onNotify={onNotify} />}
-        {activeTab === 'specs' && <SysInfoApp />}
+        {activeTab === 'network' && <MonitorApp onNotify={onNotify} />}
       </div>
     </div>
   );

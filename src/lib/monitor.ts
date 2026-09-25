@@ -24,6 +24,11 @@ export class SystemMonitor {
   // Enriched host info from real API
   private hostname = '';
   private cpuModel = '';
+  private physicalCores = 8;
+  private threadCount = 12;
+  private gpuModel = '';
+  private hostModel = '';
+  private osName = '';
   private kernel = '';
   private platform = '';
   private arch = '';
@@ -31,14 +36,14 @@ export class SystemMonitor {
   private loadAvg: number[] = [0, 0, 0];
 
   private processes: ProcessItem[] = [
-    { pid: 1, user: 'root', cpu: 0.1, mem: 0.2, virt: '168M', res: '12M', time: '02:14.22', cmd: '/sbin/init splash' },
-    { pid: 924, user: 'root', cpu: 0.0, mem: 0.1, virt: '18M', res: '8M', time: '00:04.10', cmd: '/usr/sbin/sshd -D' },
-    { pid: 1102, user: 'root', cpu: 1.4, mem: 2.1, virt: '1.2G', res: '340M', time: '14:28.45', cmd: '/usr/bin/dockerd -H fd://' },
-    { pid: 1420, user: 'www-data', cpu: 0.8, mem: 0.4, virt: '84M', res: '48M', time: '08:12.30', cmd: 'nginx: worker process' },
-    { pid: 1530, user: 'postgres', cpu: 2.1, mem: 1.2, virt: '380M', res: '196M', time: '11:05.18', cmd: 'postgres: checkpointer' },
-    { pid: 2145, user: 'doru', cpu: 4.8, mem: 2.8, virt: '890M', res: '450M', time: '22:40.11', cmd: 'python3 -m doru_ai.daemon' },
-    { pid: 2890, user: 'root', cpu: 0.2, mem: 0.1, virt: '24M', res: '6M', time: '00:01.05', cmd: '/usr/sbin/cron -f' },
-    { pid: 3210, user: 'doru', cpu: 1.1, mem: 0.8, virt: '140M', res: '88M', time: '03:19.40', cmd: 'node ./server/index.js' }
+    { pid: 101, user: 'duong', cpu: 1.2, mem: 1.4, virt: '48M', res: '18M', time: '14:20', cmd: 'terminal.app (BASH Shell & Dossier)' },
+    { pid: 102, user: 'duong', cpu: 0.8, mem: 1.1, virt: '36M', res: '14M', time: '08:15', cmd: 'monitor.app (Activity & Visitor Analytics)' },
+    { pid: 103, user: 'duong', cpu: 0.5, mem: 1.2, virt: '42M', res: '16M', time: '05:40', cmd: 'services.app (Microservices Catalog)' },
+    { pid: 104, user: 'duong', cpu: 0.9, mem: 1.5, virt: '54M', res: '22M', time: '03:10', cmd: 'git.app (Visual Git VCS Studio)' },
+    { pid: 105, user: 'duong', cpu: 0.3, mem: 0.8, virt: '28M', res: '10M', time: '02:05', cmd: 'network.app (Listening Sockets Inspector)' },
+    { pid: 106, user: 'duong', cpu: 0.2, mem: 0.6, virt: '22M', res: '8M', time: '18:44', cmd: 'vfs-worker (Virtual FS Sync Daemon)' },
+    { pid: 107, user: 'duong', cpu: 0.4, mem: 0.9, virt: '30M', res: '12M', time: '12:30', cmd: 'audio-synth (WebAudio Sound Engine)' },
+    { pid: 108, user: 'duong', cpu: 0.2, mem: 0.5, virt: '18M', res: '6M', time: '01:12', cmd: 'analytics.worker (Visitor Telemetry Agent)' }
   ];
 
   private listeners: Array<(snap: SystemSnapshot) => void> = [];
@@ -78,9 +83,23 @@ export class SystemMonitor {
       this.rxRate = data.rxRate ?? this.rxRate;
       this.txRate = data.txRate ?? this.txRate;
 
+      // Update client browser memory heap in WebOS tasks
+      if (typeof window !== 'undefined' && (window.performance as unknown as { memory?: { usedJSHeapSize?: number } })?.memory) {
+        const heap = (window.performance as unknown as { memory: { usedJSHeapSize: number } }).memory.usedJSHeapSize;
+        const heapMB = Math.round(heap / (1024 * 1024));
+        if (this.processes[0]) {
+          this.processes[0].res = `${heapMB}M`;
+        }
+      }
+
       // Enriched host metadata
       this.hostname = data.hostname ?? this.hostname;
       this.cpuModel = data.cpuModel ?? this.cpuModel;
+      this.physicalCores = data.physicalCores ?? this.physicalCores;
+      this.threadCount = data.threadCount ?? this.threadCount;
+      this.gpuModel = data.gpuModel ?? this.gpuModel;
+      this.hostModel = data.hostModel ?? this.hostModel;
+      this.osName = data.osName ?? this.osName;
       this.kernel = data.kernel ?? this.kernel;
       this.platform = data.platform ?? this.platform;
       this.arch = data.arch ?? this.arch;
@@ -166,6 +185,11 @@ export class SystemMonitor {
       // Extended real host metadata
       hostname: this.hostname,
       cpuModel: this.cpuModel,
+      physicalCores: this.physicalCores,
+      threadCount: this.threadCount,
+      gpuModel: this.gpuModel,
+      hostModel: this.hostModel,
+      osName: this.osName,
       kernel: this.kernel,
       platform: this.platform,
       arch: this.arch,
@@ -190,8 +214,8 @@ export class SystemMonitor {
   public renderChart(
     canvas: HTMLCanvasElement | null,
     dataPoints: number[],
-    strokeColor = '#38bdf8',
-    fillColor = 'rgba(56, 189, 248, 0.15)'
+    strokeColor = '#7aa2f7',
+    fillColor = 'rgba(122, 162, 247, 0.15)'
   ): void {
     if (!canvas || !canvas.parentElement) return;
     const ctx = canvas.getContext('2d');

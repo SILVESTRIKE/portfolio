@@ -110,18 +110,18 @@ export function LogsApp({ onNotify }: LogsAppProps) {
             {t.apps.logs.emptyMsg}
           </div>
         ) : (
-          filteredLogs.map((l) => {
+          filteredLogs.map((l, idx) => {
             const lvlBadgeColor =
               l.level === 'ERROR'
                 ? 'text-rose-400 bg-rose-500/10 border-rose-500/30'
                 : l.level === 'WARN'
                 ? 'text-amber-400 bg-amber-500/10 border-amber-500/30'
-                : 'text-sky-400 bg-sky-500/10 border-sky-500/30';
+                : 'text-[#7aa2f7] bg-[#7aa2f7]/10 border-[#7aa2f7]/30';
 
             return (
-              <div key={l.id} className="flex items-start gap-2.5 py-0.5 border-b border-white/[0.02]">
+              <div key={`log-${l.id}-${idx}`} className="flex items-start gap-2.5 py-0.5 border-b border-white/[0.02]">
                 <span className="text-slate-500 shrink-0 w-36">{l.timestamp}</span>
-                <span className="text-sky-400 font-medium shrink-0 w-28 truncate">{l.service}</span>
+                <span className="text-[#7aa2f7] font-medium shrink-0 w-32 truncate">{l.service}</span>
                 <span className={`px-1.5 py-0.2 rounded border text-[10px] font-bold shrink-0 ${lvlBadgeColor}`}>
                   {l.level}
                 </span>

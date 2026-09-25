@@ -5,7 +5,9 @@ System impact if absent: MonitorApp and TopPanel will fall back to simulated ran
 
 import { NextResponse } from 'next/server';
 import os from 'os';
+import fs from 'fs';
 import { execSync } from 'child_process';
+import { ProcessItem } from '@/types';
 
 interface SystemMetricsResponse {
   hostname: string;
@@ -16,6 +18,11 @@ interface SystemMetricsResponse {
   loadAvg: number[];
   cpuModel: string;
   coreCount: number;
+  physicalCores: number;
+  threadCount: number;
+  gpuModel: string;
+  hostModel: string;
+  osName: string;
   cores: number[];
   totalCpu: number;
   ramTotal: number;
@@ -25,6 +32,7 @@ interface SystemMetricsResponse {
   swapUsed: number;
   rxRate: number;
   txRate: number;
+  processes: ProcessItem[];
 }
 
 // Track previous CPU times for delta-based utilization
@@ -124,10 +132,53 @@ function getNetworkRates(): { rxRate: number; txRate: number } {
   return { rxRate: 0, txRate: 0 };
 }
 
+function getCpuTopology(): { physicalCores: number; threadCount: number } {
+  const threadCount = os.cpus().length || 1;
+  let physicalCores = 0;
+
+  try {
+    if (fs.existsSync('/proc/cpuinfo')) {
+      const content = fs.readFileSync('/proc/cpuinfo', 'utf-8');
+      const coreMap = new Set<string>();
+      let currentPhysId = '0';
+      const lines = content.split('\n');
+      for (const line of lines) {
+        if (line.startsWith('physical id')) {
+          currentPhysId = line.split(':')[1]?.trim() || '0';
+        } else if (line.startsWith('core id')) {
+          const coreId = line.split(':')[1]?.trim() || '0';
+          coreMap.add(`${currentPhysId}:${coreId}`);
+        }
+      }
+      if (coreMap.size > 0) {
+        physicalCores = coreMap.size;
+      }
+    }
+  } catch {
+    // Non-Linux or inaccessible proc
+  }
+
+  if (physicalCores === 0) {
+    physicalCores = Math.max(1, Math.round(threadCount / 2));
+  }
+
+  return { physicalCores, threadCount };
+}
+
+function getHostHardwareInfo(): { hostModel: string; gpuModel: string; osName: string } {
+  return {
+    hostModel: 'HUIT Workstation (B.Eng in IT)',
+    gpuModel: 'WebOS Accelerated GPU Engine',
+    osName: 'Caelestia Hyprland Linux x86_64 [SILVESTRIKE WebOS]'
+  };
+}
+
 export async function GET() {
   const { cores, totalCpu } = getCpuUsage();
   const { swapTotal, swapUsed } = getSwapInfo();
   const { rxRate, txRate } = getNetworkRates();
+  const { physicalCores, threadCount } = getCpuTopology();
+  const { hostModel, gpuModel, osName } = getHostHardwareInfo();
 
   const totalMem = os.totalmem();
   const freeMem = os.freemem();
@@ -140,14 +191,19 @@ export async function GET() {
   const cpuInfo = os.cpus()[0];
 
   const metrics: SystemMetricsResponse = {
-    hostname: os.hostname(),
+    hostname: 'srv-silvestrike',
     platform: os.platform(),
     arch: os.arch(),
     kernel: os.release(),
     uptime: os.uptime(),
     loadAvg: os.loadavg().map(v => parseFloat(v.toFixed(2))),
     cpuModel: cpuInfo?.model || 'Unknown',
-    coreCount: os.cpus().length,
+    coreCount: threadCount,
+    physicalCores,
+    threadCount,
+    gpuModel,
+    hostModel,
+    osName,
     cores,
     totalCpu,
     ramTotal: ramTotalMB,
@@ -156,7 +212,8 @@ export async function GET() {
     swapTotal,
     swapUsed,
     rxRate,
-    txRate
+    txRate,
+    processes: []
   };
 
   return NextResponse.json(metrics, {

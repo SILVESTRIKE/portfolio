@@ -60,18 +60,18 @@ export function TilingPane({
           }
         }
       }}
-      className={`flex-1 min-w-0 min-h-0 flex flex-col rounded-lg overflow-hidden border transition-all duration-200 relative ${
+      className={`flex-1 min-w-0 min-h-0 flex flex-col rounded-sm overflow-hidden border transition-all duration-200 relative ${
         isDragOver
-          ? 'border-sky-400 ring-2 ring-sky-400/50 shadow-[0_0_25px_rgba(56,189,248,0.3)] bg-sky-500/10'
+          ? 'border-[#7aa2f7] ring-2 ring-[#7aa2f7]/50 shadow-[0_0_25px_rgba(122,162,247,0.25)] bg-[#7aa2f7]/10'
           : isActive
-          ? 'glass-panel-active border-sky-400/50 shadow-[0_0_20px_rgba(56,189,248,0.15)] ring-1 ring-sky-400/20'
-          : 'glass-panel border-white/10 hover:border-white/20'
+          ? 'glass-panel-active border-[#7aa2f7]/40 shadow-[0_0_20px_rgba(122,162,247,0.12)] ring-1 ring-[#7aa2f7]/20'
+          : 'glass-panel border-white/10 hover:border-white/15'
       } ${isDragging ? 'opacity-40 scale-[0.99]' : 'opacity-100'}`}
     >
       {/* Ghost Snap Zone Overlay */}
       {isDragOver && (
-        <div className="absolute inset-0 bg-sky-500/15 backdrop-blur-[1px] border-2 border-dashed border-sky-400 flex items-center justify-center pointer-events-none z-30 animate-pulse">
-          <div className="px-3 py-1.5 rounded bg-black/80 border border-sky-400/60 font-mono text-[11px] text-sky-300 font-bold shadow-lg">
+        <div className="absolute inset-0 bg-[#7aa2f7]/10 backdrop-blur-[1px] border-2 border-dashed border-[#7aa2f7] flex items-center justify-center pointer-events-none z-30 animate-pulse">
+          <div className="px-3 py-1.5 rounded bg-black/85 border border-[#7aa2f7]/60 font-mono text-[11px] text-[#7aa2f7] font-bold shadow-lg">
             [ SWAP / SNAP ZONE ]
           </div>
         </div>
@@ -92,7 +92,7 @@ export function TilingPane({
         }}
         className={`h-8 px-3 bg-black/50 border-b border-white/10 flex items-center justify-between select-none ${
           !isMaximized ? 'cursor-grab active:cursor-grabbing' : 'cursor-default'
-        } ${isDragOver ? 'bg-sky-500/20' : ''}`}
+        } ${isDragOver ? 'bg-[#7aa2f7]/20' : ''}`}
         title={!isMaximized ? t.apps.pane.swapTooltip : undefined}
       >
         <div className="flex items-center gap-2 font-mono text-xs font-medium min-w-0 pointer-events-none">
@@ -107,7 +107,7 @@ export function TilingPane({
               <circle cx="16" cy="18" r="2" />
             </svg>
           )}
-          <span className={`shrink-0 ${isActive ? 'text-sky-400 font-bold' : 'text-slate-500'}`}>#</span>
+          <span className={`shrink-0 ${isActive ? 'text-[#7aa2f7] font-bold' : 'text-slate-500'}`}>#</span>
           <span className={`truncate ${isActive ? 'text-slate-100' : 'text-slate-400'}`}>{title}</span>
         </div>
 
