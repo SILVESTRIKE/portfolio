@@ -79,62 +79,41 @@ body {
   background: rgba(255, 255, 255, 0.25);
 }
 
-/* CRT Scanlines, Vignette & Ambient Effects (I1 - I5) */
+/* CRT Static Scanlines & Subtle Vignette */
 body::before {
-  content: " ";
+  content: ' ';
   display: block;
   position: fixed;
   top: 0;
   left: 0;
   bottom: 0;
   right: 0;
-  background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0, 0, 0, 0.08) 2px, rgba(0, 0, 0, 0.08) 4px);
+  background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0, 0, 0, 0.04) 2px, rgba(0, 0, 0, 0.04) 4px);
   pointer-events: none;
   z-index: 9998;
 }
 
 body::after {
-  content: " ";
+  content: ' ';
   display: block;
   position: fixed;
   top: 0;
   left: 0;
   bottom: 0;
   right: 0;
-  background: radial-gradient(ellipse at center, transparent 65%, rgba(0, 0, 0, 0.55) 100%);
+  background: radial-gradient(ellipse at center, transparent 70%, rgba(0, 0, 0, 0.45) 100%);
   pointer-events: none;
   z-index: 9997;
 }
 
-.crt-scanline {
-  position: fixed;
-  left: 0;
-  right: 0;
-  height: 6px;
-  background: linear-gradient(180deg, transparent, rgba(56, 189, 248, 0.09), transparent);
-  pointer-events: none;
-  z-index: 9999;
-  animation: scanline 6s linear infinite;
-}
-
-@keyframes scanline {
-  0% { top: -10px; opacity: 0; }
-  10% { opacity: 1; }
-  90% { opacity: 1; }
-  100% { top: 100vh; opacity: 0; }
-}
-
 body.light::before,
-body.light::after,
-body.light .crt-scanline {
+body.light::after {
   display: none;
 }
 
 @media (hover: none) and (pointer: coarse) {
   body::before,
-  body::after,
-  .crt-scanline {
+  body::after {
     display: none;
   }
 }
-
