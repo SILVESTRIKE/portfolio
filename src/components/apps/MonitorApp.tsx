@@ -111,13 +111,17 @@ export function MonitorApp({ onNotify }: MonitorAppProps) {
       {/* Process Table */}
       <div className="flex-1 bg-black/40 border border-white/10 rounded-lg overflow-hidden flex flex-col min-h-[180px]">
         <div className="p-2 border-b border-white/10 flex justify-between items-center gap-2">
-          <input
-            type="text"
-            value={filterQuery}
-            onChange={(e) => setFilterQuery(e.target.value)}
-            placeholder={t.apps.monitor.filterPlaceholder}
-            className="bg-white/5 border border-white/10 rounded px-2.5 py-1 text-xs text-slate-200 outline-none focus:border-sky-400 w-64"
-          />
+          <div className="flex items-center gap-1.5 bg-black/40 border border-white/10 rounded px-2.5 py-1 font-mono text-xs w-72 focus-within:border-sky-400/80 transition-colors">
+            <span className="text-emerald-400 font-bold">$ grep -i &quot;</span>
+            <input
+              type="text"
+              value={filterQuery}
+              onChange={(e) => setFilterQuery(e.target.value)}
+              placeholder={t.apps.monitor.filterPlaceholder}
+              className="bg-transparent border-none outline-none text-slate-200 flex-1 min-w-0 placeholder-slate-500 font-mono text-xs"
+            />
+            <span className="text-emerald-400 font-bold">&quot;</span>
+          </div>
           <span className="font-mono text-[11px] text-slate-400">
             {t.apps.monitor.activeLabel}: {filteredProcesses.length}
           </span>

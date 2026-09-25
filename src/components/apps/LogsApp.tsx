@@ -60,13 +60,17 @@ export function LogsApp({ onNotify }: LogsAppProps) {
       {/* Toolbar */}
       <div className="h-10 bg-black/50 border-b border-white/10 px-3 flex items-center justify-between gap-3 select-none">
         <div className="flex items-center gap-2">
-          <input
-            type="text"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder={t.apps.logs.filterPlaceholder}
-            className="bg-white/5 border border-white/10 rounded px-2.5 py-1 text-xs text-slate-200 outline-none focus:border-sky-400 w-52"
-          />
+          <div className="flex items-center gap-1.5 bg-black/40 border border-white/10 rounded px-2.5 py-1 font-mono text-xs w-64 focus-within:border-sky-400/80 transition-colors">
+            <span className="text-emerald-400 font-bold">$ grep -i &quot;</span>
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder={t.apps.logs.filterPlaceholder}
+              className="bg-transparent border-none outline-none text-slate-200 flex-1 min-w-0 placeholder-slate-500 font-mono text-xs"
+            />
+            <span className="text-emerald-400 font-bold">&quot;</span>
+          </div>
           <select
             value={level}
             onChange={(e) => setLevel(e.target.value)}
