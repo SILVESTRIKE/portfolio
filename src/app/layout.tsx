@@ -34,9 +34,12 @@ export const metadata: Metadata = {
   description: `Interactive browser-based developer portfolio and Linux workstation for ${DEVELOPER_CONFIG.name} (${DEVELOPER_CONFIG.alias}) featuring live telemetry, bash terminal, services catalog, and AI assistant.`,
   metadataBase: new URL(appUrl),
   icons: {
-    icon: '/logo.png',
-    shortcut: '/logo.png',
-    apple: '/logo.png',
+    icon: [
+      { url: '/favicon.ico', sizes: 'any' },
+      { url: '/logo.png', type: 'image/png' }
+    ],
+    shortcut: '/favicon.ico',
+    apple: '/apple-touch-icon.png',
   },
   openGraph: {
     title: `${DEVELOPER_CONFIG.alias} Portfolio OS`,
