@@ -82,9 +82,21 @@
   - [x] Visual system architecture flow diagrams (`dependsOn`) for instant full-stack comprehension
   - [x] Production metrics in container healthchecks (inference latency, test pass rates, uptime)
   - [x] Real GitHub commit graph integration via GitKrakenApp
-- [x] **Phase 4: Responsive & Aesthetic Hardening**
-  - [x] Keyboard navigation auto-scroll in Command Palette (`Ctrl+K`)
-  - [x] SSR hydration alignment in Spotify Player
-  - [x] Ultra-compact mobile responsive breakpoints across fastfetch and terminal views
+- [x] **Phase 4: Tone & Content Polish Across Projects**
+  - [x] Standardized project card badges to uniform Docker/engineering statuses (`RUNNING / PRODUCTION CMS`, `RUNNING / EDGE DEPLOYED`, `RUNNING / LOCAL ENGINE`, `ARCHIVED / DESKTOP + WEB POS`, `RUNNING / THESIS RAG`)
+  - [x] Enforced 4-sentence project formulation across `ProjectsView`, `ThesisView`, and `ResumePage` (Problem -> Architecture -> Contribution -> Result)
+  - [x] Added verifiable production metrics into each project card (15,000+ monthly visits, 94% accuracy on 120 breeds, <650ms speech-to-speech loop, 92.4% Top-5 recall on 15,420 legal documents)
+  - [x] Removed gimmick uptime labels; live uptime anchored to university Year 2 coding start date
+
+- [x] **Phase 5: Technical Showcase Preparation & Community Outreach Kit**
+  - [x] `docs/articles/how-to-build-virtual-fs-in-react.md`: Deep technical guide on building in-memory VFS in React/Next.js
+  - [x] `docs/articles/offline-voice-agent-langgraph.md`: Deep technical guide on low-latency voice AI with LangGraph and Whisper
+  - [x] `docs/articles/hybrid-legal-rag-pipeline.md`: Graduation thesis guide on hybrid dense-sparse RAG with Qdrant
+  - [x] `docs/outreach/showcase_and_community_kit.md`: 15-30s video demo storyboard, Reddit/J2TEAM/HackerNews/LinkedIn/ProductHunt post templates
+  - [x] Synchronized Architectural Decision Records (ADR-001 through ADR-004 in `docs/DECISIONS.md`)
+  - [x] Complete system architecture blueprint with Dual Persona routing in `docs/architecture.md`
+  - [x] CodeGraph AST index synchronization (`codegraph sync`)
+  - [x] Zero TypeScript compilation errors (`npx tsc --noEmit`)
+
 
 
