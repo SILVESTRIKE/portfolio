@@ -37,7 +37,7 @@ export const DOSSIER_FILES: DossierFile[] = [
     lang: 'TypeScript',
     badge: 'TS',
     color: '#3b82f6',
-    summary: 'Samco VinFast EV Sales CMS & E-Commerce platform (Next.js 14, Prisma)'
+    summary: 'Samco VinFast EV CMS (samco-cms-prod:v2.1): Next.js 14, Prisma, PostgreSQL, 15k+ visits, 0 downtime'
   },
   {
     id: 'dogdexx-ai.py',
@@ -46,7 +46,7 @@ export const DOSSIER_FILES: DossierFile[] = [
     lang: 'Python',
     badge: 'PY',
     color: '#10b981',
-    summary: 'AI-powered dog breed identification with PyTorch CNN & Cloudinary'
+    summary: 'DogDexx Edge AI (dogdexx-ai:v1.2): PyTorch ResNet, Next.js BFF, 94% accuracy, <180ms edge inference'
   },
   {
     id: 'doru-agent.py',
@@ -55,7 +55,7 @@ export const DOSSIER_FILES: DossierFile[] = [
     lang: 'Python',
     badge: 'PY',
     color: '#10b981',
-    summary: 'Desktop voice AI assistant with LangGraph, Whisper, Silero & Groq'
+    summary: 'Doru AI Host Daemon (doru-voice-agent:v2.0): 8-node LangGraph, Whisper STT, Kokoro TTS, <650ms loop'
   },
   {
     id: 'webbantra.cs',
@@ -64,7 +64,7 @@ export const DOSSIER_FILES: DossierFile[] = [
     lang: 'C#',
     badge: 'CS',
     color: '#a855f7',
-    summary: 'Enterprise tea commerce & WinForms retail POS suite on SQL Server'
+    summary: 'WebBanTra POS Suite (webbantra-sql:v1.0): ASP.NET Core, WinForms, MSSQL stored procs, 100% ACID'
   },
   {
     id: 'thesis-veritas.md',
@@ -72,7 +72,7 @@ export const DOSSIER_FILES: DossierFile[] = [
     lang: 'Markdown',
     badge: 'MD',
     color: '#c084fc',
-    summary: 'Graduation Thesis: Veritas AI - Vietnamese Legal & Land Registration RAG'
+    summary: 'Graduation Thesis (veritas-engine:v1.0): Hybrid BM25+BGE-M3 RAG, Qdrant DB, 92.4% recall on 15.4k laws'
   },
   {
     id: 'contact.sh',

@@ -33,7 +33,7 @@ export function ProjectsView({
               </p>
             </div>
             <span className="px-2 py-0.5 bg-sky-500/20 text-sky-300 border border-sky-500/40 rounded text-[10px] font-bold">
-              INTERNSHIP 2025
+              RUNNING / PRODUCTION CMS
             </span>
           </div>
 
@@ -52,7 +52,7 @@ export function ProjectsView({
             </div>
             <div>
               <span className="text-[#9ece6a] font-bold font-mono">4. Result: </span>
-              <span>Rút ngắn 40% thời gian xử lý báo giá cho nhân viên kinh doanh, đồng bộ dữ liệu tồn kho tức thì và đảm bảo tốc độ phản hồi giao diện dưới 300ms.</span>
+              <span>Rút ngắn 40% thời gian xử lý báo giá cho nhân viên kinh doanh, đồng bộ tồn kho tức thì, 15,000+ monthly visits và đảm bảo tốc độ phản hồi giao diện dưới 300ms với 0 downtime.</span>
             </div>
           </div>
 
@@ -65,7 +65,8 @@ export function ProjectsView({
             <span className="px-2 py-0.5 bg-white/5 rounded">Zustand</span>
           </div>
 
-          <div className="pt-1 flex items-center gap-3">
+          <div className="pt-1 flex items-center justify-between gap-3 text-[10px] text-slate-400 font-mono">
+            <span className="text-sky-400/80">Container: samco-cms-prod:v2.1 | Ports: 443:443</span>
             <a
               href="https://github.com/SILVESTRIKE/samco-binhtan-webapp"
               target="_blank"
@@ -92,7 +93,7 @@ export function ProjectsView({
               </p>
             </div>
             <span className="px-2 py-0.5 bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 rounded text-[10px] font-bold">
-              DEPLOYED LIVE
+              RUNNING / EDGE DEPLOYED
             </span>
           </div>
 
@@ -111,7 +112,7 @@ export function ProjectsView({
             </div>
             <div>
               <span className="text-[#9ece6a] font-bold font-mono">4. Result: </span>
-              <span>Đạt độ chính xác 94% trên 120 giống chó phổ biến, thời gian suy luận dưới 250ms trên Edge Deployment tại dogdexx.vercel.app.</span>
+              <span>Đạt độ chính xác 94% trên 120 giống chó phổ biến, thời gian suy luận dưới 180ms trên Edge Deployment tại dogdexx.vercel.app với 100% test pass.</span>
             </div>
           </div>
 
@@ -124,23 +125,26 @@ export function ProjectsView({
             <span className="px-2 py-0.5 bg-white/5 rounded">Cloudinary CDN</span>
           </div>
 
-          <div className="pt-1 flex items-center gap-3">
-            <a
-              href="https://dogdexx.vercel.app"
-              target="_blank"
-              rel="noreferrer"
-              className="px-3 py-1.5 bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500 hover:text-black rounded text-[11px] font-bold transition-colors"
-            >
-              {openLiveText} &rarr;
-            </a>
-            <a
-              href="https://github.com/SILVESTRIKE/DogDexx"
-              target="_blank"
-              rel="noreferrer"
-              className="px-3 py-1.5 bg-white/5 text-slate-300 hover:bg-white/10 rounded text-[11px] font-semibold transition-colors"
-            >
-              {openRepoText}
-            </a>
+          <div className="pt-1 flex items-center justify-between gap-3 text-[10px] text-slate-400 font-mono">
+            <span className="text-emerald-400/80">Container: dogdexx-ai:v1.2 | Ports: 443:443</span>
+            <div className="flex items-center gap-3">
+              <a
+                href="https://dogdexx.vercel.app"
+                target="_blank"
+                rel="noreferrer"
+                className="px-3 py-1.5 bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500 hover:text-black rounded text-[11px] font-bold transition-colors"
+              >
+                {openLiveText} &rarr;
+              </a>
+              <a
+                href="https://github.com/SILVESTRIKE/DogDexx"
+                target="_blank"
+                rel="noreferrer"
+                className="px-3 py-1.5 bg-white/5 text-slate-300 hover:bg-white/10 rounded text-[11px] font-semibold transition-colors"
+              >
+                {openRepoText}
+              </a>
+            </div>
           </div>
         </div>
       </div>
@@ -159,7 +163,7 @@ export function ProjectsView({
               </p>
             </div>
             <span className="px-2 py-0.5 bg-purple-500/20 text-purple-300 border border-purple-500/40 rounded text-[10px] font-bold">
-              HOST ENGINE
+              RUNNING / LOCAL ENGINE
             </span>
           </div>
 
@@ -178,7 +182,7 @@ export function ProjectsView({
             </div>
             <div>
               <span className="text-[#9ece6a] font-bold font-mono">4. Result: </span>
-              <span>Đạt độ trễ xử lý giọng nói trọn vòng (end-to-end) dưới 1.2s ngay trên máy cục bộ với mức tiêu thụ RAM dưới 800MB.</span>
+              <span>Đạt độ trễ xử lý giọng nói trọn vòng (end-to-end loop) dưới 650ms ngay trên máy cục bộ với mức tiêu thụ RAM dưới 800MB và độ tin cậy wakeword 0.94.</span>
             </div>
           </div>
 
@@ -191,7 +195,8 @@ export function ProjectsView({
             <span className="px-2 py-0.5 bg-white/5 rounded">Groq LPU</span>
           </div>
 
-          <div className="pt-1">
+          <div className="pt-1 flex items-center justify-between gap-3 text-[10px] text-slate-400 font-mono">
+            <span className="text-purple-400/80">Container: doru-voice-agent:v2.0 | Ports: 8828:8828 (IPC)</span>
             <button
               onClick={() => onOpenApp && onOpenApp('app-ai')}
               className="px-3 py-1.5 bg-purple-500/20 text-purple-300 hover:bg-purple-500 hover:text-black rounded text-[11px] font-bold transition-colors"
@@ -216,7 +221,7 @@ export function ProjectsView({
               </p>
             </div>
             <span className="px-2 py-0.5 bg-amber-500/20 text-amber-300 border border-amber-500/40 rounded text-[10px] font-bold">
-              COURSEWORK 2024
+              ARCHIVED / DESKTOP + WEB POS
             </span>
           </div>
 
@@ -235,7 +240,7 @@ export function ProjectsView({
             </div>
             <div>
               <span className="text-[#9ece6a] font-bold font-mono">4. Result: </span>
-              <span>Đảm bảo tính toàn vẹn dữ liệu giao dịch ACID 100%, đồng bộ tồn kho tức thì giữa thu ngân tại quầy và đơn hàng đặt trên website.</span>
+              <span>Đảm bảo tính toàn vẹn dữ liệu giao dịch ACID 100%, 0% sai lệch tồn kho giữa thu ngân tại quầy và đơn hàng đặt trên website, xử lý hàng trăm hóa đơn/ca.</span>
             </div>
           </div>
 
@@ -246,7 +251,8 @@ export function ProjectsView({
             <span className="px-2 py-0.5 bg-white/5 rounded">Microsoft SQL Server</span>
           </div>
 
-          <div className="pt-1">
+          <div className="pt-1 flex items-center justify-between gap-3 text-[10px] text-slate-400 font-mono">
+            <span className="text-amber-400/80">Container: webbantra-sql:v1.0 | DB: MSSQL 2022</span>
             <a
               href="https://github.com/SILVESTRIKE/WebBanTra"
               target="_blank"
