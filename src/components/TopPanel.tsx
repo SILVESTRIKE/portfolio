@@ -161,6 +161,15 @@ export function TopPanel({
           />
         </div>
 
+        {/* Recruiter 30s Resume Button */}
+        <a
+          href="/resume"
+          className="hidden sm:flex items-center gap-1 bg-emerald-500/15 hover:bg-emerald-500/25 px-2 py-0.5 rounded-sm border border-emerald-500/40 text-emerald-300 font-bold text-[10px] transition-colors cursor-pointer shrink-0"
+          title="Open Recruiter 30-Second Resume Summary"
+        >
+          <span>30s RESUME</span>
+        </a>
+
         {/* Language Switcher Button */}
         <button
           onClick={() => setLocale(locale === 'en' ? 'vi' : 'en')}

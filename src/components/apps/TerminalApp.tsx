@@ -491,16 +491,15 @@ export function TerminalApp({ onOpenApp }: TerminalAppProps) {
         {[
           { label: 'fastfetch', cmd: 'fastfetch' },
           { label: 'about', cmd: 'about' },
-          { label: 'skills', cmd: 'skills' },
           { label: 'projects', cmd: 'projects' },
+          { label: 'skills', cmd: 'skills' },
+          { label: 'resume', cmd: 'resume' },
+          { label: 'contact', cmd: 'contact' },
+          { label: 'clear', cmd: 'clear' },
           { label: 'monitor', cmd: 'monitor' },
           { label: 'services', cmd: 'services' },
           { label: 'git', cmd: 'git' },
-          { label: 'network', cmd: 'network' },
-          { label: 'odoo', cmd: 'odoo' },
-          { label: 'contact', cmd: 'contact' },
-          { label: 'clear', cmd: 'clear' },
-          { label: 'boot', cmd: 'boot' }
+          { label: 'network', cmd: 'network' }
         ].map((btn) => (
           <button
             key={btn.label}
