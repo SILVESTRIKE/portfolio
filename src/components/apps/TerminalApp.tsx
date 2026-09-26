@@ -18,6 +18,7 @@ import {
   executeTerminalCommand,
   escapeHtml
 } from './terminal/terminalCommands';
+import { SYSTEM_CONFIG } from '@/config';
 
 interface TerminalAppProps {
   onOpenApp?: (id: AppId) => void;
@@ -44,9 +45,18 @@ const MAX_HISTORY = 50;
 const SUGGEST_COMMANDS = ALL_TERMINAL_COMMANDS;
 
 const INITIAL_WELCOME_BANNER = `
-<div class="font-mono mb-2 text-slate-400 text-[11px] leading-relaxed select-none border-b border-white/10 pb-1.5">
-  <div class="text-[#7aa2f7] font-bold text-xs tracking-wide">SILVESTRIKE WebOS Terminal v2.3</div>
-  <div class="text-[10px] text-slate-500">Type <span class="text-[#7aa2f7] font-semibold">'help'</span> for command index, or use quick action shortcuts below.</div>
+<div class="space-y-1 font-mono mb-2 select-none border-b border-white/10 pb-2 overflow-hidden">
+  <pre class="text-[#7aa2f7] text-[3.2px] min-[320px]:text-[3.6px] min-[360px]:text-[4.2px] min-[400px]:text-[5.2px] min-[480px]:text-[6.5px] sm:text-[9px] md:text-[10px] tracking-tight leading-none font-bold overflow-x-auto scrollbar-none py-0.5">
+███████╗██╗██╗    ██╗   ██╗███████╗███████╗████████╗██████╗ ██╗██╗  ██╗███████╗
+██╔════╝██║██║    ██║   ██║██╔════╝██╔════╝╚══██╔══╝██╔══██╗██║██║ ██╔╝██╔════╝
+███████╗██║██║    ██║   ██║█████╗  ███████╗   ██║   ██████╔╝██║█████╔╝ █████╗  
+╚════██║██║██║    ╚██╗ ██╔╝██╔══╝  ╚════██║   ██║   ██╔══██╗██║██╔═██╗ ██╔══╝  
+███████║██║███████╗╚████╔╝ ███████╗███████║   ██║   ██║  ██║██║██║  ██╗███████╗
+╚══════╝╚═╝╚══════╝ ╚═══╝  ╚══════╝╚══════╝   ╚═╝   ╚═╝  ╚═╝╚═╝╚═╝  ╚═╝╚══════╝
+  </pre>
+  <div class="text-[10.5px] sm:text-[11px] text-slate-400">
+   — Type <span class="text-[#7aa2f7] font-bold">'help'</span> for command index, or use quick action shortcuts below:
+  </div>
 </div>
 `;
 
@@ -65,7 +75,7 @@ export function TerminalApp({ onOpenApp }: TerminalAppProps) {
         {
           id: 'init-prompt',
           type: 'html',
-          content: '<span style="color: #9ece6a; font-weight: 600;">duong@srv-silvestrike:~$ </span><span>fastfetch</span>'
+          content: `<span style="color: #9ece6a; font-weight: 600;">${SYSTEM_CONFIG.userAtHost}:~$ </span><span>fastfetch</span>`
         },
         {
           id: 'init-fastfetch',
@@ -147,7 +157,7 @@ export function TerminalApp({ onOpenApp }: TerminalAppProps) {
 
   const getPromptString = (sessionDir: string) => {
     const displayDir = sessionDir.replace('/home/silvestrike', '~');
-    return `duong@srv-silvestrike:${displayDir}$ `;
+    return `${SYSTEM_CONFIG.userAtHost}:${displayDir}$ `;
   };
 
   // Ghost text auto-suggestion calculation
@@ -171,7 +181,7 @@ export function TerminalApp({ onOpenApp }: TerminalAppProps) {
         {
           id: `init-${Date.now()}`,
           type: 'text',
-          content: 'Linux srv-silvestrike x86_64 [pts/new] - Type "about" or "help"',
+          content: `Linux ${SYSTEM_CONFIG.serverHost} x86_64 [pts/new] - Type "about" or "help"`,
           color: '#64748b'
         }
       ],
@@ -350,7 +360,7 @@ export function TerminalApp({ onOpenApp }: TerminalAppProps) {
         setCommandHistory([]);
         try {
           localStorage.removeItem(STORAGE_KEY_HISTORY);
-        } catch {}
+        } catch { }
       },
       onCloseSession: () => {
         if (sessions.length > 1) {
@@ -435,7 +445,7 @@ export function TerminalApp({ onOpenApp }: TerminalAppProps) {
 
         <div className="hidden sm:flex items-center gap-2 font-mono text-[10px] text-slate-500 pr-2">
           <span className="w-1.5 h-1.5 rounded-full bg-[#9ece6a] animate-pulse" />
-          <span>duong@srv-silvestrike:~</span>
+          <span>{SYSTEM_CONFIG.userAtHost}:~</span>
         </div>
       </div>
 

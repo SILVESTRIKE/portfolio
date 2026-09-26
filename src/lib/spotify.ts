@@ -117,7 +117,14 @@ async function getSpotifyAccessToken(): Promise<string | null> {
   }
 }
 
+const audioPreviewCache = new Map<string, string>();
+
 async function fetchRealAudioPreview(artist: string, title: string): Promise<string | null> {
+  const cacheKey = `${artist.toLowerCase()}:::${title.toLowerCase()}`;
+  if (audioPreviewCache.has(cacheKey)) {
+    return audioPreviewCache.get(cacheKey) || null;
+  }
+
   try {
     const cleanTitle = title
       .replace(/\s*[\(\[].*?[\)\]]/g, '')
@@ -141,6 +148,7 @@ async function fetchRealAudioPreview(artist: string, title: string): Promise<str
         const data = await res.json();
         const first = data.results?.[0];
         if (first?.previewUrl) {
+          audioPreviewCache.set(cacheKey, first.previewUrl);
           return first.previewUrl;
         }
       }
@@ -153,6 +161,7 @@ async function fetchRealAudioPreview(artist: string, title: string): Promise<str
     if (deezerRes.ok) {
       const data = await deezerRes.json();
       if (data.data?.[0]?.preview) {
+        audioPreviewCache.set(cacheKey, data.data[0].preview);
         return data.data[0].preview;
       }
     }
@@ -207,24 +216,41 @@ async function fetchFromLastFm(): Promise<SpotifyTrackInfo | null> {
       progressMs: 30000,
       durationMs: 210000,
       trackId: `lastfm-${Date.now()}`,
-      youtubeVideoId: ytVideoId || '34Na4j8AVgA'
+      youtubeVideoId: ytVideoId || undefined
     };
   } catch {
     return null;
   }
 }
 
+// In-memory cache for live track to prevent flapping and avoid redundant external API calls
+let inMemoryCachedTrack: SpotifyTrackInfo | null = null;
+let lastFetchTimestamp = 0;
+const CACHE_TTL_MS = 6000;
+
 export async function getLiveSpotifyTrack(): Promise<SpotifyTrackInfo> {
+  const now = Date.now();
+  // Return cached track if within TTL
+  if (inMemoryCachedTrack && now - lastFetchTimestamp < CACHE_TTL_MS) {
+    return inMemoryCachedTrack;
+  }
+
   // 1. Try Last.fm Scrobbler first (works without Spotify Premium!)
-  const lastFmTrack = await fetchFromLastFm();
-  if (lastFmTrack) {
-    return lastFmTrack;
+  try {
+    const lastFmTrack = await fetchFromLastFm();
+    if (lastFmTrack) {
+      inMemoryCachedTrack = lastFmTrack;
+      lastFetchTimestamp = now;
+      return lastFmTrack;
+    }
+  } catch {
+    // Continue to next provider
   }
 
   // 2. Try Spotify Official Web API
-  const token = await getSpotifyAccessToken();
-  if (token) {
-    try {
+  try {
+    const token = await getSpotifyAccessToken();
+    if (token) {
       const currentRes = await fetch(SPOTIFY_NOW_PLAYING_ENDPOINT, {
         headers: { Authorization: `Bearer ${token}` },
         cache: 'no-store'
@@ -238,7 +264,7 @@ export async function getLiveSpotifyTrack(): Promise<SpotifyTrackInfo> {
           const isrc = data.item.external_ids?.isrc;
           const ytVideoId = await resolveYouTubeVideoId(artistName, data.item.name, isrc);
 
-          return {
+          const track: SpotifyTrackInfo = {
             isPlaying: data.is_playing,
             title: data.item.name,
             artist: artistName,
@@ -250,8 +276,12 @@ export async function getLiveSpotifyTrack(): Promise<SpotifyTrackInfo> {
             durationMs: data.item.duration_ms,
             trackId: data.item.id,
             isrc,
-            youtubeVideoId: ytVideoId || '34Na4j8AVgA'
+            youtubeVideoId: ytVideoId || undefined
           };
+
+          inMemoryCachedTrack = track;
+          lastFetchTimestamp = now;
+          return track;
         }
       }
 
@@ -269,7 +299,7 @@ export async function getLiveSpotifyTrack(): Promise<SpotifyTrackInfo> {
           const isrc = recent.external_ids?.isrc;
           const ytVideoId = await resolveYouTubeVideoId(artistName, recent.name, isrc);
 
-          return {
+          const track: SpotifyTrackInfo = {
             isPlaying: false,
             title: recent.name,
             artist: artistName,
@@ -281,18 +311,31 @@ export async function getLiveSpotifyTrack(): Promise<SpotifyTrackInfo> {
             durationMs: recent.duration_ms,
             trackId: recent.id,
             isrc,
-            youtubeVideoId: ytVideoId || '34Na4j8AVgA'
+            youtubeVideoId: ytVideoId || undefined
           };
+
+          inMemoryCachedTrack = track;
+          lastFetchTimestamp = now;
+          return track;
         }
       }
-    } catch {
-      // Fallback
     }
+  } catch {
+    // Fallback to in-memory cached track
   }
 
-  // 3. Fallback track with real audio preview & YouTube ID
+  // 3. Resilient Fallback: If we ever had a valid live track, KEEP IT!
+  // Never jump to Starboy simply because Last.fm / Spotify had a temporary network hiccup or rate limit.
+  if (inMemoryCachedTrack) {
+    return {
+      ...inMemoryCachedTrack,
+      isPlaying: false
+    };
+  }
+
+  // 4. Initial cold fallback track only if server has NEVER fetched any track yet
   return {
-    isPlaying: true,
+    isPlaying: false,
     title: 'Starboy',
     artist: 'The Weeknd, Daft Punk',
     album: 'Starboy',

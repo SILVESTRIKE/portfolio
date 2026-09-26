@@ -58,23 +58,23 @@ export function LogsApp({ onNotify }: LogsAppProps) {
   return (
     <div className="h-full w-full flex flex-col font-mono text-xs bg-[#080a0f] select-text">
       {/* Toolbar */}
-      <div className="h-10 bg-black/50 border-b border-white/10 px-3 flex items-center justify-between gap-3 select-none">
-        <div className="flex items-center gap-2">
-          <div className="flex items-center gap-1.5 bg-black/40 border border-white/10 rounded px-2.5 py-1 font-mono text-xs w-64 focus-within:border-sky-400/80 transition-colors">
-            <span className="text-emerald-400 font-bold">$ grep -i &quot;</span>
+      <div className="min-h-10 py-1 bg-black/50 border-b border-white/10 px-2 sm:px-3 flex items-center justify-between gap-1.5 sm:gap-3 select-none overflow-x-auto scrollbar-none">
+        <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+          <div className="flex items-center gap-1 bg-black/40 border border-white/10 rounded px-2 py-1 font-mono text-[11px] sm:text-xs w-36 sm:w-64 focus-within:border-sky-400/80 transition-colors">
+            <span className="text-emerald-400 font-bold">$ grep &quot;</span>
             <input
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder={t.apps.logs.filterPlaceholder}
-              className="bg-transparent border-none outline-none text-slate-200 flex-1 min-w-0 placeholder-slate-500 font-mono text-xs"
+              className="bg-transparent border-none outline-none text-slate-200 flex-1 min-w-0 placeholder-slate-500 font-mono text-[11px] sm:text-xs"
             />
             <span className="text-emerald-400 font-bold">&quot;</span>
           </div>
           <select
             value={level}
             onChange={(e) => setLevel(e.target.value)}
-            className="bg-white/5 border border-white/10 rounded px-2 py-1 text-xs text-slate-200 outline-none focus:border-sky-400 cursor-pointer"
+            className="bg-white/5 border border-white/10 rounded px-1.5 sm:px-2 py-1 text-[11px] sm:text-xs text-slate-200 outline-none focus:border-sky-400 cursor-pointer"
           >
             <option value="ALL">{t.apps.logs.levelAll}</option>
             <option value="INFO">{t.apps.logs.levelInfo}</option>
@@ -83,10 +83,10 @@ export function LogsApp({ onNotify }: LogsAppProps) {
           </select>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1 sm:gap-2 shrink-0">
           <button
             onClick={handleTogglePause}
-            className={`px-3 py-1 rounded text-xs transition-colors ${
+            className={`px-2 sm:px-3 py-1 rounded text-[11px] sm:text-xs transition-colors shrink-0 ${
               isPaused
                 ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
                 : 'bg-white/5 text-slate-300 hover:bg-white/10 border border-white/10'
@@ -96,7 +96,7 @@ export function LogsApp({ onNotify }: LogsAppProps) {
           </button>
           <button
             onClick={handleClear}
-            className="bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10 px-3 py-1 rounded text-xs transition-colors"
+            className="bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10 px-2 sm:px-3 py-1 rounded text-[11px] sm:text-xs transition-colors shrink-0"
           >
             {t.apps.logs.clearBtn}
           </button>
@@ -104,7 +104,7 @@ export function LogsApp({ onNotify }: LogsAppProps) {
       </div>
 
       {/* Log stream view */}
-      <div ref={streamRef} className="flex-1 overflow-y-auto p-3 flex flex-col gap-1 leading-relaxed">
+      <div ref={streamRef} className="flex-1 overflow-y-auto p-2 sm:p-3 flex flex-col gap-1.5 sm:gap-1 leading-relaxed">
         {filteredLogs.length === 0 ? (
           <div className="text-slate-500 text-center py-8 font-sans">
             {t.apps.logs.emptyMsg}
@@ -119,13 +119,27 @@ export function LogsApp({ onNotify }: LogsAppProps) {
                 : 'text-[#7aa2f7] bg-[#7aa2f7]/10 border-[#7aa2f7]/30';
 
             return (
-              <div key={`log-${l.id}-${idx}`} className="flex items-start gap-2.5 py-0.5 border-b border-white/[0.02]">
-                <span className="text-slate-500 shrink-0 w-36">{l.timestamp}</span>
-                <span className="text-[#7aa2f7] font-medium shrink-0 w-32 truncate">{l.service}</span>
-                <span className={`px-1.5 py-0.2 rounded border text-[10px] font-bold shrink-0 ${lvlBadgeColor}`}>
-                  {l.level}
+              <div
+                key={`log-${l.id}-${idx}`}
+                className="flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-2.5 py-1.5 sm:py-0.5 border-b border-white/5 sm:border-white/[0.02]"
+              >
+                {/* Header Metadata (Timestamp, Service, Level) */}
+                <div className="flex items-center gap-2 shrink-0 min-w-0">
+                  <span className="text-slate-500 text-[10.5px] sm:text-xs shrink-0 sm:w-36">
+                    {l.timestamp}
+                  </span>
+                  <span className="text-[#7aa2f7] font-semibold sm:font-medium text-[10.5px] sm:text-xs shrink-0 sm:w-32 truncate max-w-[130px] sm:max-w-none">
+                    {l.service}
+                  </span>
+                  <span className={`px-1.5 py-0.5 rounded border text-[9px] sm:text-[10px] font-bold shrink-0 ml-auto sm:ml-0 ${lvlBadgeColor}`}>
+                    {l.level}
+                  </span>
+                </div>
+
+                {/* Log Content / Message (Below header on mobile, inline on desktop) */}
+                <span className="text-slate-200 text-xs break-words sm:break-all flex-1 pl-1 sm:pl-0 leading-normal">
+                  {l.message}
                 </span>
-                <span className="text-slate-200 break-all flex-1">{l.message}</span>
               </div>
             );
           })

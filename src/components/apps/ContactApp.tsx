@@ -8,6 +8,7 @@ System impact if absent: Visitors, hiring managers, and engineering recruiters c
 import React, { useState } from 'react';
 import { useI18n } from '@/lib/i18n';
 import { generateFingerprint } from '@/lib/fingerprint';
+import { DEVELOPER_CONFIG } from '@/config';
 
 interface ContactAppProps {
   onNotify?: (msg: string, type?: 'info' | 'warn' | 'error') => void;
@@ -145,8 +146,8 @@ export function ContactApp({ onNotify, isEmbedded = false }: ContactAppProps) {
         <div className="text-slate-400 text-[11px] leading-relaxed space-y-0.5 select-none shrink-0 border-b border-white/5 pb-2">
           <div className="text-emerald-400 font-semibold">#!/usr/bin/env bash</div>
           <div className="text-slate-500"># ------------------------------------------------------------------------------</div>
-          <div className="text-sky-300"># SILVESTRIKE CONTACT WORKSTATION — Van Trong Duong</div>
-          <div># Email: <span className="text-slate-200">vtduong04@gmail.com</span> | Status: <span className="text-emerald-400 font-bold">OPEN_FOR_HIRE</span></div>
+          <div className="text-sky-300"># {DEVELOPER_CONFIG.alias} CONTACT WORKSTATION — {DEVELOPER_CONFIG.name}</div>
+          <div># Email: <span className="text-slate-200">{DEVELOPER_CONFIG.contact.email}</span> | Status: <span className="text-emerald-400 font-bold">OPEN_FOR_HIRE</span></div>
           <div className="text-slate-500"># ------------------------------------------------------------------------------</div>
           <div className="text-amber-400/90 pt-1">
             {locale === 'vi'
@@ -242,7 +243,7 @@ export function ContactApp({ onNotify, isEmbedded = false }: ContactAppProps) {
           onClick={copyEmailToClipboard}
           className="px-3 py-2 bg-white/5 hover:bg-white/10 border border-white/15 rounded text-xs text-slate-300 hover:text-slate-100 transition-colors cursor-pointer ml-auto"
         >
-          {copiedEmail ? (locale === 'vi' ? 'Đã sao chép Email' : 'Copied Email') : 'vtduong04@gmail.com'}
+          {copiedEmail ? (locale === 'vi' ? 'Đã sao chép Email' : 'Copied Email') : DEVELOPER_CONFIG.contact.email}
         </button>
       </div>
     </div>

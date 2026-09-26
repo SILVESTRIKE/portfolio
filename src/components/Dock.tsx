@@ -8,6 +8,7 @@ System impact if absent: Desktop workstation lacks bottom system status indicato
 import React from 'react';
 import { AppId, WindowState } from '@/types';
 import { useI18n } from '@/lib/i18n';
+import { SYSTEM_CONFIG } from '@/config';
 
 interface DockProps {
   windows: Record<AppId, WindowState>;
@@ -38,7 +39,7 @@ export function Dock({ windows, activeId, onToggleApp }: DockProps) {
           [tmux:0]
         </span>
         <span className="text-slate-300 font-semibold hidden sm:inline">
-          root@srv-silvestrike
+          root@{SYSTEM_CONFIG.serverHost}
         </span>
         <span className="text-slate-600 hidden sm:inline">:</span>
         <span className="text-slate-400 hidden md:inline">

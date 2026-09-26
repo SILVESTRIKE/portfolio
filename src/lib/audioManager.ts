@@ -44,7 +44,7 @@ class GlobalAudioManager {
   private isYtReady = false;
   private isYtPlaying = false;
   private ytWatchdog: ReturnType<typeof setTimeout> | null = null;
-  private currentYtVideoId: string | null = '34Na4j8AVgA';
+  private currentYtVideoId: string | null = null;
   private activeOscillators: OscillatorNode[] = [];
 
   constructor() {
@@ -156,9 +156,9 @@ class GlobalAudioManager {
     if (!container) {
       container = document.createElement('div');
       container.id = 'yt-audio-player-host';
-      // Use standard offscreen dimensions rather than 1x1 to prevent Chromium "No available adapters" error
+      // Keep in viewport with microscopic opacity so Chromium allocates video rendering compositor without "No available adapters"
       container.style.cssText =
-        'position:fixed;bottom:-9999px;right:-9999px;width:320px;height:240px;opacity:0.01;pointer-events:none;';
+        'position:fixed;bottom:0;right:0;width:200px;height:150px;opacity:0.001;pointer-events:none;z-index:-1;';
       document.body.appendChild(container);
     }
 
@@ -194,8 +194,9 @@ class GlobalAudioManager {
 
     try {
       this.ytPlayer = new window.YT.Player('yt-audio-player-host', {
-        height: '240',
-        width: '320',
+        height: '150',
+        width: '200',
+        host: 'https://www.youtube-nocookie.com',
         videoId: this.currentYtVideoId,
         playerVars: {
           autoplay: 0,
@@ -326,14 +327,14 @@ class GlobalAudioManager {
         } catch {}
       }
 
-      // Arm watchdog: if YouTube is blocked by client adblock or doesn't reach PLAYING in 2.5s, auto fallback to HTML5 stream
+      // Arm watchdog: if YouTube is blocked by client adblock or doesn't reach PLAYING in 1.2s, auto fallback to HTML5 stream
       if (this.ytWatchdog) clearTimeout(this.ytWatchdog);
       this.ytWatchdog = setTimeout(() => {
         if (this.isPlaying && !this.isYtPlaying) {
           this.initAudio();
           this.audio?.play().catch(() => this.startSynth());
         }
-      }, 2500);
+      }, 1200);
       return;
     }
 

@@ -8,6 +8,7 @@ System Impact of Absence: Dossier studio cannot display developer contact links,
 import React from 'react';
 import { FileId } from '../types';
 import { ContactApp } from '../../ContactApp';
+import { DEVELOPER_CONFIG } from '@/config';
 
 interface ContactManualViewProps {
   activeTab: FileId;
@@ -42,7 +43,7 @@ export function ContactManualView({
           <div>
             <span className="text-sky-400 font-bold">NAME</span>
             <p className="text-slate-300 ml-4">
-              silvestrike - Van Trong Duong, software engineer & AI researcher
+              {DEVELOPER_CONFIG.alias.toLowerCase()} - {DEVELOPER_CONFIG.name}, software engineer & AI researcher
             </p>
           </div>
 

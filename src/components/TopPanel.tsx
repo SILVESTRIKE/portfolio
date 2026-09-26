@@ -10,6 +10,7 @@ import { monitor } from '@/lib/monitor';
 import { SystemSnapshot, WorkspaceId, TilingLayoutMode } from '@/types';
 import { SpotifyPlayer } from '@/components/SpotifyPlayer';
 import { useI18n } from '@/lib/i18n';
+import { SYSTEM_CONFIG } from '@/config';
 
 interface TopPanelProps {
   currentWorkspace: WorkspaceId;
@@ -50,7 +51,7 @@ export function TopPanel({
 
   const totalCpu = metrics?.totalCpu ?? 12;
   const ramGbUsed = metrics ? (metrics.ramUsed / 1024).toFixed(1) : '3.4';
-  const hostname = 'silvestrike.dev';
+  const hostname = SYSTEM_CONFIG.hostname;
 
   const workspaces: Array<{ id: WorkspaceId; label: string }> = [
     { id: 1, label: '1:term' },
@@ -75,17 +76,23 @@ export function TopPanel({
   };
 
   return (
-    <header className="h-[42px] glass-panel border-b border-white/10 px-2 sm:px-3 flex items-center justify-between gap-2 sm:gap-4 z-50 text-xs font-mono select-none relative w-full overflow-hidden">
+    <header className="h-[42px] glass-panel border-b border-white/10 px-1.5 sm:px-3 flex items-center justify-between gap-1 sm:gap-4 z-50 text-xs font-mono select-none relative w-full overflow-hidden">
       {/* Left section: host badge, Workspace Switcher & Tiling indicator */}
-      <div className="flex items-center gap-1 sm:gap-2.5 shrink-0">
-        {/* Host & App Logo badge */}
-        <div className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-2.5 py-1 bg-white/5 hover:bg-white/10 border border-white/10 rounded shrink-0 transition-colors cursor-pointer group" title="Caelestia Hyprland WebOS">
-          <span className="font-semibold text-slate-100 hidden md:inline">{hostname}</span>
-          <span className="font-semibold text-slate-100 md:hidden">{hostname.split('.')[0]}</span>
-        </div>
+      <div className="flex items-center gap-1 sm:gap-2.5 shrink-0 min-w-0">
+        {/* Host Home Button -> Switch to Workspace 2 */}
+        <button
+          type="button"
+          onClick={() => onSelectWorkspace(2)}
+          className="flex items-center gap-1 sm:gap-2 px-1.5 sm:px-2.5 py-1 bg-white/5 hover:bg-white/10 active:scale-95 border border-white/10 hover:border-[#7aa2f7]/40 rounded shrink-0 transition-all cursor-pointer group"
+          title="Home (Workspace 2: dev)"
+        >
+          <span className="font-semibold text-slate-100 text-[10.5px] sm:text-xs tracking-tight group-hover:text-[#7aa2f7] transition-colors">
+            {hostname}
+          </span>
+        </button>
 
         {/* Workspace Switcher (Hyprland / i3 style) */}
-        <div className="flex items-center gap-1 bg-black/40 p-0.5 sm:p-1 rounded-sm border border-white/10 shrink-0">
+        <div className="flex items-center gap-0.5 sm:gap-1 bg-black/40 p-0.5 sm:p-1 rounded-sm border border-white/10 shrink-0">
           {workspaces.map((ws) => {
             const isActive = currentWorkspace === ws.id;
             const count = workspaceCounts?.[ws.id] ?? 0;
@@ -94,7 +101,7 @@ export function TopPanel({
               <button
                 key={ws.id}
                 onClick={() => onSelectWorkspace(ws.id)}
-                className={`px-1.5 sm:px-2 py-0.5 rounded-sm text-[11px] font-mono transition-all flex items-center gap-1 ${isActive
+                className={`px-1.5 sm:px-2 py-0.5 rounded-sm text-[10.5px] sm:text-[11px] font-mono transition-all flex items-center gap-1 ${isActive
                   ? 'bg-[#7aa2f7]/15 text-[#7aa2f7] border border-[#7aa2f7]/40 font-bold shadow-[0_0_10px_rgba(122,162,247,0.15)]'
                   : 'text-slate-400 hover:text-slate-200 hover:bg-white/5'
                   }`}
@@ -153,7 +160,7 @@ export function TopPanel({
           </span>
         </div>
 
-        {/* Spotify Live Player Pill -> Switch to Special Workspace */}
+        {/* Spotify Live Player Pill -> Switch to Special Workspace (compact on mobile) */}
         <div className="relative shrink-0">
           <SpotifyPlayer
             mode="panel"
@@ -181,10 +188,10 @@ export function TopPanel({
           <span className={locale === 'vi' ? 'text-[#7aa2f7]' : 'text-slate-500'}>VI</span>
         </button>
 
-        {/* UTC Clock - Guaranteed fully visible right-anchored */}
-        <div className="flex items-center gap-1 bg-white/5 px-1.5 sm:px-2 py-0.5 rounded border border-white/10 text-slate-200 font-semibold shrink-0 text-[10px] sm:text-[11px]">
+        {/* UTC Clock - Hidden on mobile (< sm), visible on desktop */}
+        <div className="hidden sm:flex items-center gap-1 bg-white/5 px-2 py-0.5 rounded border border-white/10 text-slate-200 font-semibold shrink-0 text-[10px] sm:text-[11px] whitespace-nowrap">
           <span>{timeStr}</span>
-          <span className="text-slate-500 text-[9px] sm:text-[10px] hidden min-[380px]:inline">UTC</span>
+          <span className="text-slate-500 text-[9px] sm:text-[10px] hidden min-[400px]:inline">UTC</span>
         </div>
       </div>
     </header>

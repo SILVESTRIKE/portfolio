@@ -18,6 +18,7 @@ import { ProjectsView } from './aboutme/views/ProjectsView';
 import { ThesisView } from './aboutme/views/ThesisView';
 import { ContactManualView } from './aboutme/views/ContactManualView';
 import { useIsMobile } from '@/lib/breakpoints';
+import { DEVELOPER_CONFIG, SYSTEM_CONFIG } from '@/config';
 
 export function AboutMeTerminalApp({ onNotify, onOpenApp }: AboutMeTerminalAppProps) {
   const { t } = useI18n();
@@ -119,9 +120,9 @@ export function AboutMeTerminalApp({ onNotify, onOpenApp }: AboutMeTerminalAppPr
     } else if (cmd === 'fastfetch') {
       handleOpenFile('profile.yml');
       newLogs.push(
-        'SILVESTRIKE WebOS',
-        'WM: Hyprland (Wayland) | Theme: Caelestia Soft Blue',
-        'Host: Van Trong Duong | Status: Open for Software Engineer / AI Engineer Roles',
+        SYSTEM_CONFIG.os.name,
+        `WM: ${SYSTEM_CONFIG.os.wm} | Theme: Caelestia Soft Blue`,
+        `Host: ${DEVELOPER_CONFIG.name} | Status: ${DEVELOPER_CONFIG.targetRoles}`,
         'Opened profile.yml'
       );
     } else if (cmd === 'ls') {
@@ -197,28 +198,28 @@ export function AboutMeTerminalApp({ onNotify, onOpenApp }: AboutMeTerminalAppPr
   return (
     <div className="h-full w-full flex flex-col bg-[#080c14] text-slate-200 font-mono text-xs select-text overflow-hidden">
       {/* Top Application Bar */}
-      <div className="h-9 bg-[#0b0f19] border-b border-white/10 px-3 flex items-center justify-between gap-3 shrink-0 select-none">
-        <div className="flex items-center gap-2">
-          <span className="w-2.5 h-2.5 rounded-full bg-[#7aa2f7]" />
-          <span className="font-bold text-slate-200 tracking-wide text-[11px]">
-            SILVESTRIKE DOSSIER STUDIO
+      <div className="h-9 bg-[#0b0f19] border-b border-white/10 px-2 sm:px-3 flex items-center justify-between gap-2 shrink-0 select-none overflow-hidden">
+        <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
+          <span className="w-2 h-2 rounded-full bg-[#7aa2f7] shrink-0" />
+          <span className="font-bold text-slate-200 tracking-wide text-[10px] sm:text-[11px] truncate">
+            <span className="hidden sm:inline">SILVESTRIKE </span>DOSSIER STUDIO
           </span>
-          <span className="text-slate-500 text-[10px]">v2.0 [IDE Mode]</span>
+          <span className="text-slate-500 text-[10px] hidden md:inline">v2.0 [IDE Mode]</span>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 shrink-0">
           <button
             onClick={() => setIsCliOpen(!isCliOpen)}
-            className={`px-2 py-0.5 rounded text-[10px] border transition-colors flex items-center gap-1.5 ${isCliOpen
+            className={`px-1.5 sm:px-2 py-0.5 rounded text-[10px] border transition-colors flex items-center gap-1 ${isCliOpen
               ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
               : 'text-slate-400 hover:text-slate-200 border-white/10 hover:bg-white/5'
               }`}
           >
-            <span>[TERMINAL]</span>
-            <span>{isCliOpen ? 'Hide' : 'Show'}</span>
+            <span>[CLI]</span>
+            <span className="hidden sm:inline">{isCliOpen ? 'Hide' : 'Show'}</span>
           </button>
 
-          <div className="hidden sm:flex items-center gap-2 text-[10px] text-slate-400">
+          <div className="hidden md:flex items-center gap-2 text-[10px] text-slate-400">
             <span>git:(main)</span>
           </div>
         </div>
