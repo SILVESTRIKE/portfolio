@@ -146,9 +146,9 @@ export function DossierSidebar({
         </div>
       </div>
 
-      {/* Sidebar Panel (220px) */}
+      {/* Sidebar Panel (~176px - 208px) */}
       {sidebarOpen && (
-        <div className="w-56 bg-[#0a0e18] border-r border-white/10 flex flex-col shrink-0 select-none overflow-hidden">
+        <div className="w-44 sm:w-52 bg-[#0a0e18] border-r border-white/10 flex flex-col shrink-0 select-none overflow-hidden">
           {/* Explorer Header */}
           {activityBar === 'explorer' && (
             <>

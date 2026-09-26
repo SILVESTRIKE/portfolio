@@ -281,7 +281,7 @@ export function AboutMeTerminalApp({ onNotify, onOpenApp }: AboutMeTerminalAppPr
           {/* Editor Body */}
           <div
             ref={editorScrollRef}
-            className="flex-1 overflow-y-auto p-4 md:p-6 space-y-6 leading-relaxed selection:bg-[#7aa2f7]/30 font-mono text-xs"
+            className="flex-1 overflow-y-auto overflow-x-auto p-2.5 sm:p-4 md:p-6 space-y-4 sm:space-y-6 leading-relaxed selection:bg-[#7aa2f7]/30 font-mono text-xs min-w-0"
           >
             {activeTab === 'profile.yml' && <ProfileView />}
             {activeTab === 'README.md' && <ReadmeView />}
@@ -321,8 +321,8 @@ export function AboutMeTerminalApp({ onNotify, onOpenApp }: AboutMeTerminalAppPr
           />
 
           {/* IDE Status Bar */}
-          <div className="h-6 bg-[#070a12] border-t border-white/10 px-3 flex items-center justify-between text-[10px] text-slate-400 shrink-0 select-none">
-            <div className="flex items-center gap-3">
+          <div className="h-6 bg-[#070a12] border-t border-white/10 px-3 flex items-center justify-between text-[10px] text-slate-400 shrink-0 select-none whitespace-nowrap overflow-x-auto scrollbar-none gap-4">
+            <div className="flex items-center gap-3 shrink-0 whitespace-nowrap">
               <span className="flex items-center gap-1 text-[#7aa2f7] font-bold">
                 <span>git:(</span>
                 <span>{t.apps?.about?.statusBranch || 'main'}</span>
@@ -332,7 +332,7 @@ export function AboutMeTerminalApp({ onNotify, onOpenApp }: AboutMeTerminalAppPr
               <span className="text-emerald-400">0 errors, 0 warnings</span>
             </div>
 
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 shrink-0 whitespace-nowrap">
               <span>Ln 1, Col 1</span>
               <span className="text-slate-500">|</span>
               <span>{t.apps?.about?.statusSpaces || 'Spaces: 2'}</span>

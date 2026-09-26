@@ -44,8 +44,8 @@ const MAX_HISTORY = 50;
 const SUGGEST_COMMANDS = ALL_TERMINAL_COMMANDS;
 
 const INITIAL_WELCOME_BANNER = `
-<div class="space-y-1.5 font-mono mb-2">
-  <pre class="text-[#7aa2f7] text-[9px] sm:text-xs leading-none select-none font-bold overflow-x-auto">
+<div class="space-y-1.5 font-mono mb-2 overflow-hidden">
+  <pre class="text-[#7aa2f7] text-[5px] min-[360px]:text-[6px] min-[420px]:text-[7px] sm:text-[10px] md:text-xs tracking-tight leading-none select-none font-bold overflow-x-auto scrollbar-none py-1">
 ███████╗██╗██╗    ██╗   ██╗███████╗███████╗████████╗██████╗ ██╗██╗  ██╗███████╗
 ██╔════╝██║██║    ██║   ██║██╔════╝██╔════╝╚══██╔══╝██╔══██╗██║██║ ██╔╝██╔════╝
 ███████╗██║██║    ██║   ██║█████╗  ███████╗   ██║   ██████╔╝██║█████╔╝ █████╗  
@@ -53,7 +53,7 @@ const INITIAL_WELCOME_BANNER = `
 ███████║██║███████╗╚████╔╝ ███████╗███████║   ██║   ██║  ██║██║██║  ██╗███████╗
 ╚══════╝╚═╝╚══════╝ ╚═══╝  ╚══════╝╚══════╝   ╚═╝   ╚═╝  ╚═╝╚═╝╚═╝  ╚═╝╚══════╝
   </pre>
-  <div class="text-[11px] text-slate-400 pt-1">
+  <div class="text-[10px] sm:text-[11px] text-slate-400 pt-0.5">
     Type <span class="text-[#7aa2f7] font-bold">'help'</span> for command index, or click quick buttons below:
   </div>
 </div>

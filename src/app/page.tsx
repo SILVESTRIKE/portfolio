@@ -38,6 +38,7 @@ export default function WebOSPage() {
   const [hasBooted, setHasBooted] = useState<boolean>(true);
   const [bootKey, setBootKey] = useState<number>(0);
   const [currentWsId, setCurrentWsId] = useState<WorkspaceId>(1);
+  const [lastNormalWsId, setLastNormalWsId] = useState<WorkspaceId>(1);
   const [activePaneId, setActivePaneId] = useState<AppId | null>('app-terminal');
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
@@ -70,6 +71,17 @@ export default function WebOSPage() {
       sessionStorage.setItem('silves_boot_complete', 'true');
     }
     setHasBooted(true);
+    // Auto-play background music when booted into OS
+    globalAudio.play();
+    const handleFirstInteraction = () => {
+      if (!globalAudio.getStatus().isPlaying) {
+        globalAudio.play();
+      }
+      window.removeEventListener('pointerdown', handleFirstInteraction);
+      window.removeEventListener('keydown', handleFirstInteraction);
+    };
+    window.addEventListener('pointerdown', handleFirstInteraction, { once: true });
+    window.addEventListener('keydown', handleFirstInteraction, { once: true });
   }, []);
 
   // Sub-tab selection state inside each Hub
@@ -105,6 +117,13 @@ export default function WebOSPage() {
       activeAppIds: ['hub-workspace'],
       layout: 'master-stack',
       maximizedAppId: null
+    },
+    special: {
+      id: 'special',
+      name: 'special:music',
+      activeAppIds: ['app-spotify'],
+      layout: 'monocle',
+      maximizedAppId: null
     }
   });
 
@@ -114,7 +133,7 @@ export default function WebOSPage() {
     if (savedWs) {
       setWorkspaces(prev => {
         const merged: Record<WorkspaceId, WorkspaceState> = { ...savedWs };
-        for (const k of [1, 2, 3, 4] as WorkspaceId[]) {
+        for (const k of [1, 2, 3, 4, 'special'] as WorkspaceId[]) {
           if (!merged[k] || !Array.isArray(merged[k].activeAppIds) || merged[k].activeAppIds.length === 0) {
             merged[k] = prev[k];
           }
@@ -157,7 +176,14 @@ export default function WebOSPage() {
     }
   }, []);
 
-  const currentWorkspace = workspaces[currentWsId];
+  const switchWorkspace = useCallback((id: WorkspaceId) => {
+    if (id !== 'special') {
+      setLastNormalWsId(id);
+    }
+    setCurrentWsId(id);
+  }, []);
+
+  const currentWorkspace = workspaces[currentWsId] || workspaces[1];
 
   // Cycle layout modes: master-stack -> grid -> columns -> monocle
   const handleToggleLayout = () => {
@@ -175,55 +201,69 @@ export default function WebOSPage() {
     showToast(`${t.apps.toast.switchedLayout} ${nextMode.toUpperCase()}`, 'info');
   };
 
-  // Toggle app pane in current workspace (with smart Hub mapping)
+  // Toggle app pane in current workspace (with smart Hub & Special Workspace mapping)
   const handleToggleApp = (appId: AppId) => {
     let targetWsId: WorkspaceId = currentWsId;
     let targetId: AppId = appId;
 
-    if (appId === 'app-about') {
+    if (appId === 'app-spotify') {
+      if (currentWsId === 'special') {
+        switchWorkspace(lastNormalWsId || 1);
+        return;
+      }
+      targetWsId = 'special';
+      targetId = 'app-spotify';
+      switchWorkspace('special');
+    } else if (appId === 'app-about') {
       targetWsId = 2;
       setPortfolioTab('about');
       targetId = 'hub-portfolio';
-      setCurrentWsId(2);
+      switchWorkspace(2);
     } else if (appId === 'app-services') {
       targetWsId = 2;
       setPortfolioTab('services');
       targetId = 'hub-portfolio';
-      setCurrentWsId(2);
+      switchWorkspace(2);
     } else if (appId === 'app-git') {
       targetWsId = 2;
       setPortfolioTab('git');
       targetId = 'hub-portfolio';
-      setCurrentWsId(2);
+      switchWorkspace(2);
     } else if (appId === 'app-monitor') {
       targetWsId = 3;
       setSystemTab('monitor');
       targetId = 'hub-system';
-      setCurrentWsId(3);
+      switchWorkspace(3);
     } else if (appId === 'app-logs') {
       targetWsId = 3;
       setSystemTab('logs');
       targetId = 'hub-system';
-      setCurrentWsId(3);
+      switchWorkspace(3);
     } else if (appId === 'app-network') {
       targetWsId = 3;
       setSystemTab('network');
       targetId = 'hub-system';
-      setCurrentWsId(3);
+      switchWorkspace(3);
     } else if (appId === 'app-ai') {
       targetWsId = 4;
       setWorkspaceTab('ai');
       targetId = 'hub-workspace';
-      setCurrentWsId(4);
+      switchWorkspace(4);
     } else if (appId === 'app-files') {
       targetWsId = 4;
       setWorkspaceTab('files');
       targetId = 'hub-workspace';
-      setCurrentWsId(4);
+      switchWorkspace(4);
     }
 
     setWorkspaces(prev => {
-      const ws = prev[targetWsId];
+      const ws = prev[targetWsId] || {
+        id: targetWsId,
+        name: targetWsId === 'special' ? 'special:music' : `ws-${targetWsId}`,
+        activeAppIds: [targetId],
+        layout: 'monocle',
+        maximizedAppId: null
+      };
       const exists = ws.activeAppIds.includes(targetId);
 
       let nextIds: AppId[];
@@ -300,16 +340,19 @@ export default function WebOSPage() {
       if (e.altKey) {
         if (e.key === '1') {
           e.preventDefault();
-          setCurrentWsId(1);
+          switchWorkspace(1);
         } else if (e.key === '2') {
           e.preventDefault();
-          setCurrentWsId(2);
+          switchWorkspace(2);
         } else if (e.key === '3') {
           e.preventDefault();
-          setCurrentWsId(3);
+          switchWorkspace(3);
         } else if (e.key === '4') {
           e.preventDefault();
-          setCurrentWsId(4);
+          switchWorkspace(4);
+        } else if (e.key.toLowerCase() === 's') {
+          e.preventDefault();
+          switchWorkspace(currentWsId === 'special' ? (lastNormalWsId || 1) : 'special');
         } else if (e.key.toLowerCase() === 't' || e.key === 'Enter') {
           e.preventDefault();
           handleToggleApp('app-terminal');
@@ -415,7 +458,7 @@ export default function WebOSPage() {
         };
       case 'app-spotify':
         return {
-          title: 'NCT Music Player',
+          title: 'Music Player (Spotify & YouTube)',
           component: <SpotifyPlayer mode="full" />
         };
       case 'app-git':
@@ -546,7 +589,7 @@ export default function WebOSPage() {
     'app-spotify': {
       id: 'app-spotify',
       title: 'Spotify',
-      isOpen: currentWorkspace.activeAppIds.includes('app-spotify'),
+      isOpen: currentWorkspace.activeAppIds.includes('app-spotify') || currentWsId === 'special',
       isMinimized: false,
       isMaximized: currentWorkspace.maximizedAppId === 'app-spotify',
       zIndex: 1,
@@ -596,54 +639,61 @@ export default function WebOSPage() {
   };
 
   const workspaceCounts: Record<WorkspaceId, number> = {
-    1: workspaces[1].activeAppIds.length,
-    2: workspaces[2].activeAppIds.length,
-    3: workspaces[3].activeAppIds.length,
-    4: workspaces[4].activeAppIds.length
+    1: workspaces[1]?.activeAppIds.length ?? 0,
+    2: workspaces[2]?.activeAppIds.length ?? 0,
+    3: workspaces[3]?.activeAppIds.length ?? 0,
+    4: workspaces[4]?.activeAppIds.length ?? 0,
+    special: workspaces.special?.activeAppIds.length ?? 0
   };
 
   return (
-    <div className="h-screen w-screen flex flex-col overflow-hidden relative select-none bg-obsidian-950">
-      {/* Top System Panel with Workspace Switcher */}
-      <TopPanel
-        currentWorkspace={currentWsId}
-        onSelectWorkspace={(id) => setCurrentWsId(id)}
-        workspaceCounts={workspaceCounts}
-        layoutMode={currentWorkspace.layout}
-        onToggleLayout={handleToggleLayout}
-        onOpenSpotify={() => handleToggleApp('app-spotify')}
-      />
+    <div className="min-h-[100dvh] h-[100dvh] w-screen flex items-center justify-center overflow-hidden bg-obsidian-950 relative p-0 lg:px-4 lg:pt-2.5 lg:pb-3.5">
+      {/* Background ambient lighting on PC */}
+      <div className="hidden lg:block absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_50%_50%,rgba(122,162,247,0.06)_0%,transparent_75%)]" />
 
-      {/* Main Workspace Area (Dynamic Tiling) */}
-      <main id="desktop-workspace" className="flex-1 relative overflow-hidden">
-        <TilingWorkspace
-          appIds={currentWorkspace.activeAppIds}
-          activeId={activePaneId}
-          maximizedAppId={currentWorkspace.maximizedAppId}
+      {/* Main Workstation Frame: ~87% centered on PC, 100% max-width & max-height on mobile */}
+      <div className="h-[100dvh] max-h-[100dvh] w-full max-w-full lg:w-[87%] lg:max-w-[1780px] lg:h-[94.5vh] lg:max-h-[94.5vh] flex flex-col overflow-hidden relative select-none bg-obsidian-950 lg:rounded-xl lg:border lg:border-white/10 lg:shadow-[0_25px_60px_-15px_rgba(0,0,0,0.9)] z-10">
+        {/* Top System Panel with Workspace Switcher */}
+        <TopPanel
+          currentWorkspace={currentWsId}
+          onSelectWorkspace={switchWorkspace}
+          workspaceCounts={workspaceCounts}
           layoutMode={currentWorkspace.layout}
-          sidebarAppId="hub-workspace"
-          onFocus={(id) => setActivePaneId(id)}
-          onToggleMaximize={handleToggleMaximize}
-          onClose={handleClosePane}
-          onReorderAppIds={(newIds) => {
-            setWorkspaces(prev => ({
-              ...prev,
-              [currentWsId]: {
-                ...prev[currentWsId],
-                activeAppIds: newIds
-              }
-            }));
-          }}
-          renderApp={renderAppContent}
+          onToggleLayout={handleToggleLayout}
+          onOpenSpotify={() => handleToggleApp('app-spotify')}
         />
-      </main>
 
-      {/* Bottom Application Dock */}
-      <Dock
-        windows={dockWindowsState}
-        activeId={activePaneId}
-        onToggleApp={handleToggleApp}
-      />
+        {/* Main Workspace Area (Dynamic Tiling) */}
+        <main id="desktop-workspace" className="flex-1 relative overflow-hidden">
+          <TilingWorkspace
+            appIds={currentWorkspace.activeAppIds}
+            activeId={activePaneId}
+            maximizedAppId={currentWorkspace.maximizedAppId}
+            layoutMode={currentWorkspace.layout}
+            sidebarAppId="hub-workspace"
+            onFocus={(id) => setActivePaneId(id)}
+            onToggleMaximize={handleToggleMaximize}
+            onClose={handleClosePane}
+            onReorderAppIds={(newIds) => {
+              setWorkspaces(prev => ({
+                ...prev,
+                [currentWsId]: {
+                  ...prev[currentWsId],
+                  activeAppIds: newIds
+                }
+              }));
+            }}
+            renderApp={renderAppContent}
+          />
+        </main>
+
+        {/* Bottom Application Dock */}
+        <Dock
+          windows={dockWindowsState}
+          activeId={activePaneId}
+          onToggleApp={handleToggleApp}
+        />
+      </div>
 
       {/* Toast Alert Notifications */}
       <ToastContainer toasts={toasts} />
@@ -653,7 +703,7 @@ export default function WebOSPage() {
         isOpen={isCommandPaletteOpen}
         onClose={() => setIsCommandPaletteOpen(false)}
         onLaunchApp={(appId) => handleToggleApp(appId)}
-        onSwitchWorkspace={(wsId) => setCurrentWsId(wsId)}
+        onSwitchWorkspace={switchWorkspace}
         onToggleLayout={handleToggleLayout}
         onCloseActivePane={() => {
           if (activePaneId) handleClosePane(activePaneId);

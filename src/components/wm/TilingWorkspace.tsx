@@ -9,6 +9,7 @@ import React, { useState, useRef } from 'react';
 import { AppId, TilingLayoutMode } from '@/types';
 import { TilingPane } from './TilingPane';
 import { useI18n } from '@/lib/i18n';
+import { useIsMobile } from '@/lib/breakpoints';
 
 interface TilingWorkspaceProps {
   appIds: AppId[];
@@ -37,6 +38,8 @@ export function TilingWorkspace({
   sidebarAppId
 }: TilingWorkspaceProps) {
   const { t } = useI18n();
+  const isMobile = useIsMobile();
+  const effectiveLayoutMode = isMobile ? 'monocle' : layoutMode;
   const hasSidebar = !!(sidebarAppId && appIds.includes(sidebarAppId));
   const [masterRatio, setMasterRatio] = useState<number>(hasSidebar ? 70 : 60);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -127,12 +130,12 @@ export function TilingWorkspace({
     );
   }
 
-  // Monocle layout: focused pane takes full space
-  if (layoutMode === 'monocle') {
+  // Monocle layout or Mobile Viewport: focused pane takes full space
+  if (effectiveLayoutMode === 'monocle') {
     const focused = activeId && appIds.includes(activeId) ? activeId : appIds[0];
     const { title, component } = renderApp(focused);
     return (
-      <div className="h-full w-full p-2 flex">
+      <div className="h-full w-full p-1 sm:p-2 flex">
         <TilingPane
           paneId={focused}
           title={title}

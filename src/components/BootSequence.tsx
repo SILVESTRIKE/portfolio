@@ -30,6 +30,7 @@ const BOOT_LOG_LINES = [
 export function BootSequence({ onComplete }: BootSequenceProps) {
   // Phases: 'logs' -> 'blackout' -> 'logo' -> 'fadeout'
   const [phase, setPhase] = useState<'logs' | 'blackout' | 'logo' | 'fadeout'>('logs');
+  const [logoState, setLogoState] = useState<'appear' | 'sliced' | 'glitchOut'>('appear');
   const [displayedLogs, setDisplayedLogs] = useState<string[]>([]);
   const [progress, setProgress] = useState(0);
   const audioCtxRef = useRef<AudioContext | null>(null);
@@ -77,17 +78,32 @@ export function BootSequence({ onComplete }: BootSequenceProps) {
           setPhase('blackout');
           const t2 = setTimeout(() => {
             setPhase('logo');
+            setLogoState('appear');
+            playTone(440, 0.15, 'triangle', 0.04);
+
             const t3 = setTimeout(() => {
-              setPhase('fadeout');
+              setLogoState('sliced');
+              playTone(200, 0.14, 'sawtooth', 0.07);
+
               const t4 = setTimeout(() => {
-                onComplete();
-              }, 400);
+                setLogoState('glitchOut');
+                playTone(130, 0.18, 'square', 0.05);
+
+                const t5 = setTimeout(() => {
+                  setPhase('fadeout');
+                  const t6 = setTimeout(() => {
+                    onComplete();
+                  }, 400);
+                  timeoutsRef.current.push(t6);
+                }, 550);
+                timeoutsRef.current.push(t5);
+              }, 750);
               timeoutsRef.current.push(t4);
-            }, 1200);
+            }, 950);
             timeoutsRef.current.push(t3);
           }, 250);
           timeoutsRef.current.push(t2);
-        }, 200);
+        }, 180);
         timeoutsRef.current.push(t1);
       }
     }, 85);
@@ -165,14 +181,67 @@ export function BootSequence({ onComplete }: BootSequenceProps) {
         <div className="absolute inset-0 bg-[#07090e] z-30" />
       )}
 
-      {/* PHASE 3: Minimalist Flat SILVES Logo */}
+      {/* PHASE 3: SILVES Boxed Logo with Horizontal Slice & Glitch Split */}
       {phase === 'logo' && (
         <div className="absolute inset-0 flex flex-col items-center justify-center z-20 px-4">
-          <div className="flex flex-col items-center">
-            {/* Flat SILVES Typography */}
-            <h1 className="text-6xl sm:text-8xl md:text-9xl font-bold tracking-[0.25em] text-[#7aa2f7] select-none font-mono">
-              SILVES
-            </h1>
+          <div className="relative select-none flex items-center justify-center">
+            {/* Top Half of the Logo */}
+            <div
+              className={`transition-all duration-300 ease-out will-change-transform ${
+                logoState === 'appear'
+                  ? 'translate-x-0 translate-y-0 opacity-100'
+                  : logoState === 'sliced'
+                  ? 'translate-x-6 sm:translate-x-9 md:translate-x-12 opacity-100'
+                  : 'translate-x-24 sm:translate-x-36 opacity-0 scale-y-75 skew-x-6'
+              }`}
+              style={{
+                clipPath: 'polygon(0 0, 100% 0, 100% 50%, 0 50%)',
+                filter:
+                  logoState === 'appear'
+                    ? 'drop-shadow(0 0 8px rgba(122,162,247,0.25))'
+                    : logoState === 'sliced'
+                    ? 'drop-shadow(0 0 16px rgba(122,162,247,0.65)) drop-shadow(0 0 35px rgba(122,162,247,0.35))'
+                    : 'drop-shadow(0 0 24px rgba(122,162,247,0.8)) drop-shadow(0 0 45px rgba(122,162,247,0.45))'
+              }}
+            >
+              <div className="relative flex items-center justify-center px-6 sm:px-10 py-4 border-[5px] sm:border-[6px] md:border-[7px] border-[#7aa2f7] w-[290px] sm:w-[440px] md:w-[520px] h-[95px] sm:h-[135px] md:h-[160px] bg-transparent">
+                {/* Horizontal line extending past borders */}
+                <div className="absolute -left-5 -right-5 sm:-left-7 sm:-right-7 md:-left-9 md:-right-9 top-1/2 -translate-y-1/2 h-[5px] sm:h-[6px] md:h-[7px] bg-[#7aa2f7] z-10 pointer-events-none" />
+                {/* Word SILVES */}
+                <span className="font-sans font-black tracking-[0.14em] text-[#7aa2f7] text-5xl sm:text-7xl md:text-8xl leading-none z-0">
+                  SILVES
+                </span>
+              </div>
+            </div>
+
+            {/* Bottom Half of the Logo */}
+            <div
+              className={`absolute inset-0 transition-all duration-300 ease-out will-change-transform ${
+                logoState === 'appear'
+                  ? 'translate-x-0 translate-y-0 opacity-100'
+                  : logoState === 'sliced'
+                  ? '-translate-x-6 sm:-translate-x-9 md:-translate-x-12 opacity-100'
+                  : '-translate-x-24 sm:-translate-x-36 opacity-0 scale-y-75 -skew-x-6'
+              }`}
+              style={{
+                clipPath: 'polygon(0 50%, 100% 50%, 100% 100%, 0 100%)',
+                filter:
+                  logoState === 'appear'
+                    ? 'drop-shadow(0 0 8px rgba(122,162,247,0.25))'
+                    : logoState === 'sliced'
+                    ? 'drop-shadow(0 0 16px rgba(122,162,247,0.65)) drop-shadow(0 0 35px rgba(122,162,247,0.35))'
+                    : 'drop-shadow(0 0 24px rgba(122,162,247,0.8)) drop-shadow(0 0 45px rgba(122,162,247,0.45))'
+              }}
+            >
+              <div className="relative flex items-center justify-center px-6 sm:px-10 py-4 border-[5px] sm:border-[6px] md:border-[7px] border-[#7aa2f7] w-[290px] sm:w-[440px] md:w-[520px] h-[95px] sm:h-[135px] md:h-[160px] bg-transparent">
+                {/* Horizontal line extending past borders */}
+                <div className="absolute -left-5 -right-5 sm:-left-7 sm:-right-7 md:-left-9 md:-right-9 top-1/2 -translate-y-1/2 h-[5px] sm:h-[6px] md:h-[7px] bg-[#7aa2f7] z-10 pointer-events-none" />
+                {/* Word SILVES */}
+                <span className="font-sans font-black tracking-[0.14em] text-[#7aa2f7] text-5xl sm:text-7xl md:text-8xl leading-none z-0">
+                  SILVES
+                </span>
+              </div>
+            </div>
           </div>
         </div>
       )}

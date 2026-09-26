@@ -161,6 +161,13 @@ export function CommandPalette({
       shortcut: 'Alt+4',
       action: () => onSwitchWorkspace(4)
     },
+    {
+      id: 'ws-special',
+      title: `${t.commands.switchWorkspace} special: music ${currentWorkspace === 'special' ? '[active]' : ''}`,
+      category: t.commands.categoryWorkspaces,
+      shortcut: 'Alt+S',
+      action: () => onSwitchWorkspace('special')
+    },
 
     // Layout & Windows
     {

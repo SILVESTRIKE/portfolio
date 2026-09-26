@@ -4,6 +4,7 @@ System impact if absent: The private recruiter intelligence dashboard cannot sec
 */
 
 import { NextRequest, NextResponse } from 'next/server';
+import crypto from 'crypto';
 import { getAllVisitors, getAnalyticsSummary, updateVisitorNote } from '@/lib/analytics';
 import { readContacts } from '@/lib/contact';
 
@@ -93,11 +94,16 @@ function verifyAdminToken(req: NextRequest): {
     clientToken = authHeader.substring(7).trim();
   } else if (req.headers.get('x-admin-token')) {
     clientToken = (req.headers.get('x-admin-token') || '').trim();
-  } else if (req.nextUrl.searchParams.get('token')) {
-    clientToken = (req.nextUrl.searchParams.get('token') || '').trim();
   }
 
-  if (clientToken && clientToken === expectedToken) {
+  // Timing-safe constant-time token comparison against timing attacks
+  const clientBuf = Buffer.from(clientToken);
+  const expectedBuf = Buffer.from(expectedToken);
+  const isMatch =
+    clientBuf.length === expectedBuf.length &&
+    crypto.timingSafeEqual(clientBuf, expectedBuf);
+
+  if (isMatch) {
     recordSuccess(ip);
     return { authorized: true };
   }

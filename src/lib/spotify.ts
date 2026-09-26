@@ -4,6 +4,7 @@ System impact if absent: Server cannot fetch real-time music listening activity 
 */
 
 import { SpotifyTrackInfo } from '@/types';
+import { resolveYouTubeVideoId } from '@/lib/youtube';
 
 const LASTFM_API_KEY = process.env.LASTFM_API_KEY;
 const LASTFM_USERNAME = process.env.LASTFM_USERNAME;
@@ -42,6 +43,9 @@ interface SpotifyItem {
   };
   external_urls: {
     spotify: string;
+  };
+  external_ids?: {
+    isrc?: string;
   };
 }
 
@@ -190,6 +194,7 @@ async function fetchFromLastFm(): Promise<SpotifyTrackInfo | null> {
     }
 
     const realAudioUrl = await fetchRealAudioPreview(artistName || '', current.name || '');
+    const ytVideoId = await resolveYouTubeVideoId(artistName || '', current.name || '');
 
     return {
       isPlaying: isNowPlaying,
@@ -201,7 +206,8 @@ async function fetchFromLastFm(): Promise<SpotifyTrackInfo | null> {
       previewUrl: realAudioUrl || 'https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/e5/3a/86/e53a8652-5a22-00e3-df77-b4034a12032e/mzaf_14907648312317330850.plus.aac.p.m4a',
       progressMs: 30000,
       durationMs: 210000,
-      trackId: `lastfm-${Date.now()}`
+      trackId: `lastfm-${Date.now()}`,
+      youtubeVideoId: ytVideoId || '34Na4j8AVgA'
     };
   } catch {
     return null;
@@ -229,6 +235,9 @@ export async function getLiveSpotifyTrack(): Promise<SpotifyTrackInfo> {
         if (data.item) {
           const artistName = data.item.artists.map(a => a.name).join(', ');
           const realAudio = data.item.preview_url || (await fetchRealAudioPreview(artistName, data.item.name));
+          const isrc = data.item.external_ids?.isrc;
+          const ytVideoId = await resolveYouTubeVideoId(artistName, data.item.name, isrc);
+
           return {
             isPlaying: data.is_playing,
             title: data.item.name,
@@ -239,7 +248,9 @@ export async function getLiveSpotifyTrack(): Promise<SpotifyTrackInfo> {
             previewUrl: realAudio,
             progressMs: data.progress_ms,
             durationMs: data.item.duration_ms,
-            trackId: data.item.id
+            trackId: data.item.id,
+            isrc,
+            youtubeVideoId: ytVideoId || '34Na4j8AVgA'
           };
         }
       }
@@ -255,6 +266,9 @@ export async function getLiveSpotifyTrack(): Promise<SpotifyTrackInfo> {
         if (recent) {
           const artistName = recent.artists.map(a => a.name).join(', ');
           const realAudio = recent.preview_url || (await fetchRealAudioPreview(artistName, recent.name));
+          const isrc = recent.external_ids?.isrc;
+          const ytVideoId = await resolveYouTubeVideoId(artistName, recent.name, isrc);
+
           return {
             isPlaying: false,
             title: recent.name,
@@ -265,7 +279,9 @@ export async function getLiveSpotifyTrack(): Promise<SpotifyTrackInfo> {
             previewUrl: realAudio,
             progressMs: 0,
             durationMs: recent.duration_ms,
-            trackId: recent.id
+            trackId: recent.id,
+            isrc,
+            youtubeVideoId: ytVideoId || '34Na4j8AVgA'
           };
         }
       }
@@ -274,17 +290,19 @@ export async function getLiveSpotifyTrack(): Promise<SpotifyTrackInfo> {
     }
   }
 
-  // 3. Fallback track with real audio preview
+  // 3. Fallback track with real audio preview & YouTube ID
   return {
     isPlaying: true,
-    title: 'Starboy (Live Radio Stream)',
+    title: 'Starboy',
     artist: 'The Weeknd, Daft Punk',
     album: 'Starboy',
     albumArt: 'https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?auto=format&fit=crop&w=300&q=80',
     songUrl: 'https://open.spotify.com/track/7MXVkk9YM5FZxhsqOYGmB2',
     previewUrl: 'https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/e5/3a/86/e53a8652-5a22-00e3-df77-b4034a12032e/mzaf_14907648312317330850.plus.aac.p.m4a',
-    progressMs: 45000,
+    progressMs: 0,
     durationMs: 230453,
-    trackId: '7MXVkk9YM5FZxhsqOYGmB2'
+    trackId: '7MXVkk9YM5FZxhsqOYGmB2',
+    isrc: 'USUG11601673',
+    youtubeVideoId: '34Na4j8AVgA'
   };
 }
