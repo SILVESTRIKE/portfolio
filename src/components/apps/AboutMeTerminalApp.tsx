@@ -17,9 +17,11 @@ import { SkillsView } from './aboutme/views/SkillsView';
 import { ProjectsView } from './aboutme/views/ProjectsView';
 import { ThesisView } from './aboutme/views/ThesisView';
 import { ContactManualView } from './aboutme/views/ContactManualView';
+import { useIsMobile } from '@/lib/breakpoints';
 
 export function AboutMeTerminalApp({ onNotify, onOpenApp }: AboutMeTerminalAppProps) {
   const { t } = useI18n();
+  const isMobile = useIsMobile();
   const [activeTab, setActiveTab] = useState<FileId>('profile.yml');
   const [openTabs, setOpenTabs] = useState<FileId[]>([
     'profile.yml',
@@ -29,7 +31,12 @@ export function AboutMeTerminalApp({ onNotify, onOpenApp }: AboutMeTerminalAppPr
     'thesis-veritas.md'
   ]);
   const [activityBar, setActivityBar] = useState<ActivityTab>('explorer');
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  useEffect(() => {
+    // Default open on desktop/tablet, keep closed by default on mobile
+    setSidebarOpen(!isMobile);
+  }, [isMobile]);
   const [rootExpanded, setRootExpanded] = useState(true);
   const [projectsExpanded, setProjectsExpanded] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -54,6 +61,9 @@ export function AboutMeTerminalApp({ onNotify, onOpenApp }: AboutMeTerminalAppPr
       setOpenTabs((prev) => [...prev, fileId]);
     }
     setActiveTab(fileId);
+    if (isMobile) {
+      setSidebarOpen(false);
+    }
   };
 
   const handleCloseTab = (fileId: FileId, e: React.MouseEvent) => {
@@ -109,9 +119,9 @@ export function AboutMeTerminalApp({ onNotify, onOpenApp }: AboutMeTerminalAppPr
     } else if (cmd === 'fastfetch') {
       handleOpenFile('profile.yml');
       newLogs.push(
-        'Caelestia Hyprland Linux x86_64 [SILVESTRIKE Workstation]',
+        'SILVESTRIKE WebOS',
         'WM: Hyprland (Wayland) | Theme: Caelestia Soft Blue',
-        'Host: HUIT (B.Eng in IT) | Status: Open for Software Engineer / AI Engineer Roles',
+        'Host: Van Trong Duong | Status: Open for Software Engineer / AI Engineer Roles',
         'Opened profile.yml'
       );
     } else if (cmd === 'ls') {
