@@ -7,6 +7,7 @@ import { NextResponse } from 'next/server';
 import os from 'os';
 import fs from 'fs';
 import { ProcessItem } from '@/types';
+import { SYSTEM_CONFIG } from '@/config';
 
 interface SystemMetricsResponse {
   hostname: string;
@@ -170,9 +171,9 @@ function getCpuTopology(): { physicalCores: number; threadCount: number } {
 
 function getHostHardwareInfo(): { hostModel: string; gpuModel: string; osName: string } {
   return {
-    hostModel: 'VAN TRONG DUONG',
-    gpuModel: 'WebOS Accelerated GPU Engine',
-    osName: 'SILVESTRIKE WebOS'
+    hostModel: SYSTEM_CONFIG.hardwareDefaults.hostModel,
+    gpuModel: SYSTEM_CONFIG.hardwareDefaults.gpu,
+    osName: SYSTEM_CONFIG.os.name
   };
 }
 
@@ -194,13 +195,13 @@ export async function GET() {
   const cpuInfo = os.cpus()[0];
 
   const metrics: SystemMetricsResponse = {
-    hostname: 'srv-silvestrike',
+    hostname: SYSTEM_CONFIG.serverHost,
     platform: os.platform(),
     arch: os.arch(),
     kernel: os.release(),
     uptime: os.uptime(),
     loadAvg: os.loadavg().map(v => parseFloat(v.toFixed(2))),
-    cpuModel: cpuInfo?.model || 'Unknown',
+    cpuModel: cpuInfo?.model || SYSTEM_CONFIG.hardwareDefaults.cpu,
     coreCount: threadCount,
     physicalCores,
     threadCount,

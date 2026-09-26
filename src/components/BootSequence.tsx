@@ -12,7 +12,7 @@ interface BootSequenceProps {
 }
 
 const BOOT_LOG_LINES = [
-  '[    0.000000] SILVES Hyper-VFS Kernel 6.8.0-silvestrike init',
+  '[    0.000000] SILVESTRIKE Hyper-VFS Kernel 6.8.0-silvestrike init',
   '[    0.012410] Architecture: x86_64 Virtual Vector Core [8 Cores, 12 Threads]',
   '[    0.024512] Memory: 16,384 MB High-Throughput Allocator [OK]',
   '[    0.038102] Compositor: Caelestia Hyprland Wayland Engine [OK]',
@@ -191,8 +191,8 @@ export function BootSequence({ onComplete }: BootSequenceProps) {
                 logoState === 'appear'
                   ? 'translate-x-0 translate-y-0 opacity-100'
                   : logoState === 'sliced'
-                  ? 'translate-x-6 sm:translate-x-9 md:translate-x-12 opacity-100'
-                  : 'translate-x-24 sm:translate-x-36 opacity-0 scale-y-75 skew-x-6'
+                  ? 'translate-x-4 min-[360px]:translate-x-6 sm:translate-x-9 md:translate-x-12 opacity-100'
+                  : 'translate-x-20 sm:translate-x-36 opacity-0 scale-y-75 skew-x-6'
               }`}
               style={{
                 clipPath: 'polygon(0 0, 100% 0, 100% 50%, 0 50%)',
@@ -204,12 +204,12 @@ export function BootSequence({ onComplete }: BootSequenceProps) {
                     : 'drop-shadow(0 0 24px rgba(122,162,247,0.8)) drop-shadow(0 0 45px rgba(122,162,247,0.45))'
               }}
             >
-              <div className="relative flex items-center justify-center px-6 sm:px-10 py-4 border-[5px] sm:border-[6px] md:border-[7px] border-[#7aa2f7] w-[290px] sm:w-[440px] md:w-[520px] h-[95px] sm:h-[135px] md:h-[160px] bg-transparent">
+              <div className="relative flex items-center justify-center px-2 min-[360px]:px-4 sm:px-8 py-2.5 sm:py-4 border-[3px] min-[360px]:border-[4px] sm:border-[6px] md:border-[7px] border-[#7aa2f7] w-[270px] min-[360px]:w-[320px] sm:w-[540px] md:w-[680px] h-[68px] min-[360px]:h-[80px] sm:h-[115px] md:h-[140px] bg-transparent">
                 {/* Horizontal line extending past borders */}
-                <div className="absolute -left-5 -right-5 sm:-left-7 sm:-right-7 md:-left-9 md:-right-9 top-1/2 -translate-y-1/2 h-[5px] sm:h-[6px] md:h-[7px] bg-[#7aa2f7] z-10 pointer-events-none" />
-                {/* Word SILVES */}
-                <span className="font-sans font-black tracking-[0.14em] text-[#7aa2f7] text-5xl sm:text-7xl md:text-8xl leading-none z-0">
-                  SILVES
+                <div className="absolute -left-4 -right-4 min-[360px]:-left-5 min-[360px]:-right-5 sm:-left-7 sm:-right-7 md:-left-9 md:-right-9 top-1/2 -translate-y-1/2 h-[3px] min-[360px]:h-[4px] sm:h-[6px] md:h-[7px] bg-[#7aa2f7] z-10 pointer-events-none" />
+                {/* Word SILVESTRIKE */}
+                <span className="font-sans font-black tracking-[0.04em] min-[360px]:tracking-[0.08em] sm:tracking-[0.14em] text-[#7aa2f7] text-2xl min-[360px]:text-3xl sm:text-5xl md:text-6xl leading-none z-0">
+                  SILVESTRIKE
                 </span>
               </div>
             </div>
@@ -220,8 +220,8 @@ export function BootSequence({ onComplete }: BootSequenceProps) {
                 logoState === 'appear'
                   ? 'translate-x-0 translate-y-0 opacity-100'
                   : logoState === 'sliced'
-                  ? '-translate-x-6 sm:-translate-x-9 md:-translate-x-12 opacity-100'
-                  : '-translate-x-24 sm:-translate-x-36 opacity-0 scale-y-75 -skew-x-6'
+                  ? '-translate-x-4 min-[360px]:-translate-x-6 sm:-translate-x-9 md:-translate-x-12 opacity-100'
+                  : '-translate-x-20 sm:-translate-x-36 opacity-0 scale-y-75 -skew-x-6'
               }`}
               style={{
                 clipPath: 'polygon(0 50%, 100% 50%, 100% 100%, 0 100%)',
@@ -233,12 +233,12 @@ export function BootSequence({ onComplete }: BootSequenceProps) {
                     : 'drop-shadow(0 0 24px rgba(122,162,247,0.8)) drop-shadow(0 0 45px rgba(122,162,247,0.45))'
               }}
             >
-              <div className="relative flex items-center justify-center px-6 sm:px-10 py-4 border-[5px] sm:border-[6px] md:border-[7px] border-[#7aa2f7] w-[290px] sm:w-[440px] md:w-[520px] h-[95px] sm:h-[135px] md:h-[160px] bg-transparent">
+              <div className="relative flex items-center justify-center px-2 min-[360px]:px-4 sm:px-8 py-2.5 sm:py-4 border-[3px] min-[360px]:border-[4px] sm:border-[6px] md:border-[7px] border-[#7aa2f7] w-[270px] min-[360px]:w-[320px] sm:w-[540px] md:w-[680px] h-[68px] min-[360px]:h-[80px] sm:h-[115px] md:h-[140px] bg-transparent">
                 {/* Horizontal line extending past borders */}
-                <div className="absolute -left-5 -right-5 sm:-left-7 sm:-right-7 md:-left-9 md:-right-9 top-1/2 -translate-y-1/2 h-[5px] sm:h-[6px] md:h-[7px] bg-[#7aa2f7] z-10 pointer-events-none" />
-                {/* Word SILVES */}
-                <span className="font-sans font-black tracking-[0.14em] text-[#7aa2f7] text-5xl sm:text-7xl md:text-8xl leading-none z-0">
-                  SILVES
+                <div className="absolute -left-4 -right-4 min-[360px]:-left-5 min-[360px]:-right-5 sm:-left-7 sm:-right-7 md:-left-9 md:-right-9 top-1/2 -translate-y-1/2 h-[3px] min-[360px]:h-[4px] sm:h-[6px] md:h-[7px] bg-[#7aa2f7] z-10 pointer-events-none" />
+                {/* Word SILVESTRIKE */}
+                <span className="font-sans font-black tracking-[0.04em] min-[360px]:tracking-[0.08em] sm:tracking-[0.14em] text-[#7aa2f7] text-2xl min-[360px]:text-3xl sm:text-5xl md:text-6xl leading-none z-0">
+                  SILVESTRIKE
                 </span>
               </div>
             </div>

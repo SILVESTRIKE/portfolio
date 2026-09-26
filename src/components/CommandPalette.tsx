@@ -247,6 +247,9 @@ export function CommandPalette({
   // Reset selectedIndex on search
   useEffect(() => {
     setSelectedIndex(0);
+    if (listRef.current) {
+      listRef.current.scrollTop = 0;
+    }
   }, [query]);
 
   // Autofocus input on open
@@ -254,11 +257,37 @@ export function CommandPalette({
     if (isOpen) {
       setQuery('');
       setSelectedIndex(0);
+      if (listRef.current) {
+        listRef.current.scrollTop = 0;
+      }
       setTimeout(() => {
         inputRef.current?.focus();
       }, 50);
     }
   }, [isOpen]);
+
+  // Auto-scroll selected item into view during keyboard navigation
+  useEffect(() => {
+    const list = listRef.current;
+    if (!list) return;
+
+    if (selectedIndex === 0) {
+      list.scrollTop = 0;
+      return;
+    }
+
+    const selectedEl = list.querySelector<HTMLElement>('[data-selected="true"]');
+    if (!selectedEl) return;
+
+    const listRect = list.getBoundingClientRect();
+    const itemRect = selectedEl.getBoundingClientRect();
+
+    if (itemRect.bottom > listRect.bottom) {
+      list.scrollTop += itemRect.bottom - listRect.bottom + 8;
+    } else if (itemRect.top < listRect.top) {
+      list.scrollTop -= listRect.top - itemRect.top + 8;
+    }
+  }, [selectedIndex]);
 
   // Keyboard navigation inside palette
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -326,6 +355,7 @@ export function CommandPalette({
               return (
                 <div
                   key={cmd.id}
+                  data-selected={isSelected ? 'true' : undefined}
                   onClick={() => {
                     cmd.action();
                     onClose();

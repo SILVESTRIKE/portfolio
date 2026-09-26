@@ -9,6 +9,7 @@ import React from 'react';
 import { useI18n } from '@/lib/i18n';
 import { ActivityTab, DossierFile, FileId } from '../types';
 import { DOSSIER_FILES } from '../dossierData';
+import { DEVELOPER_CONFIG, SYSTEM_CONFIG } from '@/config';
 
 interface DossierSidebarProps {
   activityBar: ActivityTab;
@@ -322,13 +323,14 @@ export function DossierSidebar({
                 SYSTEM PROFILE
               </div>
               <div className="p-2.5 bg-black/40 border border-white/10 rounded space-y-2 text-[10px]">
-                <div className="text-[#89b4fa] font-bold">duong@silvestrike</div>
+                <div className="text-[#89b4fa] font-bold">{SYSTEM_CONFIG.userAtSilvestrike}</div>
                 <div className="border-b border-white/10 pb-1 text-slate-500">-----------------</div>
-                <div><span className="text-[#7aa2f7]">OS:</span> Human, Vietnam build [VN]</div>
-                <div><span className="text-[#7aa2f7]">Host:</span> HUIT B.Eng IT</div>
-                <div><span className="text-[#7aa2f7]">Metrics:</span> GPA 3.2 | IELTS 6.5</div>
-                <div><span className="text-[#7aa2f7]">Shell:</span> bash / Python / TS</div>
-                <div><span className="text-[#7aa2f7]">Kernel:</span> WebOS 2.0</div>
+                <div><span className="text-[#7aa2f7]">OS:</span> {SYSTEM_CONFIG.os.humanBuild}</div>
+                <div><span className="text-[#7aa2f7]">Host:</span> {DEVELOPER_CONFIG.education.university.short}</div>
+                <div><span className="text-[#7aa2f7]">Degree:</span> {DEVELOPER_CONFIG.education.degree.short}</div>
+                <div><span className="text-[#7aa2f7]">Metrics:</span> GPA {DEVELOPER_CONFIG.education.gpaScore} | IELTS {DEVELOPER_CONFIG.education.ielts.split(' ')[0]}</div>
+                <div><span className="text-[#7aa2f7]">Shell:</span> {SYSTEM_CONFIG.shell.developer}</div>
+                <div><span className="text-[#7aa2f7]">Kernel:</span> {SYSTEM_CONFIG.os.kernel}</div>
                 <div><span className="text-[#7aa2f7]">Uptime:</span> 22 years (Senior)</div>
                 <div><span className="text-[#7aa2f7]">Status:</span> Open for SWE / AI</div>
               </div>

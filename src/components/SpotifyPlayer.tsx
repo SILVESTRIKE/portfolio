@@ -15,8 +15,91 @@ interface SpotifyPlayerProps {
   onClose?: () => void;
 }
 
-export function SpotifyPlayer({ mode = 'panel', onOpenFullPlayer, onClose }: SpotifyPlayerProps) {
+const STORAGE_KEY_LAST_TRACK = 'silvestrike_music_last_track';
+
+// Singleton shared track state across all mounted SpotifyPlayer components
+let sharedTrack: SpotifyTrackInfo | null = null;
+const sharedTrackListeners = new Set<(t: SpotifyTrackInfo | null) => void>();
+let pollingTimer: ReturnType<typeof setInterval> | null = null;
+let activeMountCount = 0;
+
+async function syncTrack() {
+  try {
+    const res = await fetch('/api/spotify');
+    if (res.ok) {
+      const data = (await res.json()) as SpotifyTrackInfo;
+      if (data && data.title) {
+        const titleChanged = !sharedTrack || sharedTrack.title !== data.title || sharedTrack.artist !== data.artist;
+        sharedTrack = data;
+        try {
+          localStorage.setItem(STORAGE_KEY_LAST_TRACK, JSON.stringify(data));
+        } catch {
+          // Ignore localStorage errors
+        }
+        sharedTrackListeners.forEach((fn) => fn(data));
+
+        if (titleChanged) {
+          if (data.youtubeVideoId) {
+            globalAudio.setYouTubeTrack(data.youtubeVideoId);
+          } else if (data.previewUrl) {
+            globalAudio.setTrackUrl(data.previewUrl);
+          }
+        }
+      }
+    }
+  } catch {
+    // Network silent fail
+  }
+}
+
+function useSharedTrack(): SpotifyTrackInfo | null {
   const [track, setTrack] = useState<SpotifyTrackInfo | null>(null);
+
+  useEffect(() => {
+    // Read cached track from localStorage on client mount (safe from SSR hydration mismatch)
+    if (!sharedTrack) {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY_LAST_TRACK);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (parsed && parsed.title) {
+            sharedTrack = parsed;
+            setTrack(parsed);
+          }
+        }
+      } catch {
+        // Ignore localStorage errors
+      }
+    } else {
+      setTrack(sharedTrack);
+    }
+
+    sharedTrackListeners.add(setTrack);
+    activeMountCount++;
+
+    if (activeMountCount === 1) {
+      syncTrack();
+      pollingTimer = setInterval(syncTrack, 10000);
+    }
+
+    return () => {
+      sharedTrackListeners.delete(setTrack);
+      activeMountCount--;
+      if (activeMountCount <= 0) {
+        activeMountCount = 0;
+        if (pollingTimer) {
+          clearInterval(pollingTimer);
+          pollingTimer = null;
+        }
+      }
+    };
+  }, []);
+
+  return track;
+}
+
+export function SpotifyPlayer({ mode = 'panel', onOpenFullPlayer, onClose }: SpotifyPlayerProps) {
+  const track = useSharedTrack();
   const [isPlayingAudio, setIsPlayingAudio] = useState(false);
   const [volume, setVolume] = useState(0.7);
   const [currentTime, setCurrentTime] = useState(0);
@@ -84,29 +167,6 @@ export function SpotifyPlayer({ mode = 'panel', onOpenFullPlayer, onClose }: Spo
     return () => cancelAnimationFrame(animId);
   }, [mode, isPlayingAudio]);
 
-  const fetchTrack = async () => {
-    try {
-      const res = await fetch('/api/spotify');
-      if (res.ok) {
-        const data = (await res.json()) as SpotifyTrackInfo;
-        setTrack(data);
-        if (data.youtubeVideoId) {
-          globalAudio.setYouTubeTrack(data.youtubeVideoId);
-        } else if (data.previewUrl) {
-          globalAudio.setTrackUrl(data.previewUrl);
-        }
-      }
-    } catch {
-      // Network silent fail
-    }
-  };
-
-  useEffect(() => {
-    fetchTrack();
-    const interval = setInterval(fetchTrack, 10000);
-    return () => clearInterval(interval);
-  }, []);
-
   const togglePlayback = (e?: React.MouseEvent) => {
     if (e) {
       e.stopPropagation();
@@ -140,7 +200,7 @@ export function SpotifyPlayer({ mode = 'panel', onOpenFullPlayer, onClose }: Spo
 
         <div className="hidden sm:flex items-center gap-1 text-slate-200 hover:text-white min-w-0 flex-1 truncate text-left">
           <span className="text-[#1db954] font-bold text-[10px] shrink-0">MUSIC:</span>
-          <span className="truncate text-[10px] sm:text-[11px]">{track?.title || 'Starboy'}</span>
+          <span className="truncate text-[10px] sm:text-[11px]">{track?.title || 'Connecting...'}</span>
         </div>
 
         <button
@@ -225,13 +285,13 @@ export function SpotifyPlayer({ mode = 'panel', onOpenFullPlayer, onClose }: Spo
 
           <div className="flex-1 min-w-0">
             <h4 className="font-bold text-sm text-white truncate leading-tight">
-              {track?.title || 'Starboy'}
+              {track?.title || 'Connecting...'}
             </h4>
             <p className="text-slate-300 text-xs truncate mt-0.5">
-              {track?.artist || 'The Weeknd'}
+              {track?.artist || 'Live Stream'}
             </p>
             <p className="text-slate-500 text-[10px] truncate mt-0.5 font-mono">
-              {track?.album || 'Starboy'}
+              {track?.album || 'Live Audio'}
             </p>
           </div>
         </div>
@@ -355,13 +415,13 @@ export function SpotifyPlayer({ mode = 'panel', onOpenFullPlayer, onClose }: Spo
             <div className="flex-1 w-full min-w-0 flex flex-col justify-between gap-4">
               <div>
                 <h2 className="font-extrabold text-xl sm:text-2xl md:text-3xl text-white tracking-tight leading-tight">
-                  {track?.title || 'Starboy'}
+                  {track?.title || 'Connecting...'}
                 </h2>
                 <p className="text-emerald-400 font-semibold text-sm sm:text-base mt-1">
-                  {track?.artist || 'The Weeknd'}
+                  {track?.artist || 'Live Stream'}
                 </p>
                 <p className="text-slate-400 text-xs mt-0.5">
-                  {track?.album || 'Starboy'}
+                  {track?.album || 'Live Audio'}
                 </p>
               </div>
 

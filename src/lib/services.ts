@@ -4,6 +4,7 @@ System impact if absent: Systemd management application and terminal systemctl c
 */
 
 import { ServiceUnit } from '@/types';
+import { portfolioServices } from './portfolio';
 
 export class ServiceManager {
   private services: Record<string, ServiceUnit>;
@@ -11,73 +12,10 @@ export class ServiceManager {
 
   constructor() {
     this.listeners = [];
-    this.services = {
-      'doru-daemon.service': {
-        name: 'doru-daemon.service',
-        displayName: 'Doru AI Desktop Assistant Daemon',
-        status: 'running',
-        pid: 2145,
-        memory: '185.0 MB',
-        uptime: '3d 12h',
-        description: 'Core voice assistant daemon running Silero VAD, wakeword, and LangGraph audio loop',
-        logs: [
-          'WakeWordDetector initialized [ok]',
-          'Audio capture stream active on default input',
-          'LangGraph engine preloaded and warm'
-        ],
-        repoUrl: 'https://github.com/SILVESTRIKE/doru-ai',
-        language: 'Python',
-        category: 'ai'
-      },
-      'dogdexx.service': {
-        name: 'dogdexx.service',
-        displayName: 'DogDexx AI Breed Classifier & Vet Care',
-        status: 'deployed',
-        pid: 3012,
-        memory: '124.0 MB',
-        uptime: 'Live on Vercel',
-        description: 'Deep Learning Convolutional Neural Network dog breed recognition platform with medical tracking',
-        logs: [
-          'Model weights loaded: PyTorch ResNet-50 backbone',
-          'Edge inference pipeline ready at https://dogdexx.vercel.app'
-        ],
-        repoUrl: 'https://github.com/SILVESTRIKE/dogdexx',
-        deployUrl: 'https://dogdexx.vercel.app',
-        language: 'Python / PyTorch',
-        category: 'ai'
-      },
-      'sentiment-nlp.service': {
-        name: 'sentiment-nlp.service',
-        displayName: 'Vietnamese Sentiment Analysis NLP Model',
-        status: 'running',
-        pid: 4120,
-        memory: '96.5 MB',
-        uptime: 'Live Service',
-        description: 'Natural Language Processing sentiment classifier trained for Vietnamese social comments',
-        logs: [
-          'Underthesea word tokenizer initialized',
-          'Sentiment vocabulary: 45,000 tokens loaded'
-        ],
-        repoUrl: 'https://github.com/SILVESTRIKE/DanhGiaCamXuc',
-        language: 'Python / NLP',
-        category: 'ai'
-      },
-      'odoo-erp.service': {
-        name: 'odoo-erp.service',
-        displayName: 'Odoo 19 ERP Business Suite & PostgreSQL HA',
-        status: 'running',
-        pid: 5432,
-        memory: '380.0 MB',
-        uptime: 'Container Up',
-        description: 'Enterprise ERP management platform connected to pgvector PostgreSQL 15 container cluster',
-        logs: [
-          'PostgreSQL 15 pgvector initialized on port 5432',
-          'pgweb web database manager active on port 8081',
-          'CRM pipeline & Sales invoice engines online'
-        ],
-        category: 'business'
-      }
-    };
+    this.services = {};
+    for (const s of portfolioServices) {
+      this.services[s.name] = { ...s };
+    }
 
     this.fetchLiveServices();
   }

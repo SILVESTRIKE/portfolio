@@ -7,6 +7,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { execFile } from 'child_process';
 import { promisify } from 'util';
 import { GitBranchInfo, GitCommitNode, GitFileDiff, GitRepoData, GitRepoItem } from '@/types';
+import { DEVELOPER_CONFIG } from '@/config';
 
 const execFileAsync = promisify(execFile);
 
@@ -280,8 +281,8 @@ async function fetchGitHubRepoData(
       const commits: GitCommitNode[] = commitList.map((c) => ({
         hash: c.sha,
         shortHash: c.sha.substring(0, 7),
-        author: c.commit.author.name || 'SILVESTRIKE',
-        email: c.commit.author.email || 'vtduong04@gmail.com',
+        author: c.commit.author.name || DEVELOPER_CONFIG.alias,
+        email: c.commit.author.email || DEVELOPER_CONFIG.contact.email,
         date: c.commit.author.date.substring(0, 10),
         relativeTime: 'GitHub Cloud',
         message: c.commit.message.split('\n')[0],

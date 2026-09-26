@@ -5,6 +5,7 @@ System impact if absent: Terminal bash commands and server file explorer have no
 
 import { FileNode } from '@/types';
 import { WebOSPersistence } from '@/lib/persistence';
+import { DEVELOPER_CONFIG } from '@/config';
 
 export class VirtualFileSystem {
   private root: FileNode;
@@ -156,20 +157,18 @@ Enjoy exploring the interactive portfolio workstation!
     this.writeFile('/home/silvestrike/profile.yml',
       `# profile.yml - Canonical developer configuration
 developer:
-  name: "Van Trong Duong"
-  alias: "SILVESTRIKE"
-  title: "Full-Stack Developer | AI/ML Engineer | Solutions Architect"
-  location: "Ho Chi Minh City, Vietnam"
+  name: "${DEVELOPER_CONFIG.name}"
+  alias: "${DEVELOPER_CONFIG.alias}"
+  title: "${DEVELOPER_CONFIG.title}"
+  location: "${DEVELOPER_CONFIG.location}"
   education:
-    university: "Ho Chi Minh City University of Industry and Trade (HUIT)"
-    degree: "Bachelor of Engineering in Information Technology"
-    gpa: "3.2 / 4.0"
-    ielts: "6.5 Academic"
-    timeline: "2022 - 2026 (Final-year thesis & R&D)"
+    university: "${DEVELOPER_CONFIG.education.university.formal}"
+    degree: "${DEVELOPER_CONFIG.education.degree.formal}"
+    gpa: "${DEVELOPER_CONFIG.education.gpa}"
+    ielts: "${DEVELOPER_CONFIG.education.ielts}"
+    timeline: "${DEVELOPER_CONFIG.education.timelineFull}"
   engineering_philosophy:
-    - "Clean Architecture & strictly decoupled services over ad-hoc scripts"
-    - "High test coverage with clear bounded contexts and validation schemas"
-    - "Bridging deep learning models with high-throughput production infrastructure"
+${DEVELOPER_CONFIG.philosophy.map((item) => `    - "${item}"`).join('\n')}
 `, 'duong', '644');
 
     this.writeFile('/home/silvestrike/skills.json',
@@ -195,13 +194,13 @@ echo "Deployment verified healthy."
 `, 'duong', '755');
 
     this.writeFile('/home/silvestrike/README.md',
-      `# VAN TRONG DUONG (SILVESTRIKE)
-Full-Stack Developer | AI/ML Engineer | Aspiring Solutions Architect
+      `# ${DEVELOPER_CONFIG.name.toUpperCase()} (${DEVELOPER_CONFIG.alias})
+${DEVELOPER_CONFIG.title}
 
 ## About Me
-- Name: Van Trong Duong
-- Location: HCMC, Vietnam
-- Education: B.Eng Information Technology @ HUIT (GPA: 3.2/4.0 | IELTS: 6.5)
+- Name: ${DEVELOPER_CONFIG.name}
+- Location: ${DEVELOPER_CONFIG.location}
+- Education: ${DEVELOPER_CONFIG.education.degree.full} @ ${DEVELOPER_CONFIG.education.university.short} (GPA: ${DEVELOPER_CONFIG.education.gpa} | IELTS: ${DEVELOPER_CONFIG.education.ielts.split(' ')[0]})
 - Focus: Full-Stack Development • AI/ML Engineering
 - Thesis: Veritas - AI-powered Vietnamese Land & Legal Document Digitization (RAG + LLM)
 
@@ -220,22 +219,22 @@ Full-Stack Developer | AI/ML Engineer | Aspiring Solutions Architect
 - Toi_Uu_Gia: Price Elasticity Regression Deep Learning Model
 
 ## Contact
-- Email: vtduong04@gmail.com
-- Facebook: fb.com/hakudevon
-- GitHub: https://github.com/SILVESTRIKE
+- Email: ${DEVELOPER_CONFIG.contact.email}
+- Facebook: ${DEVELOPER_CONFIG.contact.facebookDisplay}
+- GitHub: ${DEVELOPER_CONFIG.contact.github}
 `, 'duong', '644');
 
     this.writeFile('/home/silvestrike/CV_VanTrongDuong.md',
-      `# Curriculum Vitae — Van Trong Duong (SILVESTRIKE)
-Contact: vtduong04@gmail.com | github.com/SILVESTRIKE
+      `# Curriculum Vitae — ${DEVELOPER_CONFIG.name} (${DEVELOPER_CONFIG.alias})
+Contact: ${DEVELOPER_CONFIG.contact.email} | ${DEVELOPER_CONFIG.contact.github.replace('https://', '')}
 
 ## Professional Summary
 Full-Stack Developer and AI/ML Engineer with strong foundation in Software Engineering and Distributed Systems.
-Final-year student at Ho Chi Minh City University of Industry and Trade (HUIT), IT Department.
-GPA: 3.2 / 4.0 | IELTS: 6.5 Academic
+Final-year student at ${DEVELOPER_CONFIG.education.university.formal}, IT Department.
+GPA: ${DEVELOPER_CONFIG.education.gpa} | IELTS: ${DEVELOPER_CONFIG.education.ielts}
 
 ## Education
-- B.Eng in Information Technology, HUIT (2022 - 2026)
+- ${DEVELOPER_CONFIG.education.degree.full}, ${DEVELOPER_CONFIG.education.university.short} (${DEVELOPER_CONFIG.education.timeline})
 - Thesis: Veritas — AI-powered Vietnamese Land & Legal Document Digitization (RAG + Multimodal LLM)
 
 ## Core Technical Skills

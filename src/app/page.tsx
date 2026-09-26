@@ -32,6 +32,7 @@ import { WebOSPersistence } from '@/lib/persistence';
 import { useI18n } from '@/lib/i18n';
 import { BootSequence } from '@/components/BootSequence';
 import { AppId, WorkspaceId, WorkspaceState, TilingLayoutMode, WindowState } from '@/types';
+import { SYSTEM_CONFIG } from '@/config';
 
 export default function WebOSPage() {
   const { t } = useI18n();
@@ -403,7 +404,7 @@ export default function WebOSPage() {
         };
       case 'hub-system':
         return {
-          title: 'Server Operations Center (srv-silvestrike)',
+          title: `Server Operations Center (${SYSTEM_CONFIG.serverHost})`,
           component: (
             <SystemHubApp
               initialTab={systemTab}
@@ -423,7 +424,7 @@ export default function WebOSPage() {
         };
       case 'app-terminal':
         return {
-          title: 'bash - duong@srv-silvestrike:~',
+          title: `bash - ${SYSTEM_CONFIG.userAtHost}:~`,
           component: <TerminalApp onOpenApp={(targetId) => handleToggleApp(targetId)} />
         };
       case 'app-monitor':

@@ -6,6 +6,7 @@ System Impact of Absence: Dossier studio cannot display the main README.md intro
 'use client';
 
 import React from 'react';
+import { DEVELOPER_CONFIG } from '@/config';
 
 export function ReadmeView() {
   return (
@@ -13,10 +14,10 @@ export function ReadmeView() {
       <div className="border border-white/10 bg-[#0b0f19] rounded-lg p-5 space-y-4">
         <div className="border-b border-white/10 pb-3">
           <h1 className="text-lg font-bold text-[#7aa2f7]">
-            SILVESTRIKE - Van Trong Duong
+            {DEVELOPER_CONFIG.alias} - {DEVELOPER_CONFIG.name}
           </h1>
           <p className="text-slate-400 text-xs mt-1">
-            Full-Stack Web Architect & AI/ML Systems Engineer based in Ho Chi Minh City.
+            {DEVELOPER_CONFIG.title} based in {DEVELOPER_CONFIG.location}.
           </p>
         </div>
 

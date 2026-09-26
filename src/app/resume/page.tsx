@@ -6,15 +6,16 @@ System impact if absent: Search engines and recruiters who do not interact with 
 import React from 'react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { DEVELOPER_CONFIG } from '@/config';
 
 export const metadata: Metadata = {
-  title: 'Van Trong Duong | Full-Stack Developer & AI/ML Engineer Resume',
-  description: '30-second executive summary of Van Trong Duong (SILVESTRIKE). Full-stack web architecture, production AI engineering, core projects, and contact channels.',
+  title: `${DEVELOPER_CONFIG.name} | ${DEVELOPER_CONFIG.title} Resume`,
+  description: `30-second executive summary of ${DEVELOPER_CONFIG.name} (${DEVELOPER_CONFIG.alias}). Full-stack web architecture, production AI engineering, core projects, and contact channels.`,
   openGraph: {
-    title: 'Van Trong Duong | Full-Stack & AI/ML Engineer (30s Resume)',
+    title: `${DEVELOPER_CONFIG.name} | Full-Stack & AI/ML Engineer (30s Resume)`,
     description: 'Executive overview, selected projects (Samco Binh Tan, DogDexx AI, Doru AI), tech stack, and direct CV download.',
     url: 'https://silvestrike.vercel.app/resume',
-    siteName: 'SILVESTRIKE Portfolio OS',
+    siteName: 'SILVESTRIKE Portfolio',
     type: 'profile'
   }
 };
@@ -92,7 +93,7 @@ export default function ResumePage() {
               Download CV (DOCX)
             </a>
             <a
-              href="mailto:vtduong04@gmail.com"
+              href={`mailto:${DEVELOPER_CONFIG.contact.email}`}
               className="px-3 py-1.5 rounded bg-[#7aa2f7]/15 hover:bg-[#7aa2f7]/25 border border-[#7aa2f7]/30 text-[#89b4fa] text-xs font-semibold font-mono transition-colors"
             >
               Contact Me
@@ -106,15 +107,15 @@ export default function ResumePage() {
             Candidate Dossier - 30s Executive Summary
           </div>
           <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
-            Văn Trọng Dương <span className="text-[#7aa2f7] font-mono text-xl sm:text-2xl font-normal">(SILVESTRIKE)</span>
+            {DEVELOPER_CONFIG.name} <span className="text-[#7aa2f7] font-mono text-xl sm:text-2xl font-normal">({DEVELOPER_CONFIG.alias})</span>
           </h1>
           <p className="text-base sm:text-lg text-slate-300 font-medium">
-            Full-Stack Developer | AI/ML Engineer
+            {DEVELOPER_CONFIG.title}
           </p>
           <div className="flex flex-wrap items-center gap-y-1 gap-x-4 text-xs font-mono text-slate-400">
-            <span>Location: Ho Chi Minh City, Vietnam</span>
-            <span>Email: vtduong04@gmail.com</span>
-            <span>Education: HUIT (Bachelor of Engineering in IT)</span>
+            <span>Location: {DEVELOPER_CONFIG.location}</span>
+            <span>Email: {DEVELOPER_CONFIG.contact.email}</span>
+            <span>Education: {DEVELOPER_CONFIG.education.university.short} ({DEVELOPER_CONFIG.education.degree.formal})</span>
             <span className="text-emerald-400 font-bold">Status: OPEN_FOR_HIRE</span>
           </div>
         </section>
@@ -276,7 +277,7 @@ export default function ResumePage() {
 
         {/* Footer */}
         <footer className="text-center text-xs text-slate-500 font-mono pt-4 pb-8">
-          SILVESTRIKE Portfolio OS &copy; {new Date().getFullYear()} — Van Trong Duong. Built with Next.js & Tailwind CSS.
+          {DEVELOPER_CONFIG.alias} Portfolio OS &copy; {new Date().getFullYear()} — {DEVELOPER_CONFIG.name}. Built with Next.js & Tailwind CSS.
         </footer>
       </div>
     </main>

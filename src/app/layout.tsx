@@ -19,6 +19,8 @@ const outfit = Outfit({
   display: 'swap',
 });
 
+import { DEVELOPER_CONFIG } from '@/config';
+
 const appUrl =
   process.env.NEXT_PUBLIC_APP_URL ||
   (process.env.VERCEL_PROJECT_PRODUCTION_URL
@@ -28,8 +30,8 @@ const appUrl =
       : 'https://silvestrike.vercel.app');
 
 export const metadata: Metadata = {
-  title: 'SILVESTRIKE Portfolio OS',
-  description: 'Interactive browser-based developer portfolio and Linux workstation for Van Trong Duong (SILVESTRIKE) featuring live telemetry, bash terminal, services catalog, and AI assistant.',
+  title: `${DEVELOPER_CONFIG.alias} Portfolio OS`,
+  description: `Interactive browser-based developer portfolio and Linux workstation for ${DEVELOPER_CONFIG.name} (${DEVELOPER_CONFIG.alias}) featuring live telemetry, bash terminal, services catalog, and AI assistant.`,
   metadataBase: new URL(appUrl),
   icons: {
     icon: '/logo.png',
@@ -37,10 +39,10 @@ export const metadata: Metadata = {
     apple: '/logo.png',
   },
   openGraph: {
-    title: 'SILVESTRIKE Portfolio OS',
-    description: 'Interactive browser-based developer portfolio and Linux workstation for Van Trong Duong (SILVESTRIKE)',
+    title: `${DEVELOPER_CONFIG.alias} Portfolio OS`,
+    description: `Interactive browser-based developer portfolio and Linux workstation for ${DEVELOPER_CONFIG.name} (${DEVELOPER_CONFIG.alias})`,
     url: appUrl,
-    siteName: 'SILVESTRIKE Portfolio OS',
+    siteName: `${DEVELOPER_CONFIG.alias} Portfolio OS`,
     locale: 'en_US',
     type: 'website',
   },

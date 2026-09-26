@@ -8,6 +8,7 @@ System impact if absent: Server specifications and hardware profile cannot be vi
 import React, { useEffect, useState } from 'react';
 import { monitor } from '@/lib/monitor';
 import { SystemSnapshot } from '@/types';
+import { SYSTEM_CONFIG } from '@/config';
 
 export function SysInfoApp() {
   const [snapshot, setSnapshot] = useState<SystemSnapshot | null>(null);
@@ -32,20 +33,20 @@ export function SysInfoApp() {
   };
 
   const hardwareDetails = [
-    { key: 'Hostname', val: snapshot?.hostname || 'srv-silvestrike' },
-    { key: 'Hardware Model', val: snapshot?.hostModel || 'VAN TRONG DUONG' },
-    { key: 'Processor', val: snapshot?.cpuModel ? `${snapshot.cpuModel} (${snapshot.physicalCores || 8} Cores, ${snapshot.threadCount || snapshot.cores.length} Threads)` : 'Intel Core i5-13420H (8 Cores, 12 Threads)' },
+    { key: 'Hostname', val: snapshot?.hostname || SYSTEM_CONFIG.serverHost },
+    { key: 'Hardware Model', val: snapshot?.hostModel || SYSTEM_CONFIG.hardwareDefaults.hostModel },
+    { key: 'Processor', val: snapshot?.cpuModel ? `${snapshot.cpuModel} (${snapshot.physicalCores || 8} Cores, ${snapshot.threadCount || snapshot.cores.length} Threads)` : `${SYSTEM_CONFIG.hardwareDefaults.cpu} (8 Cores, 12 Threads)` },
     { key: 'CPU Topology', val: `${snapshot?.physicalCores || 8} Physical Cores / ${snapshot?.threadCount || snapshot?.cores.length || 12} Threads` },
-    { key: 'Graphics (GPU)', val: snapshot?.gpuModel || 'WebOS Accelerated GPU Engine' },
-    { key: 'RAM Installed', val: snapshot ? `${snapshot.ramTotal.toLocaleString()} MB` : '16,384 MB' },
+    { key: 'Graphics (GPU)', val: snapshot?.gpuModel || SYSTEM_CONFIG.hardwareDefaults.gpu },
+    { key: 'RAM Installed', val: snapshot ? `${snapshot.ramTotal.toLocaleString()} MB` : `${SYSTEM_CONFIG.hardwareDefaults.memoryTotalGb * 1024} MB` },
     { key: 'Swap Allocated', val: snapshot ? `${snapshot.swapTotal.toLocaleString()} MB` : '4,096 MB' },
     { key: 'Load Average (1, 5, 15m)', val: snapshot?.loadAvg ? snapshot.loadAvg.join(' / ') : '0.12 / 0.18 / 0.22' }
   ];
 
   const osDetails = [
-    { key: 'Operating System', val: snapshot?.osName || 'Ubuntu 26.04.1 LTS x86_64' },
+    { key: 'Operating System', val: snapshot?.osName || SYSTEM_CONFIG.os.name },
     { key: 'Platform', val: snapshot?.platform ? `${snapshot.platform.toUpperCase()} (POSIX)` : 'LINUX (POSIX)' },
-    { key: 'Kernel Version', val: snapshot?.kernel ? `Linux ${snapshot.kernel}` : 'Linux 7.0.0-31-generic' },
+    { key: 'Kernel Version', val: snapshot?.kernel ? `Linux ${snapshot.kernel}` : SYSTEM_CONFIG.os.kernelFull },
     { key: 'Architecture', val: snapshot?.arch ? `${snapshot.arch} (Native)` : 'x86_64' },
     { key: 'System Uptime', val: formatUptime(snapshot?.uptime) },
     { key: 'Network Inbound Rate', val: snapshot ? `${snapshot.rxRate} KB/s` : '0 KB/s' },

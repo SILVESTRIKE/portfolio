@@ -6,6 +6,8 @@ System impact if absent: Terminal cannot display graphical system specifications
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { useCodingUptime } from '@/lib/uptime';
+import { DEVELOPER_CONFIG, SYSTEM_CONFIG } from '@/config';
 
 function IconSvg({ children }: { children: React.ReactNode }) {
   return (
@@ -152,17 +154,17 @@ const BRAILLE_LOGO_LINES = [
 
 export function FastfetchBanner() {
   const [specs, setSpecs] = useState<HardwareSpecs>({
-    os: 'SILVESTRIKE WebOS',
-    host: 'duong@silvestrike',
-    kernel: 'Linux 6.8.0',
-    uptime: '22 yrs (2004)',
-    packages: '143 (npm)',
-    shell: 'bash / zsh',
-    wm: 'Hyprland (Wayland)',
-    cpu: 'Intel i5-13420H (8C/12T)',
-    gpu: 'Accelerated GPU',
-    memory: '8.4 / 16.0 GiB (52%)',
-    status: 'Open for Hire'
+    os: SYSTEM_CONFIG.os.name,
+    host: DEVELOPER_CONFIG.name,
+    kernel: SYSTEM_CONFIG.os.kernelFull,
+    uptime: `${DEVELOPER_CONFIG.age} yrs (${DEVELOPER_CONFIG.birthYear})`,
+    packages: SYSTEM_CONFIG.hardwareDefaults.packagesCount,
+    shell: SYSTEM_CONFIG.shell.default,
+    wm: SYSTEM_CONFIG.os.wm,
+    cpu: SYSTEM_CONFIG.hardwareDefaults.cpu,
+    gpu: SYSTEM_CONFIG.hardwareDefaults.gpu,
+    memory: '12.0/15 GiB (82%)',
+    status: DEVELOPER_CONFIG.status
   });
 
   useEffect(() => {
@@ -254,14 +256,16 @@ export function FastfetchBanner() {
           }));
         }
       })
-      .catch(() => {});
+      .catch(() => { });
   }, []);
+
+  const liveUptime = useCodingUptime('compact');
 
   const rows: { icon: React.ReactNode; label: string; value: string; bold?: boolean }[] = [
     { icon: <HardDrive size={12} />, label: 'OS', value: specs.os },
     { icon: <Server size={12} />, label: 'Host', value: specs.host },
     { icon: <ScrollText size={12} />, label: 'Kernel', value: specs.kernel },
-    { icon: <Clock size={12} />, label: 'Uptime', value: specs.uptime },
+    { icon: <Clock size={12} />, label: 'Uptime', value: liveUptime },
     { icon: <Package size={12} />, label: 'Packages', value: specs.packages },
     { icon: <TerminalIcon size={12} />, label: 'Shell', value: specs.shell },
     { icon: <LayoutGrid size={12} />, label: 'WM', value: specs.wm },
@@ -272,19 +276,10 @@ export function FastfetchBanner() {
   ];
 
   return (
-    <div className="my-1.5 p-2 sm:p-3 bg-[#0a0d14]/90 border border-white/10 rounded-lg font-mono text-xs select-none max-w-full overflow-hidden">
-      {/* Top Header Bar */}
-      <div className="flex items-center justify-between gap-2 mb-2 pb-1.5 border-b border-white/10 text-[10px] text-slate-400">
-        <div className="flex items-center gap-2">
-          <span className="text-[#7aa2f7] font-bold tracking-wide">FASTFETCH v2.3</span>
-          <span className="text-slate-600">|</span>
-          <span className="text-slate-400">duong@srv-silvestrike</span>
-        </div>
-      </div>
-
-      <div className="flex flex-col sm:flex-row items-center sm:items-start justify-start gap-3 sm:gap-6 py-0.5">
+    <div className="my-1.5 p-2 sm:p-3 bg-[#0a0d14]/90 border border-white/10 rounded-lg font-mono text-xs select-none w-fit max-w-full overflow-hidden">
+      <div className="flex flex-col sm:flex-row items-center justify-start gap-4 sm:gap-6">
         {/* Left: ASCII / Braille Logo */}
-        <div className="shrink-0 flex flex-col items-center sm:items-start justify-center">
+        <div className="shrink-0 flex flex-col items-center justify-center">
           <pre className="whitespace-pre font-mono select-none font-bold text-[7px] sm:text-[7.5px] leading-[1.08] tracking-tighter text-[#7aa2f7] text-left">
             {BRAILLE_LOGO_LINES.map((line, idx) => (
               <div key={idx}>{line}</div>
@@ -292,18 +287,18 @@ export function FastfetchBanner() {
           </pre>
         </div>
 
-        {/* Right: Box đóng khung sát chữ, chữ căn lề phải */}
-        <div className="w-full sm:w-auto shrink-0 min-w-0">
-          <div className="rounded-lg border border-white/15 bg-black/40 p-2 sm:p-2.5 shadow-xl w-full sm:w-fit">
-            <div className="grid grid-cols-[auto_1fr] items-center gap-x-3 sm:gap-x-5 gap-y-1 text-[10.5px] sm:text-[11px]">
+        {/* Right: Box đóng khung sát chữ, đặt bên cạnh logo, thông tin căn lề phải SO VỚI BẢNG */}
+        <div className="w-fit shrink-0 min-w-0">
+          <div className="rounded-lg border border-white/15 bg-black/40 p-2 sm:p-2.5 shadow-xl w-fit">
+            <div className="grid grid-cols-[auto_auto] items-center gap-x-4 sm:gap-x-6 gap-y-1 text-[10.5px] sm:text-[11px]">
               {rows.map((row) => (
                 <React.Fragment key={row.label}>
-                  <div className="flex items-center gap-1.5 min-w-0">
+                  <div className="flex items-center gap-1.5 shrink-0">
                     <span className="text-[#7aa2f7] shrink-0 w-3 flex justify-center">{row.icon}</span>
                     <span className="text-[#7aa2f7] font-semibold whitespace-nowrap">{row.label}</span>
                   </div>
                   <div
-                    className={`text-right whitespace-nowrap truncate max-w-[200px] sm:max-w-[240px] ${row.bold ? 'text-[#9ece6a] font-bold' : 'text-slate-200'
+                    className={`text-right whitespace-nowrap ${row.bold ? 'text-[#9ece6a] font-bold' : 'text-slate-200'
                       }`}
                   >
                     {row.value}

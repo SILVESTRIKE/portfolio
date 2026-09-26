@@ -69,4 +69,22 @@
   - [x] Đồng bộ CodeGraph (`codegraph sync`)
   - [x] Chạy `npm run build` xác nhận không có lỗi Turbopack/TypeScript (Build thành công trong 1.1s)
 
+## Phase 6: Recruiter-Friendly Transformation & Docker Dashboard
+- [x] **Phase 1: Quick Technical Cleanups**
+  - [x] Centralized metadata into `@/config` (`DEVELOPER_CONFIG`, `SYSTEM_CONFIG`)
+  - [x] Standardized career titles and verified educational credentials
+- [x] **Phase 2: Recruiter-First Layer**
+  - [x] 30s Executive Summary Route (`/resume`) with server-side static rendering
+  - [x] 4-Sentence Project Formulation (Problem -> Architecture -> Contribution -> Result)
+  - [x] Recruiter-first application priority in Command Palette and dock shortcuts
+- [x] **Phase 3: Docker Container Dashboard & Git Architecture**
+  - [x] Redesigned `ServicesApp` as authentic Docker Container Workstation (`image`, `status`, `ports`, `depends_on`, `environment`, `healthcheck`)
+  - [x] Visual system architecture flow diagrams (`dependsOn`) for instant full-stack comprehension
+  - [x] Production metrics in container healthchecks (inference latency, test pass rates, uptime)
+  - [x] Real GitHub commit graph integration via GitKrakenApp
+- [x] **Phase 4: Responsive & Aesthetic Hardening**
+  - [x] Keyboard navigation auto-scroll in Command Palette (`Ctrl+K`)
+  - [x] SSR hydration alignment in Spotify Player
+  - [x] Ultra-compact mobile responsive breakpoints across fastfetch and terminal views
+
 

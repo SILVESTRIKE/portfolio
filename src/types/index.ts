@@ -49,6 +49,12 @@ export interface ServiceUnit {
   language?: string;
   category?: 'ai' | 'web' | 'system' | 'business';
   hasSandbox?: boolean;
+  image?: string;
+  containerName?: string;
+  ports?: string;
+  environment?: string[];
+  dependsOn?: string[];
+  healthcheck?: string;
 }
 
 export interface FileNode {

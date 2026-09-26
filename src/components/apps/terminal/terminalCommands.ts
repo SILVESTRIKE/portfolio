@@ -5,6 +5,8 @@ System impact if absent: Terminal cannot execute commands or TerminalApp compone
 
 import { vfs } from '@/lib/fs';
 import { AppId } from '@/types';
+import { getCodingUptimeBreakdown, formatCodingUptime } from '@/lib/uptime';
+import { DEVELOPER_CONFIG, SYSTEM_CONFIG } from '@/config';
 
 export interface CommandContext {
   currentDir: string;
@@ -163,7 +165,7 @@ export function executeTerminalCommand(
     case 'poweroff':
       return {
         outputHtml: `<div class="text-amber-400 font-mono text-xs">
-Broadcast message from root@srv-silvestrike (pts/0):
+Broadcast message from root@${SYSTEM_CONFIG.serverHost} (pts/0):
 The system is going down for maintenance NOW!
 (Session simulated reload in 2 seconds...)
 </div>`
@@ -189,18 +191,18 @@ The system is going down for maintenance NOW!
     // User & Identity
     // ----------------------------------------------------
     case 'whoami':
-      return { outputHtml: 'duong' };
+      return { outputHtml: DEVELOPER_CONFIG.username };
 
     case 'id':
       return {
-        outputHtml: 'uid=1000(duong) gid=1000(duong) groups=1000(duong),4(adm),24(cdrom),27(sudo),30(dip),46(plugdev),122(lpadmin),134(lxd),998(docker)'
+        outputHtml: `uid=1000(${DEVELOPER_CONFIG.username}) gid=1000(${DEVELOPER_CONFIG.username}) groups=1000(${DEVELOPER_CONFIG.username}),4(adm),24(cdrom),27(sudo),30(dip),46(plugdev),122(lpadmin),134(lxd),998(docker)`
       };
 
     case 'groups':
-      return { outputHtml: 'duong adm cdrom sudo dip plugdev lpadmin lxd docker' };
+      return { outputHtml: `${DEVELOPER_CONFIG.username} adm cdrom sudo dip plugdev lpadmin lxd docker` };
 
     case 'hostname':
-      return { outputHtml: 'srv-silvestrike' };
+      return { outputHtml: SYSTEM_CONFIG.serverHost };
 
     // ----------------------------------------------------
     // System & Hardware Telemetry
@@ -208,12 +210,12 @@ The system is going down for maintenance NOW!
     case 'uname': {
       if (args.includes('-a')) {
         return {
-          outputHtml: 'Linux srv-silvestrike 7.0.0-31-generic #31-Ubuntu SMP PREEMPT_DYNAMIC x86_64 x86_64 x86_64 GNU/Linux'
+          outputHtml: `Linux ${SYSTEM_CONFIG.serverHost} ${SYSTEM_CONFIG.os.kernelFull.replace('Linux ', '')} #31-Ubuntu SMP PREEMPT_DYNAMIC x86_64 x86_64 x86_64 GNU/Linux`
         };
       }
-      if (args.includes('-r')) return { outputHtml: '7.0.0-31-generic' };
+      if (args.includes('-r')) return { outputHtml: SYSTEM_CONFIG.os.kernelFull.replace('Linux ', '') };
       if (args.includes('-m')) return { outputHtml: 'x86_64' };
-      if (args.includes('-n')) return { outputHtml: 'srv-silvestrike' };
+      if (args.includes('-n')) return { outputHtml: SYSTEM_CONFIG.serverHost };
       return { outputHtml: 'Linux' };
     }
 
@@ -248,10 +250,14 @@ The system is going down for maintenance NOW!
       return { outputHtml: `<pre class="font-mono text-xs leading-tight">${header}${grid}</pre>` };
     }
 
-    case 'uptime':
+    case 'uptime': {
+      const breakdown = getCodingUptimeBreakdown();
+      const live = formatCodingUptime(breakdown, 'full');
+      const now = new Date().toTimeString().split(' ')[0];
       return {
-        outputHtml: '03:26:15 up 24 days, 14:12,  1 user,  load average: 0.14, 0.12, 0.09'
+        outputHtml: `${now} up ${live},  1 user,  load average: 0.14, 0.12, 0.09`
       };
+    }
 
     case 'free': {
       const isHuman = args.includes('-h') || args.length === 0;
@@ -965,13 +971,13 @@ nothing to commit, working tree clean
           outputHtml: `
 <pre class="font-mono text-xs leading-tight">
 <span class="text-amber-400 font-bold">commit 9fa4c81b2e8d47b</span> (HEAD -> <span class="text-[#7aa2f7]">main</span>, <span class="text-emerald-400">origin/main</span>)
-Author: Van Trong Duong &lt;vtduong04@gmail.com&gt;
+Author: ${DEVELOPER_CONFIG.name} &lt;${DEVELOPER_CONFIG.contact.email}&gt;
 Date:   Sat Sep 26 03:00:00 2026 +0700
 
     feat(fastfetch): integrate real hardware telemetry (8 cores, 12 threads)
 
 <span class="text-amber-400 font-bold">commit 5a1b3c9d7e2f4a0</span>
-Author: Van Trong Duong &lt;vtduong04@gmail.com&gt;
+Author: ${DEVELOPER_CONFIG.name} &lt;${DEVELOPER_CONFIG.contact.email}&gt;
 Date:   Fri Sep 25 18:30:15 2026 +0700
 
     feat(dossier): add direct CV download and contact workstation
@@ -1228,19 +1234,17 @@ alias cls='clear'
       return {
         outputHtml: `
 <div class="p-3 bg-[#0d121f] border border-[#7aa2f7]/30 rounded-lg space-y-2 font-mono text-xs my-1">
-  <div class="text-[#7aa2f7] font-bold text-sm">VAN TRONG DUONG (SILVESTRIKE)</div>
-  <div class="text-slate-400">Full-Stack Developer | AI/ML Engineer</div>
+  <div class="text-[#7aa2f7] font-bold text-sm">${DEVELOPER_CONFIG.name.toUpperCase()} (${DEVELOPER_CONFIG.alias})</div>
+  <div class="text-slate-400">${DEVELOPER_CONFIG.title}</div>
   <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-2 border-t border-white/10 text-[11px]">
-    <div><span class="text-[#7aa2f7]">Education:</span> B.Eng in IT @ HUIT</div>
-    <div><span class="text-[#7aa2f7]">GPA:</span> 3.2 / 4.0 | <span class="text-[#7aa2f7]">IELTS:</span> 6.5 Academic</div>
-    <div><span class="text-[#7aa2f7]">Timeline:</span> 2022 - 2026 (Final Year)</div>
-    <div><span class="text-[#7aa2f7]">Location:</span> Ho Chi Minh City, Vietnam</div>
+    <div><span class="text-[#7aa2f7]">Education:</span> ${DEVELOPER_CONFIG.education.degree.short} @ ${DEVELOPER_CONFIG.education.university.short}</div>
+    <div><span class="text-[#7aa2f7]">GPA:</span> ${DEVELOPER_CONFIG.education.gpa} | <span class="text-[#7aa2f7]">IELTS:</span> ${DEVELOPER_CONFIG.education.ielts}</div>
+    <div><span class="text-[#7aa2f7]">Timeline:</span> ${DEVELOPER_CONFIG.education.timeline}</div>
+    <div><span class="text-[#7aa2f7]">Location:</span> ${DEVELOPER_CONFIG.location}</div>
   </div>
   <div class="pt-2 border-t border-white/5 text-[11px] text-slate-300">
     <div class="text-amber-300 font-bold mb-1">Engineering Philosophy:</div>
-    <div>* Clean Architecture &amp; strictly decoupled services over ad-hoc scripts</div>
-    <div>* High test coverage with clear bounded contexts and validation schemas</div>
-    <div>* Bridging deep learning models with high-throughput production infrastructure</div>
+    ${DEVELOPER_CONFIG.philosophy.map((item) => `<div>* ${item}</div>`).join('')}
   </div>
 </div>
 `
@@ -1255,8 +1259,8 @@ alias cls='clear'
     <div class="text-emerald-400 font-bold text-sm">30-SECOND EXECUTIVE RESUME</div>
     <a href="/resume" target="_blank" class="text-[10px] text-[#7aa2f7] hover:underline">[Open /resume Page]</a>
   </div>
-  <div class="text-slate-300 text-[11px]">VAN TRONG DUONG (SILVESTRIKE) — Full-Stack Developer | AI/ML Engineer</div>
-  <div class="text-slate-400 text-[11px]">Ho Chi Minh City, Vietnam | vtduong04@gmail.com | HUIT B.Eng in IT</div>
+  <div class="text-slate-300 text-[11px]">${DEVELOPER_CONFIG.name.toUpperCase()} (${DEVELOPER_CONFIG.alias}) — ${DEVELOPER_CONFIG.title}</div>
+  <div class="text-slate-400 text-[11px]">${DEVELOPER_CONFIG.location} | ${DEVELOPER_CONFIG.contact.email} | ${DEVELOPER_CONFIG.education.university.short} ${DEVELOPER_CONFIG.education.degree.short}</div>
   <div class="pt-2 border-t border-white/10 space-y-1 text-[11px]">
     <div><span class="text-sky-400 font-bold">* Samco Binh Tan WebApp:</span> VinFast EV Sales CMS &amp; E-Commerce (Next.js 14, Prisma, PostgreSQL). Cut quote generation by 40%.</div>
     <div><span class="text-emerald-400 font-bold">* DogDexx AI:</span> Computer Vision Breed Identifier &amp; Health Records (PyTorch CNN, Node BFF, Next.js). 94% accuracy on 120 breeds.</div>
@@ -1264,7 +1268,7 @@ alias cls='clear'
   </div>
   <div class="pt-2 border-t border-white/10 flex items-center gap-3">
     <a href="/CV_VanTrongDuong.docx" download class="px-2.5 py-1 bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 rounded text-[10px] font-bold">Download CV (DOCX)</a>
-    <a href="mailto:vtduong04@gmail.com" class="px-2.5 py-1 bg-white/5 text-slate-300 border border-white/10 rounded text-[10px]">Email Recruiter Channel</a>
+    <a href="mailto:${DEVELOPER_CONFIG.contact.email}" class="px-2.5 py-1 bg-white/5 text-slate-300 border border-white/10 rounded text-[10px]">Email Recruiter Channel</a>
   </div>
 </div>
 `

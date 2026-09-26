@@ -1,11 +1,11 @@
 /*
-Reason for existence: Systemd and GitHub Microservices Portfolio Hub displaying SILVESTRIKE repositories as active server services with live deployment links, voice telemetry, and interactive sandboxes.
-System impact if absent: Users cannot inspect GitHub portfolio projects, run live previews, or interact with repository trial sandboxes.
+Reason for existence: Docker Container & Microservices Workstation Dashboard presenting SILVESTRIKE repositories as authentic Docker container cards with architecture flows, live ports, and healthcheck telemetry.
+System impact if absent: Users and recruiters cannot inspect container architecture, dependency flows, live endpoints, or verified production metrics.
 */
 
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { portfolioServices } from '@/lib/portfolio';
 import { ServiceUnit } from '@/types';
 import { useI18n } from '@/lib/i18n';
@@ -15,9 +15,20 @@ interface ServicesAppProps {
   onOpenApp?: (appId: string) => void;
 }
 
-export function ServicesApp({ onNotify, onOpenApp }: ServicesAppProps) {
+// Generate deterministic 8-char container ID from service name
+function getDeterministicContainerId(name: string): string {
+  let hash = 0;
+  for (let i = 0; i < name.length; i++) {
+    hash = (hash << 5) - hash + name.charCodeAt(i);
+    hash |= 0;
+  }
+  const hex = Math.abs(hash).toString(16).padStart(8, '0');
+  return hex.substring(0, 8);
+}
+
+export function ServicesApp({ onNotify: _onNotify, onOpenApp }: ServicesAppProps) {
   const { t } = useI18n();
-  const [servicesList, setServicesList] = useState<ServiceUnit[]>(portfolioServices);
+  const [servicesList] = useState<ServiceUnit[]>(portfolioServices);
   const [githubStats, setGithubStats] = useState<Record<string, { stars: number; forks: number; updated: string }>>({});
   const [filterCat, setFilterCat] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -47,105 +58,214 @@ export function ServicesApp({ onNotify, onOpenApp }: ServicesAppProps) {
     loadLiveData();
   }, []);
 
-  const filtered = servicesList.filter(s => {
-    if (filterCat !== 'all' && s.category !== filterCat) return false;
-    if (searchQuery && !s.name.toLowerCase().includes(searchQuery.toLowerCase()) && !s.displayName.toLowerCase().includes(searchQuery.toLowerCase())) {
-      return false;
-    }
-    return true;
-  });
+  const filtered = useMemo(() => {
+    return servicesList.filter(s => {
+      if (filterCat !== 'all' && s.category !== filterCat) return false;
+      if (searchQuery) {
+        const q = searchQuery.toLowerCase();
+        const inName = s.name.toLowerCase().includes(q);
+        const inDisplay = s.displayName.toLowerCase().includes(q);
+        const inDesc = s.description.toLowerCase().includes(q);
+        const inImage = s.image?.toLowerCase().includes(q) ?? false;
+        const inDepends = s.dependsOn?.some(d => d.toLowerCase().includes(q)) ?? false;
+        if (!inName && !inDisplay && !inDesc && !inImage && !inDepends) return false;
+      }
+      return true;
+    });
+  }, [servicesList, filterCat, searchQuery]);
 
   const catLabels: Record<string, string> = {
     all: t.apps.services.categoryAll,
     ai: t.apps.services.filterAi,
+    web: t.apps.services.filterWeb,
     system: t.apps.services.filterSystem,
-    business: t.apps.services.filterBusiness,
-    web: t.apps.services.filterWeb
+    business: t.apps.services.filterBusiness
   };
 
+  const totalContainers = servicesList.length;
+  const runningContainers = servicesList.filter(s => s.status === 'running' || s.status === 'deployed').length;
+  const deployedContainers = servicesList.filter(s => s.status === 'deployed').length;
+
   return (
-    <div className="h-full w-full p-3.5 flex flex-col gap-3 font-sans text-xs overflow-y-auto select-none">
-      {/* Top Filter and Search Bar */}
-      <div className="flex flex-wrap justify-between items-center gap-2">
-        <div className="flex items-center gap-1.5 bg-black/40 p-1 rounded border border-white/10">
-          {['all', 'ai', 'system', 'business', 'web'].map((cat) => (
-            <button
-              key={cat}
-              onClick={() => setFilterCat(cat)}
-              className={`px-2.5 py-1 rounded text-[11px] font-mono uppercase transition-colors ${filterCat === cat
-                  ? 'bg-sky-500/20 text-sky-300 font-bold border border-sky-400/30'
-                  : 'text-slate-400 hover:text-slate-200'
-                }`}
-            >
-              {catLabels[cat] || cat.toUpperCase()}
-            </button>
-          ))}
+    <div className="h-full w-full p-3 sm:p-4 flex flex-col gap-3 font-sans text-xs overflow-y-auto select-none bg-[#0a0d14]">
+      {/* Docker Engine Telemetry & Filter Bar */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-2.5 bg-black/40 p-2.5 rounded-lg border border-white/10 shrink-0">
+        {/* Docker Daemon Status Line */}
+        <div className="flex items-center gap-2 font-mono text-[11px] text-slate-300 flex-wrap">
+          <span className="text-[#1cd0a5] font-bold flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full bg-[#1cd0a5] animate-pulse" />
+            DOCKER ENGINE
+          </span>
+          <span className="text-slate-600">|</span>
+          <span>{totalContainers} {t.apps.services.containerSummary}</span>
+          <span className="text-slate-600">|</span>
+          <span className="text-emerald-400 font-semibold">{runningContainers} online</span>
+          <span className="text-slate-600">|</span>
+          <span className="text-sky-400 font-semibold">{deployedContainers} live deployed</span>
         </div>
 
-        <div className="flex items-center gap-1 bg-black/40 border border-white/10 rounded px-2.5 py-1 text-xs text-slate-100 font-mono focus-within:border-sky-400">
-          <span className="text-slate-500 font-bold">$ grep -i &quot;</span>
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder={t.apps.services.searchPlaceholder}
-            className="bg-transparent border-none text-slate-100 outline-none w-48 font-mono text-xs"
-          />
-          <span className="text-slate-500 font-bold">&quot;</span>
+        {/* Filter Categories and Grep search */}
+        <div className="flex flex-wrap items-center gap-2 w-full md:w-auto justify-between md:justify-end">
+          <div className="flex items-center gap-1 bg-black/60 p-0.5 rounded border border-white/10">
+            {['all', 'ai', 'web', 'system', 'business'].map((cat) => (
+              <button
+                key={cat}
+                onClick={() => setFilterCat(cat)}
+                className={`px-2 py-0.5 rounded text-[10px] font-mono uppercase transition-colors ${filterCat === cat
+                    ? 'bg-[#7aa2f7]/20 text-[#7aa2f7] font-bold border border-[#7aa2f7]/40'
+                    : 'text-slate-400 hover:text-slate-200'
+                  }`}
+              >
+                {catLabels[cat] || cat.toUpperCase()}
+              </button>
+            ))}
+          </div>
+
+          <div className="flex items-center gap-1 bg-black/60 border border-white/10 rounded px-2 py-0.5 text-[11px] text-slate-100 font-mono focus-within:border-[#7aa2f7]">
+            <span className="text-slate-500 font-bold">$ grep -i &quot;</span>
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder={t.apps.services.searchPlaceholder}
+              className="bg-transparent border-none text-slate-100 outline-none w-32 sm:w-44 font-mono text-[11px]"
+            />
+            <span className="text-slate-500 font-bold">&quot;</span>
+          </div>
         </div>
       </div>
 
-      {/* Services Grid (Container-Responsive) */}
-      <div className="grid grid-cols-[repeat(auto-fill,minmax(280px,1fr))] gap-3">
+      {/* Container Cards Grid */}
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-3.5 pb-2">
         {filtered.map((s) => {
+          const containerId = getDeterministicContainerId(s.name);
           const isDeployed = s.status === 'deployed';
           const isHostEngine = s.name === 'doru-ai.service';
+          const imageName = s.image || `${s.name.replace('.service', '')}:latest`;
 
           return (
             <div
               key={s.name}
-              className={`bg-white/[0.03] border rounded-lg p-3 flex flex-col justify-between gap-3 transition-all hover:border-white/20 min-w-0 ${isHostEngine
-                  ? 'border-emerald-500/40 bg-emerald-950/10 shadow-[0_0_15px_rgba(16,185,129,0.08)]'
+              className={`bg-white/[0.02] border rounded-lg p-3.5 flex flex-col justify-between gap-3 transition-all hover:border-white/20 min-w-0 ${isHostEngine
+                  ? 'border-emerald-500/40 bg-emerald-950/10 shadow-[0_0_20px_rgba(16,185,129,0.06)]'
                   : isDeployed
-                    ? 'border-sky-500/40 bg-sky-950/10 shadow-[0_0_15px_rgba(56,189,248,0.08)]'
+                    ? 'border-sky-500/40 bg-sky-950/10 shadow-[0_0_20px_rgba(56,189,248,0.06)]'
                     : 'border-white/10'
                 }`}
             >
-              <div className="min-w-0">
-                <div className="flex justify-between items-start gap-2 min-w-0">
-                  <div className="min-w-0 flex-1">
-                    <div className="font-mono font-bold text-slate-100 text-xs flex items-center gap-1.5 flex-wrap">
-                      <span className="truncate">{s.name}</span>
-                      {s.language && (
-                        <span className="text-[9px] bg-white/5 px-1.5 py-0.5 rounded text-slate-400 font-normal shrink-0">
-                          {s.language}
-                        </span>
-                      )}
-                    </div>
-                    <div className="text-[11px] font-medium text-slate-300 mt-1 truncate">
-                      {s.displayName}
-                    </div>
+              <div className="space-y-2.5 min-w-0">
+                {/* Container Top Meta Header */}
+                <div className="flex items-center justify-between gap-2 border-b border-white/10 pb-2 min-w-0">
+                  <div className="flex items-center gap-2 min-w-0 flex-wrap">
+                    <span className="font-mono text-[10px] text-slate-400 bg-white/5 px-1.5 py-0.5 rounded border border-white/10">
+                      ID: <span className="text-slate-200 font-bold">{containerId}</span>
+                    </span>
+                    <span className="font-mono text-[10.5px] text-[#7aa2f7] font-semibold truncate max-w-[200px] sm:max-w-xs">
+                      {imageName}
+                    </span>
                   </div>
 
                   <span
-                    className={`px-1.5 py-0.5 rounded text-[9px] font-mono font-bold uppercase shrink-0 whitespace-nowrap ${isHostEngine
+                    className={`px-2 py-0.5 rounded text-[9.5px] font-mono font-bold uppercase shrink-0 whitespace-nowrap flex items-center gap-1 ${isHostEngine
                         ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 animate-pulse'
                         : isDeployed
                           ? 'bg-sky-500/20 text-sky-400 border border-sky-500/40'
                           : 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
                       }`}
                   >
+                    <span className="w-1.5 h-1.5 rounded-full bg-current" />
                     {isHostEngine ? t.apps.services.statusHostEngine : isDeployed ? t.apps.services.statusDeployed : t.apps.services.statusRunning}
                   </span>
                 </div>
 
-                <div className="text-[11px] text-slate-400 mt-2 line-clamp-2 leading-relaxed">
-                  {s.description}
+                {/* Display Name & Overview */}
+                <div className="min-w-0">
+                  <h3 className="font-mono font-bold text-slate-100 text-xs sm:text-[13px] tracking-tight truncate">
+                    {s.displayName}
+                  </h3>
+                  <p className="text-[11px] text-slate-300 mt-1 line-clamp-2 leading-relaxed">
+                    {s.description}
+                  </p>
                 </div>
 
-                {/* Real GitHub Telemetry pill if available */}
+                {/* Ports / Live Demo Mapping Row */}
+                {s.ports && (
+                  <div className="flex items-center gap-1.5 font-mono text-[10.5px] bg-black/40 px-2.5 py-1 rounded border border-white/5 min-w-0">
+                    <span className="text-slate-500 font-bold shrink-0">{t.apps.services.portsLabel}:</span>
+                    {s.deployUrl ? (
+                      <a
+                        href={s.deployUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-sky-300 hover:text-sky-200 underline underline-offset-2 truncate flex items-center gap-1"
+                        title="Click to visit live deployment"
+                      >
+                        <span>{s.ports}</span>
+                        <svg className="w-3 h-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                        </svg>
+                      </a>
+                    ) : (
+                      <span className="text-slate-300 truncate">{s.ports}</span>
+                    )}
+                  </div>
+                )}
+
+                {/* DEPENDS_ON Architecture Flow Pipeline */}
+                {s.dependsOn && s.dependsOn.length > 0 && (
+                  <div className="space-y-1">
+                    <div className="text-[9.5px] font-mono text-slate-400 font-bold tracking-wider uppercase">
+                      {t.apps.services.dependsOnLabel}
+                    </div>
+                    <div className="flex items-center gap-1 flex-wrap font-mono text-[10px]">
+                      {s.dependsOn.map((dep, dIdx) => (
+                        <React.Fragment key={dIdx}>
+                          <span className="px-2 py-0.5 rounded bg-black/50 border border-white/10 text-slate-200 font-medium">
+                            {dep}
+                          </span>
+                          {dIdx < (s.dependsOn?.length ?? 0) - 1 && (
+                            <span className="text-[#7aa2f7] font-bold text-[11px] select-none">
+                              &rarr;
+                            </span>
+                          )}
+                        </React.Fragment>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* ENVIRONMENT Variables */}
+                {s.environment && s.environment.length > 0 && (
+                  <div className="space-y-1">
+                    <div className="text-[9.5px] font-mono text-slate-400 font-bold tracking-wider uppercase">
+                      {t.apps.services.envLabel}
+                    </div>
+                    <div className="flex items-center gap-1 flex-wrap font-mono text-[9.5px]">
+                      {s.environment.map((env, eIdx) => (
+                        <span
+                          key={eIdx}
+                          className="px-1.5 py-0.2 rounded bg-white/5 border border-white/10 text-slate-300"
+                        >
+                          {env}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* HEALTHCHECK / Production Telemetry Box */}
+                {s.healthcheck && (
+                  <div className="p-2 rounded bg-black/50 border-l-2 border-emerald-400 border-r border-t border-b border-white/5 font-mono text-[10.5px] text-emerald-300/90 leading-relaxed">
+                    <div className="text-[9px] text-slate-500 font-bold uppercase mb-0.5">
+                      {t.apps.services.healthLabel}
+                    </div>
+                    {s.healthcheck}
+                  </div>
+                )}
+
+                {/* GitHub Telemetry Stats */}
                 {s.repoUrl && (
-                  <div className="mt-2 flex items-center gap-2 font-mono text-[10px] text-slate-400 flex-wrap">
+                  <div className="flex items-center gap-2 font-mono text-[10px] text-slate-400 flex-wrap pt-0.5">
                     {(() => {
                       const repoSlug = s.repoUrl ? s.repoUrl.split('/').pop()?.toLowerCase() : '';
                       const stat = repoSlug ? githubStats[repoSlug] : null;
@@ -165,47 +285,25 @@ export function ServicesApp({ onNotify, onOpenApp }: ServicesAppProps) {
                     })()}
                   </div>
                 )}
-
-                {/* Telemetry bar for Doru AI */}
-                {isHostEngine && (
-                  <div className="mt-2.5 p-2 bg-black/50 border border-emerald-500/30 rounded font-mono text-[10px] text-slate-300 flex flex-col gap-1">
-                    <div className="flex justify-between items-center text-emerald-400 font-bold">
-                      <span>VOICE TELEMETRY (Silero VAD)</span>
-                      <span>ACTIVE</span>
-                    </div>
-                    <div className="flex justify-between text-slate-400">
-                      <span>Wakeword RepCNN: &quot;doru&quot;</span>
-                      <span className="text-sky-400">Prob: 0.94</span>
-                    </div>
-                    <div className="flex justify-between text-slate-400">
-                      <span>LangGraph 8-Node State:</span>
-                      <span className="text-emerald-300">LISTENING</span>
-                    </div>
-                    <div className="flex justify-between text-slate-400">
-                      <span>LPU Engine:</span>
-                      <span className="text-slate-200">Groq gpt-oss-20b</span>
-                    </div>
-                  </div>
-                )}
               </div>
 
-              {/* Action buttons */}
-              <div className="flex flex-wrap gap-1.5 pt-2 border-t border-white/5 font-mono text-[11px]">
+              {/* Action Buttons Footer */}
+              <div className="flex flex-wrap gap-2 pt-2.5 border-t border-white/5 font-mono text-[11px]">
                 {s.deployUrl && (
                   <a
                     href={s.deployUrl}
                     target="_blank"
                     rel="noreferrer"
-                    className="flex-1 text-center bg-sky-500 hover:bg-sky-400 text-black font-bold py-1 rounded transition-colors"
+                    className="flex-1 text-center bg-sky-500 hover:bg-sky-400 text-black font-bold py-1.5 rounded transition-colors shadow-sm"
                   >
                     {t.apps.services.openLiveSite}
                   </a>
                 )}
 
-                {s.name === 'doru-ai.service' && onOpenApp && (
+                {onOpenApp && (
                   <button
                     onClick={() => onOpenApp('app-git')}
-                    className="flex-1 bg-[#1cd0a5]/20 hover:bg-[#1cd0a5]/30 text-[#1cd0a5] font-bold py-1 rounded border border-[#1cd0a5]/40 transition-colors"
+                    className="flex-1 bg-[#1cd0a5]/20 hover:bg-[#1cd0a5]/30 text-[#1cd0a5] font-bold py-1.5 rounded border border-[#1cd0a5]/40 transition-colors"
                   >
                     {t.apps.services.openGitKraken}
                   </button>
@@ -216,7 +314,7 @@ export function ServicesApp({ onNotify, onOpenApp }: ServicesAppProps) {
                     href={s.repoUrl}
                     target="_blank"
                     rel="noreferrer"
-                    className="px-2 py-1 bg-white/5 hover:bg-white/10 text-slate-400 hover:text-slate-200 rounded border border-white/10 transition-colors"
+                    className="px-3 py-1.5 bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white rounded border border-white/10 transition-colors"
                     title="View GitHub Repository"
                   >
                     GitHub

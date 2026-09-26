@@ -300,7 +300,7 @@ export function GitKrakenApp() {
       </div>
 
       {/* Main Studio Body */}
-      <div className="flex-1 flex min-h-0">
+      <div className="flex-1 flex flex-col md:flex-row min-h-0 overflow-hidden">
         {/* Left Sidebar (Git Tree / Branches) */}
         <div className="w-48 bg-[#141923] border-r border-white/10 flex flex-col shrink-0 hidden md:flex">
           <div className="p-3 border-b border-white/5 font-mono text-[10px] text-slate-400 font-bold uppercase tracking-wider">
@@ -360,9 +360,9 @@ export function GitKrakenApp() {
         </div>
 
         {/* Center: Visual Commit Graph & List */}
-        <div className="flex-1 flex flex-col min-w-0 border-r border-white/10 bg-[#10141d]">
+        <div className={`flex flex-col min-w-0 bg-[#10141d] md:border-r border-white/10 ${selectedCommit ? 'h-[45%] md:h-full md:flex-1' : 'flex-1'}`}>
           {/* Table Header */}
-          <div className="h-8 bg-[#151a24] border-b border-white/10 px-3 flex items-center text-slate-400 font-mono text-[10px] uppercase font-bold shrink-0">
+          <div className="h-8 bg-[#151a24] border-b border-white/10 px-3 flex items-center text-slate-400 font-mono text-[10px] uppercase font-bold shrink-0 overflow-hidden">
             <div className="w-14">Graph</div>
             <div className="flex-1 min-w-0">Commit Message</div>
             <div className="w-28 hidden sm:block">Author</div>
@@ -371,7 +371,8 @@ export function GitKrakenApp() {
           </div>
 
           {/* Commits List */}
-          <div className="flex-1 overflow-y-auto">
+          <div className="flex-1 overflow-y-auto overflow-x-auto scrollbar-thin">
+            <div className="min-w-[320px] sm:min-w-0">
             {isLoading ? (
               <div className="h-full flex items-center justify-center text-slate-500 font-mono">
                 Loading Git repository commits...
@@ -451,11 +452,18 @@ export function GitKrakenApp() {
                 );
               })
             )}
+            </div>
           </div>
         </div>
 
         {/* Right Pane: Commit Inspector & Real Unified Diff Viewer */}
-        <div className="w-72 md:w-80 lg:w-96 max-w-[48%] bg-[#131722] flex flex-col shrink-0 overflow-hidden">
+        <div
+          className={`bg-[#131722] flex flex-col shrink-0 overflow-hidden ${
+            selectedCommit
+              ? 'h-[55%] md:h-full w-full md:w-80 lg:w-96 border-t md:border-t-0 md:border-l border-white/10'
+              : 'hidden md:flex md:w-80 lg:w-96 md:border-l border-white/10'
+          }`}
+        >
           {selectedCommit ? (
             <div className="h-full flex flex-col">
               {/* Commit Details Header */}
@@ -464,30 +472,45 @@ export function GitKrakenApp() {
                   <span className="text-[10px] font-mono font-bold text-slate-400 uppercase">
                     Commit Inspector
                   </span>
-                  <button
-                    onClick={() => handleCopyHash(selectedCommit.hash)}
-                    className="text-[10px] font-mono text-[#1cd0a5] hover:underline"
-                  >
-                    {copiedHash === selectedCommit.hash ? 'Hash Copied!' : selectedCommit.shortHash}
-                  </button>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => handleCopyHash(selectedCommit.hash)}
+                      className="text-[10px] font-mono text-[#1cd0a5] hover:underline"
+                    >
+                      {copiedHash === selectedCommit.hash ? 'Hash Copied!' : selectedCommit.shortHash}
+                    </button>
+                    <button
+                      onClick={() => setSelectedCommit(null)}
+                      className="text-slate-400 hover:text-white px-1.5 py-0.5 rounded text-[10px] font-mono hover:bg-white/10 transition-colors"
+                      title="Close Inspector"
+                    >
+                      [x]
+                    </button>
+                  </div>
                 </div>
 
-                <h3 className="font-bold text-sm text-white mt-1.5 leading-snug">
+                <h3 className="font-bold text-sm text-white mt-1.5 leading-snug break-words">
                   {selectedCommit.message}
                 </h3>
 
-                <div className="mt-2.5 pt-2 border-t border-white/5 flex flex-col gap-1 text-[10px] font-mono text-slate-400">
-                  <div className="flex justify-between">
-                    <span>Author:</span>
-                    <span className="text-slate-200">{selectedCommit.author} ({selectedCommit.email})</span>
+                <div className="mt-2.5 pt-2 border-t border-white/5 flex flex-col gap-1.5 text-[10px] font-mono text-slate-400">
+                  <div className="flex flex-col sm:flex-row sm:justify-between gap-0.5 min-w-0">
+                    <span className="shrink-0 text-slate-400">Author:</span>
+                    <span className="text-slate-200 break-words text-left sm:text-right">
+                      {selectedCommit.author} <span className="text-slate-400">({selectedCommit.email})</span>
+                    </span>
                   </div>
-                  <div className="flex justify-between">
-                    <span>Date:</span>
-                    <span className="text-slate-200">{selectedCommit.date} ({selectedCommit.relativeTime})</span>
+                  <div className="flex flex-col sm:flex-row sm:justify-between gap-0.5 min-w-0">
+                    <span className="shrink-0 text-slate-400">Date:</span>
+                    <span className="text-slate-200 break-words text-left sm:text-right">
+                      {selectedCommit.date} <span className="text-slate-400">({selectedCommit.relativeTime})</span>
+                    </span>
                   </div>
-                  <div className="flex justify-between">
-                    <span>Hash:</span>
-                    <span className="text-slate-400 truncate max-w-[180px]">{selectedCommit.hash}</span>
+                  <div className="flex flex-col sm:flex-row sm:justify-between gap-0.5 min-w-0">
+                    <span className="shrink-0 text-slate-400">Hash:</span>
+                    <span className="text-slate-300 font-mono break-all text-left sm:text-right select-all">
+                      {selectedCommit.hash}
+                    </span>
                   </div>
                 </div>
               </div>
