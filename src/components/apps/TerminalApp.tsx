@@ -44,18 +44,9 @@ const MAX_HISTORY = 50;
 const SUGGEST_COMMANDS = ALL_TERMINAL_COMMANDS;
 
 const INITIAL_WELCOME_BANNER = `
-<div class="space-y-1.5 font-mono mb-2 overflow-hidden">
-  <pre class="text-[#7aa2f7] text-[5px] min-[360px]:text-[6px] min-[420px]:text-[7px] sm:text-[10px] md:text-xs tracking-tight leading-none select-none font-bold overflow-x-auto scrollbar-none py-1">
-███████╗██╗██╗    ██╗   ██╗███████╗███████╗████████╗██████╗ ██╗██╗  ██╗███████╗
-██╔════╝██║██║    ██║   ██║██╔════╝██╔════╝╚══██╔══╝██╔══██╗██║██║ ██╔╝██╔════╝
-███████╗██║██║    ██║   ██║█████╗  ███████╗   ██║   ██████╔╝██║█████╔╝ █████╗  
-╚════██║██║██║    ╚██╗ ██╔╝██╔══╝  ╚════██║   ██║   ██╔══██╗██║██╔═██╗ ██╔══╝  
-███████║██║███████╗╚████╔╝ ███████╗███████║   ██║   ██║  ██║██║██║  ██╗███████╗
-╚══════╝╚═╝╚══════╝ ╚═══╝  ╚══════╝╚══════╝   ╚═╝   ╚═╝  ╚═╝╚═╝╚═╝  ╚═╝╚══════╝
-  </pre>
-  <div class="text-[10px] sm:text-[11px] text-slate-400 pt-0.5">
-    Type <span class="text-[#7aa2f7] font-bold">'help'</span> for command index, or click quick buttons below:
-  </div>
+<div class="font-mono mb-2 text-slate-400 text-[11px] leading-relaxed select-none border-b border-white/10 pb-1.5">
+  <div class="text-[#7aa2f7] font-bold text-xs tracking-wide">SILVESTRIKE WebOS Terminal v2.3</div>
+  <div class="text-[10px] text-slate-500">Type <span class="text-[#7aa2f7] font-semibold">'help'</span> for command index, or use quick action shortcuts below.</div>
 </div>
 `;
 
@@ -120,11 +111,39 @@ export function TerminalApp({ onOpenApp }: TerminalAppProps) {
 
   const activeSession = sessions.find((s) => s.id === activeSessionId) || sessions[0];
 
+  const scrollToBottom = useCallback((smooth = false) => {
+    if (!scrollRef.current) return;
+    scrollRef.current.scrollTo({
+      top: scrollRef.current.scrollHeight,
+      behavior: smooth ? 'smooth' : 'auto'
+    });
+  }, []);
+
   useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-    }
-  }, [activeSession?.lines]);
+    scrollToBottom(false);
+    const frame = requestAnimationFrame(() => scrollToBottom(false));
+    const t1 = setTimeout(() => scrollToBottom(false), 60);
+    const t2 = setTimeout(() => scrollToBottom(false), 250);
+    return () => {
+      cancelAnimationFrame(frame);
+      clearTimeout(t1);
+      clearTimeout(t2);
+    };
+  }, [activeSession?.lines, activeSessionId, scrollToBottom]);
+
+  // Keep pinned to bottom on content resizing if near bottom
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const observer = new ResizeObserver(() => {
+      const isNearBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 140;
+      if (isNearBottom) {
+        el.scrollTop = el.scrollHeight;
+      }
+    });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
   const getPromptString = (sessionDir: string) => {
     const displayDir = sessionDir.replace('/home/silvestrike', '~');
@@ -421,7 +440,7 @@ export function TerminalApp({ onOpenApp }: TerminalAppProps) {
       </div>
 
       {/* Terminal Viewport */}
-      <div ref={scrollRef} className="flex-1 p-3.5 overflow-y-auto leading-normal">
+      <div ref={scrollRef} className="flex-1 p-3 sm:p-3.5 overflow-y-auto overflow-x-hidden leading-normal">
         {activeSession.lines.map((line) => (
           <div
             key={line.id}

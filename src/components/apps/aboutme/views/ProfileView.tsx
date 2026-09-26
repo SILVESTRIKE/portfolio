@@ -89,7 +89,7 @@ export function ProfileView() {
           <span className="text-amber-400">developer</span>:
           {'\n'}  <span className="text-[#7aa2f7]">name</span>: <span className="text-emerald-300">"Van Trong Duong"</span>
           {'\n'}  <span className="text-[#7aa2f7]">alias</span>: <span className="text-emerald-300">"SILVESTRIKE"</span>
-          {'\n'}  <span className="text-[#7aa2f7]">title</span>: <span className="text-emerald-300">"Full-Stack Developer | AI/ML Engineer | Solutions Architect"</span>
+          {'\n'}  <span className="text-[#7aa2f7]">title</span>: <span className="text-emerald-300">"Full-Stack Developer | AI/ML Engineer"</span>
           {'\n'}  <span className="text-[#7aa2f7]">location</span>: <span className="text-emerald-300">"Ho Chi Minh City, Vietnam"</span>
           {'\n'}  <span className="text-[#7aa2f7]">education</span>:
           {'\n'}    <span className="text-[#7aa2f7]">university</span>: <span className="text-emerald-300">"Ho Chi Minh City University of Industry and Trade (HUIT)"</span>
