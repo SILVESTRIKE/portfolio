@@ -6,7 +6,6 @@ System impact if absent: MonitorApp and TopPanel will fall back to simulated ran
 import { NextResponse } from 'next/server';
 import os from 'os';
 import fs from 'fs';
-import { execSync } from 'child_process';
 import { ProcessItem } from '@/types';
 
 interface SystemMetricsResponse {
@@ -83,13 +82,15 @@ function getCpuUsage(): { cores: number[]; totalCpu: number } {
 
 function getSwapInfo(): { swapTotal: number; swapUsed: number } {
   try {
-    const meminfo = execSync('cat /proc/meminfo', { encoding: 'utf-8' });
-    const swapTotalMatch = meminfo.match(/SwapTotal:\s+(\d+)\s+kB/);
-    const swapFreeMatch = meminfo.match(/SwapFree:\s+(\d+)\s+kB/);
-    if (swapTotalMatch && swapFreeMatch) {
-      const swapTotal = Math.round(parseInt(swapTotalMatch[1]) / 1024);
-      const swapFree = Math.round(parseInt(swapFreeMatch[1]) / 1024);
-      return { swapTotal, swapUsed: swapTotal - swapFree };
+    if (fs.existsSync('/proc/meminfo')) {
+      const meminfo = fs.readFileSync('/proc/meminfo', 'utf-8');
+      const swapTotalMatch = meminfo.match(/SwapTotal:\s+(\d+)\s+kB/);
+      const swapFreeMatch = meminfo.match(/SwapFree:\s+(\d+)\s+kB/);
+      if (swapTotalMatch && swapFreeMatch) {
+        const swapTotal = Math.round(parseInt(swapTotalMatch[1]) / 1024);
+        const swapFree = Math.round(parseInt(swapFreeMatch[1]) / 1024);
+        return { swapTotal, swapUsed: swapTotal - swapFree };
+      }
     }
   } catch {
     // Fallback for non-Linux
@@ -99,20 +100,21 @@ function getSwapInfo(): { swapTotal: number; swapUsed: number } {
 
 function getNetworkRates(): { rxRate: number; txRate: number } {
   try {
-    const netDev = execSync('cat /proc/net/dev', { encoding: 'utf-8' });
-    const lines = netDev.split('\n');
-    let totalRx = 0;
-    let totalTx = 0;
+    if (fs.existsSync('/proc/net/dev')) {
+      const netDev = fs.readFileSync('/proc/net/dev', 'utf-8');
+      const lines = netDev.split('\n');
+      let totalRx = 0;
+      let totalTx = 0;
 
-    for (const line of lines) {
-      // Skip loopback and header lines
-      if (line.includes('lo:') || !line.includes(':')) continue;
-      const parts = line.trim().split(/\s+/);
-      if (parts.length >= 10) {
-        totalRx += parseInt(parts[1]) || 0;
-        totalTx += parseInt(parts[9]) || 0;
+      for (const line of lines) {
+        // Skip loopback and header lines
+        if (line.includes('lo:') || !line.includes(':')) continue;
+        const parts = line.trim().split(/\s+/);
+        if (parts.length >= 10) {
+          totalRx += parseInt(parts[1]) || 0;
+          totalTx += parseInt(parts[9]) || 0;
+        }
       }
-    }
 
     const now = Date.now();
     if (prevNetBytes) {
@@ -126,6 +128,7 @@ function getNetworkRates(): { rxRate: number; txRate: number } {
     }
 
     prevNetBytes = { rx: totalRx, tx: totalTx, ts: now };
+    }
   } catch {
     // Fallback for non-Linux
   }

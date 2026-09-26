@@ -31,24 +31,24 @@ export function ReadmeView() {
         </div>
 
         {/* Architecture Pillars */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-2">
-          <div className="p-3 bg-white/[0.02] border border-white/10 rounded space-y-1.5">
-            <div className="text-sky-400 font-bold">[1] Clean Architecture</div>
-            <p className="text-slate-400 text-[10px]">
+        <div className="flex items-stretch gap-3 pt-2 overflow-x-auto pb-2 scrollbar-thin">
+          <div className="p-3 bg-white/[0.02] border border-white/10 rounded space-y-1.5 min-w-[200px] sm:min-w-[220px] flex-1 shrink-0">
+            <div className="text-sky-400 font-bold text-xs">[1] Clean Architecture</div>
+            <p className="text-slate-400 text-[10px] leading-relaxed">
               Controller-Service separation, strict boundary schema validation, and zero business logic leakage.
             </p>
           </div>
 
-          <div className="p-3 bg-white/[0.02] border border-white/10 rounded space-y-1.5">
-            <div className="text-emerald-400 font-bold">[2] Applied AI/ML</div>
-            <p className="text-slate-400 text-[10px]">
+          <div className="p-3 bg-white/[0.02] border border-white/10 rounded space-y-1.5 min-w-[200px] sm:min-w-[220px] flex-1 shrink-0">
+            <div className="text-emerald-400 font-bold text-xs">[2] Applied AI/ML</div>
+            <p className="text-slate-400 text-[10px] leading-relaxed">
               Production RAG pipelines, voice assistants (STT/TTS/VAD), and computer vision classification engines.
             </p>
           </div>
 
-          <div className="p-3 bg-white/[0.02] border border-white/10 rounded space-y-1.5">
-            <div className="text-purple-400 font-bold">[3] Cloud & Linux</div>
-            <p className="text-slate-400 text-[10px]">
+          <div className="p-3 bg-white/[0.02] border border-white/10 rounded space-y-1.5 min-w-[200px] sm:min-w-[220px] flex-1 shrink-0">
+            <div className="text-purple-400 font-bold text-xs">[3] Cloud & Linux</div>
+            <p className="text-slate-400 text-[10px] leading-relaxed">
               Linux workstation proficiency, Docker containerization, CI/CD automation, and relational database tuning.
             </p>
           </div>

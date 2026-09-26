@@ -51,14 +51,25 @@ System impact if absent: Application renders without dark server styling, custom
   user-select: none;
 }
 
+html {
+  color-scheme: dark;
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  height: 100%;
+}
+
 body {
   background-color: var(--background);
   color: var(--foreground);
   font-family: var(--font-mono), monospace;
-  height: 100vh;
+  height: 100dvh;
+  max-height: 100dvh;
   width: 100vw;
+  max-width: 100vw;
   overflow: hidden;
   position: relative;
+  line-height: 1.5;
   background-image: 
     radial-gradient(circle at 15% 15%, rgba(122, 162, 247, 0.03) 0%, transparent 40%),
     radial-gradient(circle at 85% 80%, rgba(158, 206, 106, 0.02) 0%, transparent 45%),

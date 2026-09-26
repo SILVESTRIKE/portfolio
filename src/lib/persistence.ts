@@ -53,6 +53,7 @@ export class WebOSPersistence {
     try {
       const raw = localStorage.getItem(STORAGE_KEYS.ACTIVE_WS);
       if (!raw) return null;
+      if (raw === 'special') return 'special';
       const num = parseInt(raw, 10);
       if ([1, 2, 3, 4].includes(num)) {
         return num as WorkspaceId;

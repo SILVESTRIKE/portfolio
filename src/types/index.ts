@@ -20,7 +20,7 @@ export type AppId =
   | 'app-contact'
   | 'app-admin';
 
-export type WorkspaceId = 1 | 2 | 3 | 4;
+export type WorkspaceId = 1 | 2 | 3 | 4 | 'special';
 
 export type TilingLayoutMode = 'master-stack' | 'grid' | 'columns' | 'monocle';
 
@@ -157,6 +157,8 @@ export interface SpotifyTrackInfo {
   progressMs: number;
   durationMs: number;
   trackId: string;
+  isrc?: string;
+  youtubeVideoId?: string | null;
 }
 
 export interface GitCommitNode {

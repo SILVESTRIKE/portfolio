@@ -113,23 +113,15 @@ export function ContactApp({ onNotify, isEmbedded = false }: ContactAppProps) {
 
   return (
     <div className={`w-full flex flex-col font-mono text-xs select-text bg-[#080c14] border border-white/10 rounded-lg overflow-hidden shadow-2xl ${isEmbedded ? 'h-full min-h-[440px]' : 'h-full'}`}>
-      {/* Top Header / Profile Info */}
-      <div className="bg-white/[0.03] border-b border-white/10 p-3 sm:p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shrink-0">
-        <div>
-          <div className="flex items-center gap-2">
-            <span className="text-sm font-bold text-slate-100">
-              {c.headerTitle}
-            </span>
-            <span className="px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 text-[10px] font-bold">
-              {c.openForHire}
-            </span>
-          </div>
-          <div className="text-slate-400 text-xs mt-1">
-            {c.headerSub}
-          </div>
-          <div className="text-slate-500 text-[11px] mt-0.5">
-            {c.headerEdu}
-          </div>
+      {/* Top Header: Clean, minimal recruiter bar */}
+      <div className="bg-white/[0.02] border-b border-white/10 px-3 sm:px-4 py-2 flex items-center justify-between gap-2 shrink-0">
+        <div className="flex items-center gap-2 min-w-0">
+          <span className="text-xs sm:text-sm font-bold text-slate-100 truncate">
+            {c.headerTitle}
+          </span>
+          <span className="px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 text-[9px] font-bold shrink-0">
+            {c.openForHire}
+          </span>
         </div>
 
         {/* Direct Download CV Button */}
@@ -139,9 +131,11 @@ export function ContactApp({ onNotify, isEmbedded = false }: ContactAppProps) {
           onClick={() => {
             if (onNotify) onNotify(c.downloadingCvToast, 'info');
           }}
-          className="shrink-0 px-3.5 py-1.5 rounded border text-xs font-bold transition-all cursor-pointer bg-emerald-500/20 text-emerald-300 border-emerald-500/40 hover:bg-emerald-500/30 text-center"
+          className="shrink-0 px-2.5 py-1 rounded border text-[11px] font-bold transition-all cursor-pointer bg-emerald-500/15 text-emerald-300 border-emerald-500/30 hover:bg-emerald-500/25 flex items-center gap-1.5"
+          title="Download official CV (DOCX)"
         >
-          {c.downloadCvBtn} (DOCX)
+          <span>{c.downloadCvBtn}</span>
+          <span className="text-[9px] text-emerald-400/60 font-mono">(DOCX)</span>
         </a>
       </div>
 
@@ -175,8 +169,8 @@ export function ContactApp({ onNotify, isEmbedded = false }: ContactAppProps) {
       </form>
 
       {/* Status Bar */}
-      <div className="bg-black/80 border-t border-white/10 px-3 py-1.5 text-[11px] font-mono text-slate-300 flex flex-wrap items-center justify-between gap-2 shrink-0">
-        <div className="truncate">
+      <div className="bg-black/80 border-t border-white/10 px-3 py-1.5 text-[11px] font-mono text-slate-300 flex items-center justify-between gap-3 shrink-0 overflow-x-auto whitespace-nowrap scrollbar-none">
+        <div className="whitespace-nowrap shrink-0">
           {submitStatus === 'idle' && (
             <span className="text-slate-400">
               {locale === 'vi'
@@ -203,13 +197,13 @@ export function ContactApp({ onNotify, isEmbedded = false }: ContactAppProps) {
           )}
         </div>
 
-        <div className="text-[10px] text-slate-500 shrink-0">
+        <div className="text-[10px] text-slate-500 shrink-0 whitespace-nowrap">
           {locale === 'vi' ? 'Dòng ' : 'Line '} {content ? content.split('\n').length : 1}, {content.length} {locale === 'vi' ? 'ký tự' : 'chars'}
         </div>
       </div>
 
       {/* Recruiter-Friendly Actions Menu */}
-      <div className="bg-[#06090f] border-t border-white/10 p-2.5 flex flex-wrap items-center gap-2 font-mono text-xs select-none shrink-0">
+      <div className="bg-[#06090f] border-t border-white/10 p-2.5 flex items-center gap-2 font-mono text-xs select-none shrink-0 overflow-x-auto whitespace-nowrap scrollbar-none">
         {/* Submit Button */}
         <button
           type="button"

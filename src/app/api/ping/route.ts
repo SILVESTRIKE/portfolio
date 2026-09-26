@@ -4,13 +4,13 @@ System impact if absent: NetworkApp ping tool will lack live latency diagnostic 
 */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { exec } from 'child_process';
+import { execFile } from 'child_process';
 import { promisify } from 'util';
 
-const execAsync = promisify(exec);
+const execFileAsync = promisify(execFile);
 
-// Allowed characters: alphanumeric, dots, hyphens
-const HOST_REGEX = /^[a-zA-Z0-9.-]+$/;
+// Allowed characters: must start and end with alphanumeric, dots and hyphens allowed inside
+const HOST_REGEX = /^[a-zA-Z0-9]([a-zA-Z0-9.-]*[a-zA-Z0-9])?$/;
 
 function isPrivateHost(host: string): boolean {
   const lower = host.toLowerCase();
@@ -75,8 +75,8 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    // Run ping: 3 packets, 2s timeout
-    const { stdout, stderr } = await execAsync(`ping -c 3 -W 2 ${host}`, { timeout: 4000 });
+    // Run ping: 3 packets, 2s timeout using array args (zero shell invocation)
+    const { stdout, stderr } = await execFileAsync('ping', ['-c', '3', '-W', '2', host], { timeout: 4000 });
     const output = (stdout || stderr).trim();
     const lines = output.split('\n').map(l => l.trim()).filter(Boolean);
 

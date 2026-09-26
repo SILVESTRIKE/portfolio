@@ -11,9 +11,9 @@ export function ProfileView() {
   return (
     <div className="space-y-6 w-full">
       {/* Neofetch Hero Box */}
-      <div className="border border-[#7aa2f7]/30 bg-black/50 rounded-lg p-4 md:p-5 space-y-4 w-full">
-        {/* Compact ASCII Art */}
-        <pre className="text-[#7aa2f7] text-[10px] md:text-xs leading-none overflow-x-auto select-none font-bold">
+      <div className="border border-[#7aa2f7]/30 bg-black/50 rounded-lg p-3 sm:p-4 space-y-3 w-full min-w-0 overflow-x-auto scrollbar-thin">
+        {/* Compact Responsive ASCII Art */}
+        <pre className="text-[#7aa2f7] text-[6px] min-[360px]:text-[7px] sm:text-[8px] md:text-[9px] leading-tight overflow-x-auto scrollbar-none select-none font-bold py-1">
           {`███████╗██╗██╗    ██╗   ██╗███████╗███████╗████████╗██████╗ ██╗██╗  ██╗███████╗
 ██╔════╝██║██║    ██║   ██║██╔════╝██╔════╝╚══██╔══╝██╔══██╗██║██║ ██╔╝██╔════╝
 ███████╗██║██║    ██║   ██║█████╗  ███████╗   ██║   ██████╔╝██║█████╔╝ █████╗  
@@ -22,48 +22,57 @@ export function ProfileView() {
 ╚══════╝╚═╝╚══════╝ ╚═══╝  ╚══════╝╚══════╝   ╚═╝   ╚═╝  ╚═╝╚═╝╚═╝  ╚═╝╚══════╝`}
         </pre>
 
-        {/* Neofetch Key-Value Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-2 pt-2 border-t border-white/10 text-[11px]">
-          <div>
+        {/* Neofetch Key-Value Grid (No truncate ellipsis, horizontal scrollable) */}
+        <div className="grid grid-cols-1 min-[580px]:grid-cols-2 gap-x-5 gap-y-1.5 pt-2 border-t border-white/10 text-[10px] sm:text-[11px] font-mono min-w-max">
+          <div className="col-span-1 min-[580px]:col-span-2 pb-1 whitespace-nowrap">
             <span className="text-emerald-400 font-bold">duong@silvestrike</span>
-            <span className="text-slate-500 ml-2">------------------------</span>
+            <span className="text-slate-600 ml-2">------------------------</span>
           </div>
-          <div>
-            <span className="text-[#7aa2f7]">Terminal:</span> silvestrike-ide-v2
+          <div className="flex items-baseline gap-1.5 whitespace-nowrap">
+            <span className="text-[#7aa2f7] font-semibold shrink-0">Terminal:</span>
+            <span className="text-slate-300">silvestrike-ide-v2</span>
           </div>
-          <div>
-            <span className="text-[#7aa2f7]">OS:</span> Human, Vietnam build [VN]
+          <div className="flex items-baseline gap-1.5 whitespace-nowrap">
+            <span className="text-[#7aa2f7] font-semibold shrink-0">OS:</span>
+            <span className="text-slate-300">Human, Vietnam build [VN]</span>
           </div>
-          <div>
-            <span className="text-[#7aa2f7]">Host:</span> HUIT (Information Technology)
+          <div className="flex items-baseline gap-1.5 whitespace-nowrap">
+            <span className="text-[#7aa2f7] font-semibold shrink-0">Host:</span>
+            <span className="text-slate-300">HUIT (Information Technology)</span>
           </div>
-          <div>
-            <span className="text-[#7aa2f7]">Degree:</span> B.Eng in IT (Final Year)
+          <div className="flex items-baseline gap-1.5 whitespace-nowrap">
+            <span className="text-[#7aa2f7] font-semibold shrink-0">Degree:</span>
+            <span className="text-slate-300">B.Eng in IT (Final Year)</span>
           </div>
-          <div>
-            <span className="text-[#7aa2f7]">GPA / IELTS:</span> 3.2 / 4.0 | 6.5 Academic
+          <div className="flex items-baseline gap-1.5 whitespace-nowrap">
+            <span className="text-[#7aa2f7] font-semibold shrink-0">GPA / IELTS:</span>
+            <span className="text-slate-300">3.2 / 4.0 | 6.5 Academic</span>
           </div>
-          <div>
-            <span className="text-[#7aa2f7]">Shell:</span> bash / Python / TypeScript
+          <div className="flex items-baseline gap-1.5 whitespace-nowrap">
+            <span className="text-[#7aa2f7] font-semibold shrink-0">Shell:</span>
+            <span className="text-slate-300">bash / Python / TypeScript</span>
           </div>
-          <div>
-            <span className="text-[#7aa2f7]">Kernel:</span> WebOS 2.0 Tiling Desktop
+          <div className="flex items-baseline gap-1.5 whitespace-nowrap">
+            <span className="text-[#7aa2f7] font-semibold shrink-0">Kernel:</span>
+            <span className="text-slate-300">WebOS 2.0 Tiling Desktop</span>
           </div>
-          <div>
-            <span className="text-[#7aa2f7]">Status:</span> Open for SWE / AI-ML Roles
+          <div className="flex items-baseline gap-1.5 whitespace-nowrap">
+            <span className="text-[#7aa2f7] font-semibold shrink-0">Status:</span>
+            <span className="text-emerald-400 font-bold">Open for SWE / AI-ML Roles</span>
           </div>
-          <div>
-            <span className="text-[#7aa2f7]">Uptime:</span> 22 years
+          <div className="flex items-baseline gap-1.5 whitespace-nowrap">
+            <span className="text-[#7aa2f7] font-semibold shrink-0">Uptime:</span>
+            <span className="text-slate-300">22 years</span>
           </div>
         </div>
 
         {/* ANSI 8-Color Palette Squares */}
-        <div className="flex items-center gap-1.5 pt-2 border-t border-white/5 select-none">
+        <div className="flex items-center gap-1.5 pt-2 border-t border-white/5 select-none overflow-x-auto">
           {['#000000', '#ef4444', '#22c55e', '#eab308', '#3b82f6', '#a855f7', '#06b6d4', '#e2e8f0'].map(
             (c, i) => (
               <div
                 key={i}
-                className="w-5 h-3 rounded-sm border border-white/10"
+                className="w-4 sm:w-5 h-2.5 sm:h-3 rounded-sm border border-white/10 shrink-0"
                 style={{ backgroundColor: c }}
               />
             )
@@ -72,11 +81,11 @@ export function ProfileView() {
       </div>
 
       {/* Formatted YAML View */}
-      <div className="bg-[#0b0f19] border border-white/10 rounded-lg p-4 font-mono text-[11px] leading-relaxed">
-        <div className="text-slate-500 pb-2 border-b border-white/5 mb-3">
+      <div className="bg-[#0b0f19] border border-white/10 rounded-lg p-3 sm:p-4 font-mono text-[10px] sm:text-[11px] leading-relaxed min-w-0 overflow-x-auto scrollbar-thin">
+        <div className="text-slate-500 pb-2 border-b border-white/5 mb-3 whitespace-nowrap">
           # profile.yml - Canonical developer configuration
         </div>
-        <pre className="text-slate-300 overflow-x-auto">
+        <pre className="text-slate-300 overflow-x-auto whitespace-pre scrollbar-thin py-1">
           <span className="text-amber-400">developer</span>:
           {'\n'}  <span className="text-[#7aa2f7]">name</span>: <span className="text-emerald-300">"Van Trong Duong"</span>
           {'\n'}  <span className="text-[#7aa2f7]">alias</span>: <span className="text-emerald-300">"SILVESTRIKE"</span>

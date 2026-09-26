@@ -29,22 +29,22 @@ export function ThesisView() {
           Veritas is an AI-powered enterprise pipeline specialized in digitizing and querying Vietnamese land registration records and legal texts using advanced Retrieval-Augmented Generation (RAG) architecture and fine-tuned LLMs.
         </p>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
-          <div className="p-3 bg-white/[0.02] rounded border border-white/5">
+        <div className="flex items-stretch gap-3 pt-2 overflow-x-auto pb-2 scrollbar-thin">
+          <div className="p-3 bg-white/[0.02] rounded border border-white/5 min-w-[200px] sm:min-w-[220px] flex-1 shrink-0">
             <div className="text-purple-400 font-bold mb-1">[1] RAG Pipeline</div>
             <div className="text-slate-400 text-[10px]">
               Hybrid dense and sparse embeddings with vector store reranking algorithms.
             </div>
           </div>
 
-          <div className="p-3 bg-white/[0.02] rounded border border-white/5">
+          <div className="p-3 bg-white/[0.02] rounded border border-white/5 min-w-[200px] sm:min-w-[220px] flex-1 shrink-0">
             <div className="text-sky-400 font-bold mb-1">[2] Fine-Tuning</div>
             <div className="text-slate-400 text-[10px]">
               Domain-specific legal parameter tuning and evaluation on administrative cases.
             </div>
           </div>
 
-          <div className="p-3 bg-white/[0.02] rounded border border-white/5">
+          <div className="p-3 bg-white/[0.02] rounded border border-white/5 min-w-[200px] sm:min-w-[220px] flex-1 shrink-0">
             <div className="text-emerald-400 font-bold mb-1">[3] High Impact</div>
             <div className="text-slate-400 text-[10px]">
               Zero-latency compliance lookups for Vietnamese public administration records.

@@ -180,7 +180,7 @@ The system is going down for maintenance NOW!
       return {
         outputHtml: `
 <div class="font-mono text-xs text-cyan-400">
-  [ok] Initializing TRON / eDEX-UI cinematic boot sequence...
+  [ok] Initializing boot sequence...
 </div>
 `
       };

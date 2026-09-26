@@ -23,6 +23,11 @@ export const metadata: Metadata = {
   title: 'SILVESTRIKE Portfolio OS',
   description: 'Interactive browser-based developer portfolio and Linux workstation for Van Trong Duong (SILVESTRIKE) featuring live telemetry, bash terminal, services catalog, and AI assistant.',
   metadataBase: new URL('https://silvestrike.dev'),
+  icons: {
+    icon: '/logo.png',
+    shortcut: '/logo.png',
+    apple: '/logo.png',
+  },
   openGraph: {
     title: 'SILVESTRIKE Portfolio OS',
     description: 'Interactive browser-based developer portfolio and Linux workstation for Van Trong Duong (SILVESTRIKE)',
