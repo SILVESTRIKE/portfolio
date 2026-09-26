@@ -19,12 +19,12 @@ export function Dock({ windows, activeId, onToggleApp }: DockProps) {
   const { t } = useI18n();
 
   const dockApps: Array<{ id: AppId; label: string }> = [
-    { id: 'app-terminal', label: t.dock.terminalShort || 'terminal' },
     { id: 'hub-portfolio', label: t.dock.devPortfolioShort || 'portfolio' },
+    { id: 'app-contact', label: t.dock.contactShort || 'contact' },
+    { id: 'app-terminal', label: t.dock.terminalShort || 'terminal' },
     { id: 'hub-system', label: t.dock.serverOpsShort || 'system' },
     { id: 'hub-workspace', label: t.dock.aiWorkbenchShort || 'workbench' },
-    { id: 'app-spotify', label: 'music' },
-    { id: 'app-contact', label: t.dock.contactShort || 'contact' }
+    { id: 'app-spotify', label: 'music' }
   ];
 
   return (

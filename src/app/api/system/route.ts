@@ -116,18 +116,18 @@ function getNetworkRates(): { rxRate: number; txRate: number } {
         }
       }
 
-    const now = Date.now();
-    if (prevNetBytes) {
-      const elapsed = (now - prevNetBytes.ts) / 1000;
-      if (elapsed > 0) {
-        const rxRate = Math.round((totalRx - prevNetBytes.rx) / elapsed / 1024); // KB/s
-        const txRate = Math.round((totalTx - prevNetBytes.tx) / elapsed / 1024);
-        prevNetBytes = { rx: totalRx, tx: totalTx, ts: now };
-        return { rxRate: Math.max(0, rxRate), txRate: Math.max(0, txRate) };
+      const now = Date.now();
+      if (prevNetBytes) {
+        const elapsed = (now - prevNetBytes.ts) / 1000;
+        if (elapsed > 0) {
+          const rxRate = Math.round((totalRx - prevNetBytes.rx) / elapsed / 1024); // KB/s
+          const txRate = Math.round((totalTx - prevNetBytes.tx) / elapsed / 1024);
+          prevNetBytes = { rx: totalRx, tx: totalTx, ts: now };
+          return { rxRate: Math.max(0, rxRate), txRate: Math.max(0, txRate) };
+        }
       }
-    }
 
-    prevNetBytes = { rx: totalRx, tx: totalTx, ts: now };
+      prevNetBytes = { rx: totalRx, tx: totalTx, ts: now };
     }
   } catch {
     // Fallback for non-Linux
@@ -172,7 +172,7 @@ function getHostHardwareInfo(): { hostModel: string; gpuModel: string; osName: s
   return {
     hostModel: 'VAN TRONG DUONG',
     gpuModel: 'WebOS Accelerated GPU Engine',
-    osName: 'Caelestia Hyprland Linux x86_64 [SILVESTRIKE WebOS]'
+    osName: 'SILVESTRIKE WebOS'
   };
 }
 

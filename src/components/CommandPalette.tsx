@@ -49,13 +49,12 @@ export function CommandPalette({
   const listRef = useRef<HTMLDivElement>(null);
 
   const commands: CommandItem[] = useMemo(() => [
-    // Applications
+    // Applications (Recruiter-First Hierarchy)
     {
-      id: 'app-terminal',
-      title: t.commands.openTerminal,
+      id: 'app-about',
+      title: t.commands.openAbout,
       category: t.commands.categoryApps,
-      shortcut: 'Alt+T',
-      action: () => onLaunchApp('app-terminal')
+      action: () => onLaunchApp('app-about')
     },
     {
       id: 'hub-portfolio',
@@ -65,17 +64,34 @@ export function CommandPalette({
       action: () => onLaunchApp('hub-portfolio')
     },
     {
-      id: 'app-about',
-      title: t.commands.openAbout,
+      id: 'resume-view',
+      title: 'Candidate 30s Executive Summary (Resume)',
       category: t.commands.categoryApps,
-      action: () => onLaunchApp('app-about')
+      action: () => {
+        window.location.href = '/resume';
+      }
     },
     {
-      id: 'app-git',
-      title: t.commands.openGitKraken,
+      id: 'app-contact',
+      title: t.apps.contact.title,
       category: t.commands.categoryApps,
-      action: () => onLaunchApp('app-git')
+      action: () => onLaunchApp('app-contact')
     },
+    {
+      id: 'app-terminal',
+      title: t.commands.openTerminal,
+      category: t.commands.categoryApps,
+      shortcut: 'Alt+T',
+      action: () => onLaunchApp('app-terminal')
+    },
+    {
+      id: 'app-ai',
+      title: t.commands.openAi,
+      category: t.commands.categoryApps,
+      action: () => onLaunchApp('app-ai')
+    },
+
+    // System Operations & Internals (Secondary)
     {
       id: 'hub-system',
       title: t.commands.openSystemHub,
@@ -96,16 +112,16 @@ export function CommandPalette({
       action: () => onLaunchApp('app-services')
     },
     {
+      id: 'app-git',
+      title: t.commands.openGitKraken,
+      category: t.commands.categoryApps,
+      action: () => onLaunchApp('app-git')
+    },
+    {
       id: 'app-files',
       title: t.commands.openFiles,
       category: t.commands.categoryApps,
       action: () => onLaunchApp('app-files')
-    },
-    {
-      id: 'app-logs',
-      title: t.commands.openLogs,
-      category: t.commands.categoryApps,
-      action: () => onLaunchApp('app-logs')
     },
     {
       id: 'app-network',
@@ -114,22 +130,16 @@ export function CommandPalette({
       action: () => onLaunchApp('app-network')
     },
     {
-      id: 'app-ai',
-      title: t.commands.openAi,
+      id: 'app-logs',
+      title: t.commands.openLogs,
       category: t.commands.categoryApps,
-      action: () => onLaunchApp('app-ai')
+      action: () => onLaunchApp('app-logs')
     },
     {
       id: 'app-spotify',
       title: t.commands.openSpotify,
       category: t.commands.categoryApps,
       action: () => onLaunchApp('app-spotify')
-    },
-    {
-      id: 'app-contact',
-      title: t.apps.contact.title,
-      category: t.commands.categoryApps,
-      action: () => onLaunchApp('app-contact')
     },
 
     // Workspaces

@@ -54,7 +54,7 @@ export const ALL_TERMINAL_COMMANDS: string[] = [
   'cowsay', 'fortune', 'sl', 'cmatrix',
 
   // Portfolio Navigation Shortcuts
-  'about', 'profile', 'bio', 'skills', 'projects', 'contact', 'services',
+  'about', 'profile', 'bio', 'resume', 'cv', 'skills', 'projects', 'contact', 'services',
   'portfolio', 'git', 'network', 'files', 'spotify', 'odoo', 'traffic'
 ];
 
@@ -1229,7 +1229,7 @@ alias cls='clear'
         outputHtml: `
 <div class="p-3 bg-[#0d121f] border border-[#7aa2f7]/30 rounded-lg space-y-2 font-mono text-xs my-1">
   <div class="text-[#7aa2f7] font-bold text-sm">VAN TRONG DUONG (SILVESTRIKE)</div>
-  <div class="text-slate-400">Full-Stack Developer | AI/ML Engineer | Aspiring Solutions Architect</div>
+  <div class="text-slate-400">Full-Stack Developer | AI/ML Engineer</div>
   <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-2 border-t border-white/10 text-[11px]">
     <div><span class="text-[#7aa2f7]">Education:</span> B.Eng in IT @ HUIT</div>
     <div><span class="text-[#7aa2f7]">GPA:</span> 3.2 / 4.0 | <span class="text-[#7aa2f7]">IELTS:</span> 6.5 Academic</div>
@@ -1241,6 +1241,30 @@ alias cls='clear'
     <div>* Clean Architecture &amp; strictly decoupled services over ad-hoc scripts</div>
     <div>* High test coverage with clear bounded contexts and validation schemas</div>
     <div>* Bridging deep learning models with high-throughput production infrastructure</div>
+  </div>
+</div>
+`
+      };
+
+    case 'resume':
+    case 'cv':
+      return {
+        outputHtml: `
+<div class="p-3 bg-[#0d121f] border border-emerald-500/30 rounded-lg space-y-2 font-mono text-xs my-1">
+  <div class="flex items-center justify-between">
+    <div class="text-emerald-400 font-bold text-sm">30-SECOND EXECUTIVE RESUME</div>
+    <a href="/resume" target="_blank" class="text-[10px] text-[#7aa2f7] hover:underline">[Open /resume Page]</a>
+  </div>
+  <div class="text-slate-300 text-[11px]">VAN TRONG DUONG (SILVESTRIKE) — Full-Stack Developer | AI/ML Engineer</div>
+  <div class="text-slate-400 text-[11px]">Ho Chi Minh City, Vietnam | vtduong04@gmail.com | HUIT B.Eng in IT</div>
+  <div class="pt-2 border-t border-white/10 space-y-1 text-[11px]">
+    <div><span class="text-sky-400 font-bold">* Samco Binh Tan WebApp:</span> VinFast EV Sales CMS &amp; E-Commerce (Next.js 14, Prisma, PostgreSQL). Cut quote generation by 40%.</div>
+    <div><span class="text-emerald-400 font-bold">* DogDexx AI:</span> Computer Vision Breed Identifier &amp; Health Records (PyTorch CNN, Node BFF, Next.js). 94% accuracy on 120 breeds.</div>
+    <div><span class="text-purple-400 font-bold">* Doru Voice AI:</span> Offline Linux Desktop Assistant (LangGraph, Whisper STT, Groq LPU). Sub-1.2s local response latency.</div>
+  </div>
+  <div class="pt-2 border-t border-white/10 flex items-center gap-3">
+    <a href="/CV_VanTrongDuong.docx" download class="px-2.5 py-1 bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 rounded text-[10px] font-bold">Download CV (DOCX)</a>
+    <a href="mailto:vtduong04@gmail.com" class="px-2.5 py-1 bg-white/5 text-slate-300 border border-white/10 rounded text-[10px]">Email Recruiter Channel</a>
   </div>
 </div>
 `
