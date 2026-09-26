@@ -136,25 +136,37 @@ interface HardwareSpecs {
   status: string;
 }
 
-const BRAILLE_LOGO_LINES = ["⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀", "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣷⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀", "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣠⣴⣿⢿⡿⣦⣄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀", "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⢻⣿⡻⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀", "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣠⢤⣖⣶⣿⣽⣟⣿⣻⣯⣷⣷⣶⣴⣠⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢹⠀⠀⠀⠀⠀⠀⠀⠀⡀⠀⠀⠀⠀⠀⠀⠀", "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⣴⣾⣟⣿⣻⣟⣿⡾⣷⢿⣻⢽⠿⠽⠾⢷⢿⢯⣿⢿⣶⣤⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢴⣿⡦⠀⠀⠀⠀⠀⠀", "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⡴⣾⢿⣯⣷⣿⣯⣿⠯⠟⠉⠁⠁⠀⠀⠀⠀⠀⠀⠀⠀⠈⠉⠙⠽⠿⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠓⠀⠀⠀⠀⠀⠀⠀", "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⢴⣯⣿⢿⣻⣯⣷⠿⠚⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀", "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣠⣾⣿⢿⣾⡿⣿⢯⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀", "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣴⢿⣻⣾⡿⣷⣿⠏⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣀⣀⣠⣤⣤⣤⣤⣦⣶⣶⣶⣶⣶⣶⣶⣶⣶⣶⣴⣤⣄⡀", "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣼⡿⣿⣻⣯⣿⢿⡞⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣀⣀⣤⣤⣴⣶⣶⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡯", "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣠⣾⣟⣿⣟⣯⣿⣾⢿⢗⠀⠀⠀⠀⠀⡀⣀⣤⣴⣴⣶⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⡿⢿⠿⡿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠿⠋⠀", "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣴⡿⣾⠻⠝⠙⠉⠈⢀⣀⣠⣤⣴⣶⣷⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⢿⠿⠿⠛⠛⠙⠉⠉⠈⠀⠀⠀⠀⠀⠀⠀⢹⣿⣿⣿⣿⣿⣿⣿⣿⠿⠋⠁⠀⠀⠀", "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠋⠈⣁⣀⣤⣤⣶⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⠿⠟⠛⠋⠉⠁⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⣿⣿⣿⠿⠟⠛⠉⠀⠀⠀⠀⠀⠀⠀", "⠀⠀⠀⠀⠀⠀⠀⣀⣠⣤⣶⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠟⠋⠉⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀", "⠀⠀⠀⣀⣤⣶⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀", "⢀⣴⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡃⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀", "⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀", "⠀⠉⠙⠛⠻⠿⢿⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣴⣷⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⠀⠀⠀⠀⠀⠀", "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠉⠛⠻⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣦⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣠⣾⣿⡟⠀⠀⠀⠀⠀⠀⠀⠀⠀⠚⠷⠑⠀⠀⠀⠀⠀", "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⠻⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⣄⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⣴⣾⣿⣿⠏⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀", "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠛⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⣦⣤⣄⣀⡀⡀⠀⡀⢀⢀⣀⣠⣤⣶⣿⣿⣿⣿⠟⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀", "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⠻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⠛⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀", "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⠻⠿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⠿⠛⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀", "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠉⠛⠛⠛⠛⠟⠻⠛⠛⠛⠙⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀"];
+const BRAILLE_LOGO_LINES = [
+  '⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡀⡀⡀⡀⡀',
+  '⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣠⢴⣺⢽⠽⠝⠝⠙⠚⠳⠖⣤',
+  '⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡴⡽⡽⡝⠊⠁',
+  '⠀⠀⠀⠀⠀⠀⠀⠀ ⠀⠀⢠⣞⡯⣯⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⣀⣀⣤⣤⣤⣤⣴⣴⣶⣶⣦⣤⣄',
+  '⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣰⢽⢮⠻⠪⠀⣀⣀⣠⣤⣴⣶⣾⣿⣿⣿⠿⠿⠟⠟⠿⣿⣿⣿⣿⣿⠿⠋',
+  '⠀⠀⠀⠀⠀⠀⠀⠀⠀⣊⣩⣤⣴⣶⣿⣿⣿⠿⠿⠛⠛⠉⠉⠁⠀⠀⠀⠀⠀⠀⠀⠠⠿⠟⠛⠉',
+  ' ⠀⠀⠀⠀⢀⣠⣴⣾⣿⣿⣿⣿⣿⣿⣿⠏',
+  ' ⠀⠀⠀⠲⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡀',
+  ' ⠀⠀⠀⠀⠀⠀⠉⠉⠙⠛⠿⣿⣿⣿⣿⣷⣄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣠⣾⠃',
+  ' ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⠻⢿⣿⣿⣿⣶⣤⣄⣀⣀⣀⣀⣤⣶⣾⠟⠁',
+  ' ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠙⠻⠿⣿⣿⣿⣿⣿⣿⠿⠟⠋'
+];
 
 export function FastfetchBanner() {
   const [specs, setSpecs] = useState<HardwareSpecs>({
-    os: 'Caelestia Hyprland Linux x86_64 [SILVESTRIKE WebOS]',
-    host: 'VAN TRONG DUONG',
-    kernel: 'Linux 6.8.0-silvestrike-c1',
-    uptime: '22 years (Est. 2004)',
-    packages: '143 (npm), 8 (sandboxes), 10 (microservices)',
-    shell: 'bash 5.2.26 / zsh 5.9 (x86_64-pc-linux-gnu)',
-    wm: 'Hyprland (Wayland compositor)',
-    cpu: '13th Gen Intel Core i5-13420H (8 Cores, 12 Threads)',
-    gpu: 'WebOS Accelerated GPU Engine',
-    memory: '8.42 GiB / 16.00 GiB (52%)',
-    status: 'Open for SWE / AI Roles'
+    os: 'SILVESTRIKE WebOS',
+    host: 'duong@silvestrike',
+    kernel: 'Linux 6.8.0',
+    uptime: '22 yrs (2004)',
+    packages: '143 (npm)',
+    shell: 'bash / zsh',
+    wm: 'Hyprland (Wayland)',
+    cpu: 'Intel i5-13420H (8C/12T)',
+    gpu: 'Accelerated GPU',
+    memory: '8.4 / 16.0 GiB (52%)',
+    status: 'Open for Hire'
   });
 
   useEffect(() => {
-    let detectedGpu = 'WebOS Accelerated GPU Engine';
+    let detectedGpu = 'Accelerated GPU';
     try {
       const canvas = document.createElement('canvas');
       const gl =
@@ -166,10 +178,15 @@ export function FastfetchBanner() {
           const rawRenderer = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
           if (typeof rawRenderer === 'string' && rawRenderer.trim()) {
             const angleMatch = rawRenderer.match(/ANGLE \([^,]+,\s*([^,]+)/i);
-            if (angleMatch && angleMatch[1]) {
-              detectedGpu = angleMatch[1].replace(/\s*\([^)]*\)/g, '').trim();
-            } else {
-              detectedGpu = rawRenderer.replace(/Direct3D.*$/i, '').trim();
+            const candidate = angleMatch && angleMatch[1] ? angleMatch[1] : rawRenderer;
+            detectedGpu = candidate
+              .replace(/\s*\([^)]*\)/g, '')
+              .replace(/Direct3D.*$/i, '')
+              .replace(/Intel\(R\)\s*/gi, '')
+              .replace(/NVIDIA\s*/gi, '')
+              .trim();
+            if (detectedGpu.length > 20) {
+              detectedGpu = detectedGpu.substring(0, 18) + '..';
             }
           }
         }
@@ -178,17 +195,15 @@ export function FastfetchBanner() {
       // Keep default GPU
     }
 
-    let detectedOs = 'Ubuntu 26.04.1 LTS x86_64 [SILVESTRIKE WebOS]';
+    let detectedOs = 'SILVESTRIKE WebOS';
     try {
       const ua = navigator.userAgent;
-      if (ua.includes('Windows NT 10.0')) {
-        detectedOs = 'Ubuntu 26.04.1 LTS [Client: Windows 11/10]';
+      if (ua.includes('Windows')) {
+        detectedOs = 'Ubuntu / Windows 11';
       } else if (ua.includes('Macintosh')) {
-        detectedOs = 'Ubuntu 26.04.1 LTS [Client: macOS Darwin]';
-      } else if (ua.includes('Ubuntu')) {
-        detectedOs = 'Ubuntu 26.04.1 LTS x86_64 [SILVESTRIKE Host]';
+        detectedOs = 'Ubuntu / macOS Darwin';
       } else if (ua.includes('Linux')) {
-        detectedOs = 'Linux x86_64 [SILVESTRIKE Host]';
+        detectedOs = 'Ubuntu 26.04 Linux';
       }
     } catch {
       // Keep default OS
@@ -202,26 +217,31 @@ export function FastfetchBanner() {
       .then((sys) => {
         if (sys && typeof sys.cpuModel === 'string') {
           let cleanCpu = sys.cpuModel
-            .replace(/\(R\)|\(TM\)/g, '')
+            .replace(/\(R\)|\(TM\)/gi, '')
+            .replace(/13th Gen\s+/gi, '')
+            .replace(/Intel Core\s+/gi, 'Intel ')
             .replace(/\s+/g, ' ')
             .trim();
 
           const phys = sys.physicalCores || 8;
-          const threads = sys.threadCount || sys.coreCount || 12;
-          cleanCpu = `${cleanCpu} (${phys} Cores, ${threads} Threads)`;
-
-          let memStr = `${(8.42).toFixed(2)} GiB / ${clientMemGb.toFixed(2)} GiB (52%)`;
-          if (sys.ramTotal && sys.ramUsed) {
-            const usedGiB = (sys.ramUsed / 1024).toFixed(2);
-            const totalGiB = (sys.ramTotal / 1024).toFixed(2);
-            const pct = Math.round((sys.ramUsed / sys.ramTotal) * 100);
-            memStr = `${usedGiB} GiB / ${totalGiB} GiB (${pct}%)`;
+          const threads = sys.threadCount || sys.coreCount || clientCores;
+          cleanCpu = `${cleanCpu} (${phys}C/${threads}T)`;
+          if (cleanCpu.length > 24) {
+            cleanCpu = cleanCpu.substring(0, 22) + '..';
           }
 
-          const hostModel = sys.hostModel ? sys.hostModel : 'VAN TRONG DUONG';
-          const kernel = sys.kernel ? `Linux ${sys.kernel}` : 'Linux 7.0.0-31-generic';
+          let memStr = `8.4 / ${clientMemGb.toFixed(0)} GiB (52%)`;
+          if (sys.ramTotal && sys.ramUsed) {
+            const usedGiB = (sys.ramUsed / 1024).toFixed(1);
+            const totalGiB = (sys.ramTotal / 1024).toFixed(0);
+            const pct = Math.round((sys.ramUsed / sys.ramTotal) * 100);
+            memStr = `${usedGiB}/${totalGiB} GiB (${pct}%)`;
+          }
+
+          const hostModel = sys.hostModel ? sys.hostModel : 'duong@silvestrike';
+          const kernel = sys.kernel ? `Linux ${sys.kernel}` : 'Linux 6.8.0';
           const osName = sys.osName ?? detectedOs;
-          const gpu = sys.gpuModel || detectedGpu;
+          const gpu = sys.gpuModel ? sys.gpuModel.replace(/Intel\(R\)\s*/gi, '').substring(0, 18) : detectedGpu;
 
           setSpecs((prev) => ({
             ...prev,
@@ -232,25 +252,9 @@ export function FastfetchBanner() {
             cpu: cleanCpu,
             memory: memStr
           }));
-        } else {
-          setSpecs((prev) => ({
-            ...prev,
-            os: detectedOs,
-            gpu: detectedGpu,
-            cpu: `13th Gen Intel Core i5-13420H (8 Cores, ${clientCores} Threads)`,
-            memory: `8.42 GiB / ${clientMemGb.toFixed(2)} GiB (52%)`
-          }));
         }
       })
-      .catch(() => {
-        setSpecs((prev) => ({
-          ...prev,
-          os: detectedOs,
-          gpu: detectedGpu,
-          cpu: `13th Gen Intel Core i5-13420H (8 Cores, ${clientCores} Threads)`,
-          memory: `8.42 GiB / ${clientMemGb.toFixed(2)} GiB (52%)`
-        }));
-      });
+      .catch(() => {});
   }, []);
 
   const rows: { icon: React.ReactNode; label: string; value: string; bold?: boolean }[] = [
@@ -268,18 +272,20 @@ export function FastfetchBanner() {
   ];
 
   return (
-    <div className="my-2 p-3 sm:p-4 bg-[#0a0d14]/90 border border-white/10 rounded-lg font-mono text-xs select-none max-w-full">
+    <div className="my-1.5 p-2 sm:p-3 bg-[#0a0d14]/90 border border-white/10 rounded-lg font-mono text-xs select-none max-w-full overflow-hidden">
       {/* Top Header Bar */}
-      <div className="flex items-center justify-between gap-2 mb-3 pb-2 border-b border-white/10 text-[10px] text-slate-400">
+      <div className="flex items-center justify-between gap-2 mb-2 pb-1.5 border-b border-white/10 text-[10px] text-slate-400">
         <div className="flex items-center gap-2">
-          <span className="text-slate-300 font-semibold tracking-wide">FASTFETCH v2.3.0</span>
+          <span className="text-[#7aa2f7] font-bold tracking-wide">FASTFETCH v2.3</span>
+          <span className="text-slate-600">|</span>
+          <span className="text-slate-400">duong@srv-silvestrike</span>
         </div>
       </div>
 
-      <div className="flex flex-col md:flex-row items-center md:items-start justify-start gap-6 sm:gap-8 lg:gap-10 py-1">
+      <div className="flex flex-col sm:flex-row items-center sm:items-start justify-start gap-3 sm:gap-6 py-0.5">
         {/* Left: ASCII / Braille Logo */}
-        <div className="shrink-0 flex flex-col items-start justify-center">
-          <pre className="whitespace-pre font-mono select-none font-bold text-[6.5px] sm:text-[7.5px] md:text-[8px] leading-[1.08] tracking-tighter text-[#7aa2f7] text-left">
+        <div className="shrink-0 flex flex-col items-center sm:items-start justify-center">
+          <pre className="whitespace-pre font-mono select-none font-bold text-[7px] sm:text-[7.5px] leading-[1.08] tracking-tighter text-[#7aa2f7] text-left">
             {BRAILLE_LOGO_LINES.map((line, idx) => (
               <div key={idx}>{line}</div>
             ))}
@@ -287,17 +293,17 @@ export function FastfetchBanner() {
         </div>
 
         {/* Right: Box đóng khung sát chữ, chữ căn lề phải */}
-        <div className="w-fit shrink-0">
-          <div className="rounded-lg border border-white/20 bg-black/40 p-3 sm:p-3.5 shadow-xl w-fit">
-            <div className="grid grid-cols-[auto_1fr] items-center gap-x-6 sm:gap-x-8 gap-y-1.5 text-[11px] sm:text-xs">
+        <div className="w-full sm:w-auto shrink-0 min-w-0">
+          <div className="rounded-lg border border-white/15 bg-black/40 p-2 sm:p-2.5 shadow-xl w-full sm:w-fit">
+            <div className="grid grid-cols-[auto_1fr] items-center gap-x-3 sm:gap-x-5 gap-y-1 text-[10.5px] sm:text-[11px]">
               {rows.map((row) => (
                 <React.Fragment key={row.label}>
-                  <div className="flex items-center gap-2">
-                    <span className="text-[#7aa2f7] shrink-0 w-3.5 flex justify-center">{row.icon}</span>
+                  <div className="flex items-center gap-1.5 min-w-0">
+                    <span className="text-[#7aa2f7] shrink-0 w-3 flex justify-center">{row.icon}</span>
                     <span className="text-[#7aa2f7] font-semibold whitespace-nowrap">{row.label}</span>
                   </div>
                   <div
-                    className={`text-right whitespace-nowrap ${row.bold ? 'text-[#9ece6a] font-bold' : 'text-slate-200'
+                    className={`text-right whitespace-nowrap truncate max-w-[200px] sm:max-w-[240px] ${row.bold ? 'text-[#9ece6a] font-bold' : 'text-slate-200'
                       }`}
                   >
                     {row.value}
@@ -307,21 +313,19 @@ export function FastfetchBanner() {
             </div>
 
             {/* ANSI Color Blocks - 1 Row */}
-            <div className="pt-2.5 select-none border-t border-white/10 mt-2.5 flex items-center justify-start gap-1.5">
-              <span className="w-4 h-2.5 rounded-xs bg-[#1e1e2e] border border-white/20" />
-              <span className="w-4 h-2.5 rounded-xs bg-[#e06c75]" />
-              <span className="w-4 h-2.5 rounded-xs bg-[#98c379]" />
-              <span className="w-4 h-2.5 rounded-xs bg-[#e5c07b]" />
-              <span className="w-4 h-2.5 rounded-xs bg-[#61afef]" />
-              <span className="w-4 h-2.5 rounded-xs bg-[#c678dd]" />
-              <span className="w-4 h-2.5 rounded-xs bg-[#56b6c2]" />
-              <span className="w-4 h-2.5 rounded-xs bg-[#abb2bf]" />
+            <div className="pt-2 select-none border-t border-white/10 mt-2 flex items-center justify-start gap-1">
+              <span className="w-3.5 h-2 rounded-xs bg-[#1e1e2e] border border-white/20" />
+              <span className="w-3.5 h-2 rounded-xs bg-[#e06c75]" />
+              <span className="w-3.5 h-2 rounded-xs bg-[#98c379]" />
+              <span className="w-3.5 h-2 rounded-xs bg-[#e5c07b]" />
+              <span className="w-3.5 h-2 rounded-xs bg-[#61afef]" />
+              <span className="w-3.5 h-2 rounded-xs bg-[#c678dd]" />
+              <span className="w-3.5 h-2 rounded-xs bg-[#56b6c2]" />
+              <span className="w-3.5 h-2 rounded-xs bg-[#abb2bf]" />
             </div>
           </div>
         </div>
       </div>
-
-
     </div>
   );
 }
