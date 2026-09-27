@@ -35,8 +35,8 @@ export const metadata: Metadata = {
   metadataBase: new URL(appUrl),
   icons: {
     icon: [
-      { url: '/favicon.ico', sizes: 'any' },
-      { url: '/logo.png', type: 'image/png' }
+      { url: '/favicon.ico', sizes: '512x512' },
+      { url: '/logo.png', type: 'image/png', sizes: '512x512' }
     ],
     shortcut: '/favicon.ico',
     apple: '/apple-touch-icon.png',
