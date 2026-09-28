@@ -5,6 +5,7 @@ System impact if absent: Next.js cannot render root HTML structure and typograph
 
 import type { Metadata } from 'next';
 import { JetBrains_Mono, Outfit } from 'next/font/google';
+import { Analytics } from '@vercel/analytics/next';
 import './globals.css';
 
 const jetbrainsMono = JetBrains_Mono({
@@ -64,6 +65,7 @@ export default function RootLayout({
         <I18nProvider>
           {children}
         </I18nProvider>
+        <Analytics />
       </body>
     </html>
   );
