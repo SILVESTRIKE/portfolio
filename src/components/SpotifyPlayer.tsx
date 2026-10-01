@@ -544,40 +544,53 @@ export function SpotifyPlayer({ mode = 'panel', onOpenFullPlayer, onClose }: Spo
             </div>
 
             {/* Controls Bar */}
-            <div className="flex items-center justify-between gap-2 pt-1.5 border-t border-white/10">
-              <div className="flex items-center gap-1 sm:gap-1.5">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 pt-1.5 border-t border-white/10">
+              <div className="flex items-center justify-center sm:justify-start gap-1.5 sm:gap-2">
                 <button
                   type="button"
                   onClick={() => globalAudio.playPrev()}
-                  className="px-2 py-1 sm:px-3 sm:py-1.5 rounded bg-white/5 hover:bg-white/15 text-slate-300 hover:text-white border border-white/10 text-[10px] sm:text-xs font-bold transition-all cursor-pointer"
+                  className="flex-1 sm:flex-none px-3 py-1.5 rounded bg-white/5 hover:bg-white/15 text-slate-300 hover:text-white border border-white/10 text-xs font-bold transition-all cursor-pointer text-center"
                   title="Previous song"
                 >
-                  [|&lt; PREV]
+                  <span className="sm:hidden">[|&lt;]</span>
+                  <span className="hidden sm:inline">[|&lt; PREV]</span>
                 </button>
 
                 <button
                   type="button"
                   onClick={handleTogglePlay}
-                  className={`px-3 py-1 sm:px-4 sm:py-1.5 rounded font-bold text-[10px] sm:text-xs transition-all flex items-center gap-1.5 cursor-pointer ${isPlayingAudio
-                    ? 'bg-emerald-500 text-black shadow-[0_0_15px_rgba(16,185,129,0.4)]'
-                    : 'bg-white text-black hover:bg-slate-200'
-                    }`}
+                  className={`flex-1 sm:flex-none px-4 py-1.5 rounded font-bold text-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+                    isPlayingAudio
+                      ? 'bg-emerald-500 text-black shadow-[0_0_15px_rgba(16,185,129,0.4)]'
+                      : 'bg-white text-black hover:bg-slate-200'
+                  }`}
                 >
-                  <span>{isPlayingAudio ? '[|| PAUSE]' : '[> PLAY]'}</span>
+                  {isPlayingAudio ? (
+                    <>
+                      <span className="sm:hidden">[||]</span>
+                      <span className="hidden sm:inline">[|| PAUSE]</span>
+                    </>
+                  ) : (
+                    <>
+                      <span className="sm:hidden">[&gt;]</span>
+                      <span className="hidden sm:inline">[&gt; PLAY]</span>
+                    </>
+                  )}
                 </button>
 
                 <button
                   type="button"
                   onClick={() => globalAudio.playNext()}
-                  className="px-2 py-1 sm:px-3 sm:py-1.5 rounded bg-white/5 hover:bg-white/15 text-slate-300 hover:text-white border border-white/10 text-[10px] sm:text-xs font-bold transition-all cursor-pointer"
+                  className="flex-1 sm:flex-none px-3 py-1.5 rounded bg-white/5 hover:bg-white/15 text-slate-300 hover:text-white border border-white/10 text-xs font-bold transition-all cursor-pointer text-center"
                   title="Next song"
                 >
-                  [NEXT &gt;|]
+                  <span className="sm:hidden">[&gt;|]</span>
+                  <span className="hidden sm:inline">[NEXT &gt;|]</span>
                 </button>
               </div>
 
-              {/* Volume Slider */}
-              <div className="flex items-center gap-1.5 sm:gap-2 bg-white/5 px-2 py-1 sm:px-2.5 sm:py-1.5 rounded border border-white/10 text-[9px] sm:text-[10px] text-slate-300 shrink-0">
+              {/* Volume Slider - full row on mobile, inline on desktop */}
+              <div className="flex items-center justify-between sm:justify-end gap-2 bg-white/5 px-2.5 py-1.5 rounded border border-white/10 text-[10px] text-slate-300 shrink-0">
                 <span className="text-slate-400">VOL:</span>
                 <input
                   type="range"
@@ -590,14 +603,14 @@ export function SpotifyPlayer({ mode = 'panel', onOpenFullPlayer, onClose }: Spo
                     setVolume(next);
                     globalAudio.setVolume(next);
                   }}
-                  className="w-12 sm:w-20 accent-emerald-500 cursor-pointer h-1"
+                  className="flex-1 sm:w-20 accent-emerald-500 cursor-pointer h-1"
                 />
-                <span className="w-5 sm:w-7 text-right">{Math.round(volume * 100)}%</span>
+                <span className="w-7 text-right">{Math.round(volume * 100)}%</span>
               </div>
             </div>
 
             {/* External Links */}
-            <div className="flex items-center gap-2 pt-1 text-[9px] sm:text-[10px]">
+            <div className="flex items-center gap-2 pt-1 text-[10px]">
               {currentTrack?.youtubeVideoId && (
                 <a
                   href={`https://www.youtube.com/watch?v=${currentTrack.youtubeVideoId}`}
@@ -605,7 +618,8 @@ export function SpotifyPlayer({ mode = 'panel', onOpenFullPlayer, onClose }: Spo
                   rel="noreferrer"
                   className="flex-1 text-center bg-red-600/10 hover:bg-red-600/20 border border-red-500/30 text-red-300 hover:text-white py-1 rounded transition-colors"
                 >
-                  [OPEN ON YOUTUBE]
+                  <span className="sm:hidden">[YOUTUBE]</span>
+                  <span className="hidden sm:inline">[OPEN ON YOUTUBE]</span>
                 </a>
               )}
               {currentTrack?.songUrl && (
@@ -615,7 +629,8 @@ export function SpotifyPlayer({ mode = 'panel', onOpenFullPlayer, onClose }: Spo
                   rel="noreferrer"
                   className="flex-1 text-center bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 hover:text-white py-1 rounded transition-colors"
                 >
-                  [VIEW ON LAST.FM]
+                  <span className="sm:hidden">[LAST.FM]</span>
+                  <span className="hidden sm:inline">[VIEW ON LAST.FM]</span>
                 </a>
               )}
             </div>
