@@ -84,7 +84,7 @@ export default function ResumePage() {
   ];
 
   return (
-    <main className="min-h-screen bg-[#080b12] text-slate-200 font-sans selection:bg-[#7aa2f7]/30 selection:text-white px-4 py-8 sm:py-12">
+    <main className="min-h-screen w-full bg-[#080b12] text-slate-200 font-sans selection:bg-[#7aa2f7]/30 selection:text-white px-4 py-8 sm:py-12 select-text">
       <div className="max-w-4xl mx-auto space-y-10">
 
         {/* Top Navigation & Direct Action Bar */}
