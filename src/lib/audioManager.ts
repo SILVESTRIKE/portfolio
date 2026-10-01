@@ -53,7 +53,7 @@ class GlobalAudioManager {
   private isSynthPlaying = false;
   private analyser: AnalyserNode | null = null;
   private freqData: Uint8Array<ArrayBuffer> | null = null;
-  private beatCounter = 0;
+  private smoothBars = new Float32Array(32);
 
   // Queue Management
   private queue: MusicTrackInfo[] = [];
@@ -142,13 +142,20 @@ class GlobalAudioManager {
   // --- YouTube IFrame Engine ---
   public setYouTubeTrack(videoId: string | null, forcePlay = false) {
     if (!videoId) return;
+
+    // Mutually exclusive: stop HTML5 audio and synth whenever targeting YouTube
+    if (this.audio && !this.audio.paused) {
+      try {
+        this.audio.pause();
+      } catch {
+        // Ignore
+      }
+    }
+    this.stopSynth();
+
     if (this.currentYtVideoId === videoId && (this.isYtReady || this.isYtPlaying)) {
-      if (forcePlay) {
-        if (!this.isPlaying) {
-          this.play();
-        } else if (this.ytPlayer?.seekTo) {
-          this.ytPlayer.seekTo(0, true);
-        }
+      if (forcePlay && !this.isPlaying) {
+        this.play();
       }
       return;
     }
@@ -164,10 +171,6 @@ class GlobalAudioManager {
         } else if (this.ytPlayer?.cueVideoById) {
           this.ytPlayer.cueVideoById(videoId);
         }
-        if (this.audio && !this.audio.paused) {
-          this.audio.pause();
-        }
-        this.stopSynth();
       } catch {
         // Fallback
       }
@@ -404,6 +407,21 @@ class GlobalAudioManager {
   }
 
   public async playTrack(track: MusicTrackInfo) {
+    const isSameTrack =
+      this.currentTrack &&
+      ((track.trackId && this.currentTrack.trackId === track.trackId) ||
+        (this.currentTrack.title.toLowerCase() === track.title.toLowerCase() &&
+          this.currentTrack.artist.toLowerCase() === track.artist.toLowerCase()));
+
+    // If this exact track is already actively playing, don't restart or double-play
+    if (
+      this.isPlaying &&
+      isSameTrack &&
+      (this.isYtPlaying || (this.audio && !this.audio.paused) || this.isSynthPlaying)
+    ) {
+      return;
+    }
+
     this.currentTrack = track;
     const foundIdx = this.queue.findIndex(
       t =>
@@ -459,6 +477,16 @@ class GlobalAudioManager {
   }
 
   public setTrackUrl(url: string | null) {
+    // When switching to HTML5 audio, pause YouTube and stop synth
+    if (this.isYtReady && this.ytPlayer?.pauseVideo) {
+      try {
+        this.ytPlayer.pauseVideo();
+      } catch {
+        // Ignore
+      }
+    }
+    this.stopSynth();
+
     const nextUrl = url && url.startsWith('http') ? url : 'https://stream.zeno.fm/f3wvbbqmdg8uv';
     if (this.currentUrl !== nextUrl) {
       this.currentUrl = nextUrl;
@@ -481,6 +509,11 @@ class GlobalAudioManager {
   }
 
   public play() {
+    // If already actively playing, return immediately to prevent duplicate streams or restarts
+    if (this.isPlaying && (this.isYtPlaying || (this.audio && !this.audio.paused) || this.isSynthPlaying)) {
+      return;
+    }
+
     this.ensureAudioContext();
     this.isPlaying = true;
     this.notify();
@@ -698,7 +731,11 @@ class GlobalAudioManager {
     }
 
     if (!this.isPlaying) {
-      this.freqData.fill(0);
+      // Smooth decay to baseline when paused or stopped
+      for (let i = 0; i < this.freqData.length; i++) {
+        this.smoothBars[i] = Math.max(0, this.smoothBars[i] - 10);
+        this.freqData[i] = Math.round(this.smoothBars[i]);
+      }
       return this.freqData;
     }
 
@@ -711,18 +748,65 @@ class GlobalAudioManager {
           break;
         }
       }
+      if (hasSignal) {
+        // Apply smooth gravity to real analyser signal
+        for (let i = 0; i < this.freqData.length; i++) {
+          const raw = this.freqData[i];
+          if (raw > this.smoothBars[i]) {
+            this.smoothBars[i] += (raw - this.smoothBars[i]) * 0.45;
+          } else {
+            this.smoothBars[i] = Math.max(0, this.smoothBars[i] - 8);
+          }
+          this.freqData[i] = Math.round(this.smoothBars[i]);
+        }
+        return this.freqData;
+      }
     }
 
-    // Dynamic musical harmonics for visualizer when playing iframe stream
-    if (!hasSignal && this.isPlaying) {
-      this.beatCounter += 0.15;
-      const baseAmp = Math.round(this.volume * 220);
-      for (let i = 0; i < this.freqData.length; i++) {
-        const harmonic = Math.sin(this.beatCounter * 1.2 + i * 0.4) * 0.5 + 0.5;
-        const decay = Math.max(0.2, 1 - (i / this.freqData.length) * 0.7);
-        const noise = (Math.sin(i * 13.37 + this.beatCounter * 3) * 0.5 + 0.5) * 0.3;
-        this.freqData[i] = Math.round(baseAmp * decay * (harmonic * 0.7 + noise));
+    // Dynamic musical CAVA simulation synchronized with real time (124 BPM standard tempo, 4/4 meter)
+    const nowSec = typeof window !== 'undefined' ? performance.now() / 1000 : 0;
+    const bpm = 124;
+    const beatPeriod = 60 / bpm; // ~0.484s per beat
+    const beatPhase = (nowSec % beatPeriod) / beatPeriod; // 0 to 1 within beat
+    const barProgress = (nowSec % (beatPeriod * 4)) / (beatPeriod * 4); // 4/4 measure
+
+    // Musical envelopes: Kick on beats 1 & 3, Snare on 2 & 4, Hi-hat on eighth notes
+    const isKick = beatPhase < 0.28;
+    const kickEnvelope = isKick ? Math.pow(1 - beatPhase / 0.28, 1.8) : 0;
+    const snareEnvelope =
+      Math.floor(barProgress * 4) % 2 === 1 && beatPhase < 0.35
+        ? Math.pow(1 - beatPhase / 0.35, 1.5)
+        : 0;
+    const hihat = Math.sin(nowSec * Math.PI * (bpm / 30)) * 0.5 + 0.5;
+
+    const baseAmp = this.volume * 210;
+
+    for (let i = 0; i < this.freqData.length; i++) {
+      let target = 0;
+      if (i < 6) {
+        // Sub-bass & Bass (kick drum pulse + smooth low-end resonance)
+        const bassHarmonic = Math.sin(nowSec * 3.5 + i * 0.5) * 0.25 + 0.75;
+        target = baseAmp * (0.35 + kickEnvelope * 0.65) * bassHarmonic;
+      } else if (i < 18) {
+        // Mid-range (vocals, rhythm guitars, synths, snare)
+        const midHarmonic = Math.sin(nowSec * 5.0 + i * 0.45) * 0.4 + 0.6;
+        const midDecay = 1 - ((i - 6) / 12) * 0.35;
+        target = baseAmp * (0.3 + snareEnvelope * 0.5) * midHarmonic * midDecay;
+      } else {
+        // Highs / Treble (hi-hats, cymbals, air shimmer)
+        const trebleHarmonic = Math.sin(nowSec * 7.5 + i * 0.3) * 0.35 + 0.65;
+        const trebleDecay = Math.max(0.18, 0.75 - ((i - 18) / 14) * 0.55);
+        target = baseAmp * (0.2 + hihat * 0.35) * trebleHarmonic * trebleDecay;
       }
+
+      // Smooth attack and realistic CAVA exponential gravity falloff
+      if (target > this.smoothBars[i]) {
+        this.smoothBars[i] += (target - this.smoothBars[i]) * 0.35; // Fast attack
+      } else {
+        this.smoothBars[i] = Math.max(0, this.smoothBars[i] - 7); // Smooth falloff
+      }
+
+      this.freqData[i] = Math.min(255, Math.max(0, Math.round(this.smoothBars[i])));
     }
 
     return this.freqData;

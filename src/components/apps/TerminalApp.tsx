@@ -7,9 +7,6 @@ System impact if absent: Users will not have a functional terminal shell, home d
 
 import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { vfs } from '@/lib/fs';
-import { services } from '@/lib/services';
-import { logManager } from '@/lib/logs';
-import { monitor } from '@/lib/monitor';
 import { AppId } from '@/types';
 
 import { FastfetchBanner } from './terminal/FastfetchBanner';
@@ -46,14 +43,14 @@ const SUGGEST_COMMANDS = ALL_TERMINAL_COMMANDS;
 
 const INITIAL_WELCOME_BANNER = `
 <div class="space-y-1 font-mono mb-2 select-none border-b border-white/10 pb-2 overflow-hidden">
-  <pre class="text-[#7aa2f7] text-[3.2px] min-[320px]:text-[3.6px] min-[360px]:text-[4.2px] min-[400px]:text-[5.2px] min-[480px]:text-[6.5px] sm:text-[9px] md:text-[10px] tracking-tight leading-none font-bold overflow-x-auto scrollbar-none py-0.5">
-███████╗██╗██╗    ██╗   ██╗███████╗███████╗████████╗██████╗ ██╗██╗  ██╗███████╗
-██╔════╝██║██║    ██║   ██║██╔════╝██╔════╝╚══██╔══╝██╔══██╗██║██║ ██╔╝██╔════╝
-███████╗██║██║    ██║   ██║█████╗  ███████╗   ██║   ██████╔╝██║█████╔╝ █████╗  
-╚════██║██║██║    ╚██╗ ██╔╝██╔══╝  ╚════██║   ██║   ██╔══██╗██║██╔═██╗ ██╔══╝  
-███████║██║███████╗╚████╔╝ ███████╗███████║   ██║   ██║  ██║██║██║  ██╗███████╗
-╚══════╝╚═╝╚══════╝ ╚═══╝  ╚══════╝╚══════╝   ╚═╝   ╚═╝  ╚═╝╚═╝╚═╝  ╚═╝╚══════╝
-  </pre>
+    <pre class="text-[#7aa2f7] font-mono text-[3.5px] min-[320px]:text-[4px] min-[360px]:text-[4.5px] min-[400px]:text-[5.5px] min-[480px]:text-[6.8px] sm:text-[9px] md:text-[10px] tracking-normal leading-none font-bold overflow-x-auto scrollbar-none py-0.5">
+  ███████╗██╗██╗    ██╗   ██╗███████╗███████╗████████╗██████╗ ██╗██╗  ██╗███████╗
+  ██╔════╝██║██║    ██║   ██║██╔════╝██╔════╝╚══██╔══╝██╔══██╗██║██║ ██╔╝██╔════╝
+  ███████╗██║██║    ██║   ██║█████╗  ███████╗   ██║   ██████╔╝██║█████╔╝ █████╗  
+  ╚════██║██║██║    ╚██╗ ██╔╝██╔══╝  ╚════██║   ██║   ██╔══██╗██║██╔═██╗ ██╔══╝  
+  ███████║██║███████╗╚████╔╝ ███████╗███████║   ██║   ██║  ██║██║██║  ██╗███████╗
+  ╚══════╝╚═╝╚══════╝ ╚═══╝  ╚══════╝╚══════╝   ╚═╝   ╚═╝  ╚═╝╚═╝╚═╝  ╚═╝╚══════╝
+    </pre>
   <div class="text-[10.5px] sm:text-[11px] text-slate-400">
    — Type <span class="text-[#7aa2f7] font-bold">'help'</span> for command index, or use quick action shortcuts below:
   </div>

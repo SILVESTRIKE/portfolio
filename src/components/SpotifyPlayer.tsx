@@ -183,12 +183,15 @@ export function SpotifyPlayer({ mode = 'panel', onOpenFullPlayer, onClose }: Spo
             grad.addColorStop(1, 'rgba(125, 211, 252, 1)');
 
             ctx.fillStyle = grad;
-            ctx.fillRect(
-              i * (barWidth + gap),
-              height - barHeight,
-              barWidth,
-              barHeight
-            );
+            const x = i * (barWidth + gap);
+            const y = height - barHeight;
+            ctx.fillRect(x, y, barWidth, barHeight);
+
+            // Sleek peak cap highlight for active bars
+            if (barHeight > 6) {
+              ctx.fillStyle = 'rgba(186, 230, 253, 0.85)';
+              ctx.fillRect(x, y, barWidth, 1.5);
+            }
           }
         }
       }

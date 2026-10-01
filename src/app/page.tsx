@@ -72,8 +72,11 @@ export default function WebOSPage() {
       sessionStorage.setItem('silves_boot_complete', 'true');
     }
     setHasBooted(true);
-    // Auto-play background music when booted into OS
-    globalAudio.play();
+    // Only start music if NOT already playing
+    if (!globalAudio.getStatus().isPlaying) {
+      globalAudio.play();
+    }
+
     const handleFirstInteraction = () => {
       if (!globalAudio.getStatus().isPlaying) {
         globalAudio.play();
@@ -81,8 +84,11 @@ export default function WebOSPage() {
       window.removeEventListener('pointerdown', handleFirstInteraction);
       window.removeEventListener('keydown', handleFirstInteraction);
     };
-    window.addEventListener('pointerdown', handleFirstInteraction, { once: true });
-    window.addEventListener('keydown', handleFirstInteraction, { once: true });
+
+    if (!globalAudio.getStatus().isPlaying) {
+      window.addEventListener('pointerdown', handleFirstInteraction, { once: true });
+      window.addEventListener('keydown', handleFirstInteraction, { once: true });
+    }
   }, []);
 
   // Sub-tab selection state inside each Hub

@@ -4,17 +4,11 @@ System impact if absent: Next.js cannot render root HTML structure and typograph
 */
 
 import type { Metadata } from 'next';
-import { JetBrains_Mono, Outfit } from 'next/font/google';
+import { JetBrains_Mono } from 'next/font/google';
 import './globals.css';
 
 const jetbrainsMono = JetBrains_Mono({
-  variable: '--font-mono',
-  subsets: ['latin'],
-  display: 'swap',
-});
-
-const outfit = Outfit({
-  variable: '--font-sans',
+  variable: '--font-jetbrains',
   subsets: ['latin'],
   display: 'swap',
 });
@@ -63,9 +57,9 @@ export default function RootLayout({
     <html
       lang="en"
       data-scroll-behavior="smooth"
-      className={`${jetbrainsMono.variable} ${outfit.variable} min-h-full dark`}
+      className={`${jetbrainsMono.variable} min-h-full dark`}
     >
-      <body className="min-h-full w-full font-sans text-slate-100 antialiased flex flex-col bg-obsidian-950">
+      <body className="min-h-full w-full font-mono text-slate-100 antialiased flex flex-col bg-obsidian-950">
         <I18nProvider>
           {children}
         </I18nProvider>
