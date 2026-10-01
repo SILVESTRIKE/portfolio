@@ -238,42 +238,74 @@ export function SpotifyPlayer({ mode = 'panel', onOpenFullPlayer, onClose }: Spo
   // ==========================================
   if (mode === 'panel') {
     return (
-      <div className="relative">
+      <div className="relative flex items-center">
         <div
-          onClick={() => setShowFlyout(!showFlyout)}
-          className={`flex items-center gap-2 px-2.5 py-1 rounded border font-mono text-[11px] cursor-pointer transition-all ${
+          className={`flex items-center rounded border font-mono text-[11px] transition-all overflow-hidden ${
             isPlayingAudio
-              ? 'bg-emerald-500/15 border-emerald-500/40 text-emerald-300 shadow-[0_0_12px_rgba(16,185,129,0.2)]'
-              : 'bg-black/50 border-white/10 text-slate-300 hover:border-emerald-500/30 hover:text-white'
+              ? 'bg-emerald-500/15 border-emerald-500/40 text-emerald-300 shadow-[0_0_12px_rgba(16,185,129,0.25)]'
+              : 'bg-black/50 border-white/10 text-slate-300 hover:border-emerald-500/30'
           }`}
-          title="Click to toggle music widget HUD"
         >
-          <span
-            className={`w-2 h-2 rounded-full ${
+          {/* Quick Play/Pause Action Button (Always visible on mobile & desktop) */}
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              handleTogglePlay();
+            }}
+            className={`p-1.5 sm:px-2 sm:py-1 flex items-center justify-center gap-1 transition-all cursor-pointer font-bold text-[10px] ${
               isPlayingAudio
-                ? 'bg-emerald-400 animate-pulse shadow-[0_0_8px_#34d399]'
-                : isNowPlayingLive
-                ? 'bg-emerald-500'
-                : 'bg-amber-400/80'
+                ? 'bg-emerald-400 text-black hover:bg-emerald-300 shadow-[0_0_8px_rgba(52,211,153,0.6)]'
+                : 'bg-white/10 hover:bg-white/20 text-slate-200 hover:text-white'
             }`}
-          />
+            title={isPlayingAudio ? 'Pause music' : 'Play music'}
+            aria-label={isPlayingAudio ? 'Pause' : 'Play'}
+          >
+            {isPlayingAudio ? (
+              <svg className="w-3 h-3 fill-current" viewBox="0 0 24 24">
+                <rect x="6" y="4" width="4" height="16" rx="1" />
+                <rect x="14" y="4" width="4" height="16" rx="1" />
+              </svg>
+            ) : (
+              <svg className="w-3 h-3 fill-current ml-0.5" viewBox="0 0 24 24">
+                <polygon points="6 4 20 12 6 20 6 4" />
+              </svg>
+            )}
+          </button>
 
-          <span className="font-semibold text-slate-400 text-[10px]">
-            {isPlayingAudio ? '[PLAYING]' : isNowPlayingLive ? '[LIVE]' : '[IDLE]'}
-          </span>
+          {/* Interactive Info Section -> Toggles Flyout (Hidden on mobile, visible on sm+) */}
+          <div
+            onClick={() => setShowFlyout(!showFlyout)}
+            className="hidden sm:flex items-center gap-2 px-2.5 py-1 cursor-pointer select-none border-l border-white/10 hover:text-white transition-colors"
+            title="Click to toggle music widget HUD"
+          >
+            <span
+              className={`w-1.5 h-1.5 rounded-full shrink-0 ${
+                isPlayingAudio
+                  ? 'bg-emerald-400 animate-pulse shadow-[0_0_6px_#34d399]'
+                  : isNowPlayingLive
+                  ? 'bg-emerald-500'
+                  : 'bg-amber-400/80'
+              }`}
+            />
 
-          <span className="max-w-[140px] sm:max-w-[190px] truncate text-slate-200">
-            {currentTrack?.title || 'Iron Man'} - {currentTrack?.artist || 'Black Sabbath'}
-          </span>
+            <span className="font-semibold text-slate-400 text-[10px] hidden md:inline shrink-0">
+              {isPlayingAudio ? '[PLAYING]' : isNowPlayingLive ? '[LIVE]' : '[IDLE]'}
+            </span>
 
-          <span className="text-[10px] text-emerald-400/80 font-mono hidden md:inline">
-            {isPlayingAudio ? '||||' : '..'}
-          </span>
+            <span className="max-w-[110px] md:max-w-[170px] truncate text-slate-200 text-[10.5px]">
+              {currentTrack?.title || 'Iron Man'} - {currentTrack?.artist || 'Black Sabbath'}
+            </span>
+
+            <span className="text-[10px] text-emerald-400/80 font-mono hidden lg:inline shrink-0">
+              {isPlayingAudio ? '||||' : '..'}
+            </span>
+          </div>
         </div>
 
         {/* Panel Dropdown Flyout */}
         {showFlyout && (
-          <div className="absolute right-0 top-full mt-2 w-80 z-50">
+          <div className="absolute right-0 top-full mt-2 w-80 max-w-[calc(100vw-24px)] z-50">
             <SpotifyPlayer
               mode="flyout"
               onOpenFullPlayer={() => {
