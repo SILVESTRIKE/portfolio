@@ -464,16 +464,17 @@ export function SpotifyPlayer({ mode = 'panel', onOpenFullPlayer, onClose }: Spo
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 sm:gap-5 flex-1 items-start">
           {/* Left Column: Player Deck */}
           <div className="lg:col-span-7 bg-[#0b101c]/90 border border-emerald-500/30 rounded-xl p-3 sm:p-5 shadow-2xl backdrop-blur-xl relative overflow-hidden flex flex-col gap-2.5 sm:gap-4">
-            <div className="flex flex-row items-center sm:items-start gap-3 sm:gap-5">
+            <div className="flex flex-row items-center sm:items-start gap-3.5 sm:gap-5">
               {/* Album Art with CRT Glow */}
-              <div className="relative w-20 h-20 sm:w-36 sm:h-36 rounded-lg sm:rounded-xl overflow-hidden shadow-xl sm:shadow-2xl border border-white/20 shrink-0 bg-black group">
+              <div className="relative w-20 h-20 sm:w-40 sm:h-40 md:w-44 md:h-44 rounded-lg sm:rounded-xl overflow-hidden shadow-xl sm:shadow-2xl border border-white/20 shrink-0 bg-black group">
                 {currentTrack?.albumArt ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
                     src={currentTrack.albumArt}
                     alt={currentTrack.title}
-                    className={`w-full h-full object-cover transition-transform duration-700 ${isPlayingAudio ? 'scale-105' : 'scale-100'
-                      }`}
+                    className={`w-full h-full object-cover transition-transform duration-700 ${
+                      isPlayingAudio ? 'scale-105' : 'scale-100'
+                    }`}
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-xs text-slate-500">
@@ -481,7 +482,7 @@ export function SpotifyPlayer({ mode = 'panel', onOpenFullPlayer, onClose }: Spo
                   </div>
                 )}
                 <div className="absolute bottom-1 right-1 bg-black/85 px-1 py-0.2 sm:px-1.5 sm:py-0.5 rounded text-[8px] sm:text-[9px] font-mono text-emerald-400 border border-emerald-500/30">
-                  {isPlayingAudio ? 'ON' : 'OFF'}
+                  {isPlayingAudio ? 'AUDIO ON' : 'STANDBY'}
                 </div>
               </div>
 
@@ -490,7 +491,7 @@ export function SpotifyPlayer({ mode = 'panel', onOpenFullPlayer, onClose }: Spo
                 <span className="text-[9px] sm:text-[10px] text-emerald-400 tracking-wider font-semibold uppercase">
                   {currentTrack?.source === 'fallback' ? 'FALLBACK AUDIOTRACK' : 'CURRENT SELECTION'}
                 </span>
-                <h3 className="font-bold text-sm sm:text-lg text-white truncate mt-0.5">
+                <h3 className="font-bold text-sm sm:text-xl text-white truncate mt-0.5">
                   {currentTrack?.title || 'Iron Man'}
                 </h3>
                 <p className="text-slate-300 text-xs sm:text-sm truncate">
@@ -502,11 +503,11 @@ export function SpotifyPlayer({ mode = 'panel', onOpenFullPlayer, onClose }: Spo
 
                 <div className="mt-1 sm:mt-2.5 flex flex-wrap items-center gap-1.5 text-[9px] sm:text-[10px]">
                   <span className="px-1.5 py-0.2 rounded bg-emerald-500/10 text-emerald-300 border border-emerald-500/20">
-                    {relativeTimeLabel}
+                    STATUS: {relativeTimeLabel}
                   </span>
                   {currentTrack?.youtubeVideoId && (
                     <span className="px-1.5 py-0.2 rounded bg-red-500/10 text-red-300 border border-red-500/20">
-                      YT EMBED
+                      YOUTUBE EMBEDDED
                     </span>
                   )}
                 </div>
@@ -514,7 +515,7 @@ export function SpotifyPlayer({ mode = 'panel', onOpenFullPlayer, onClose }: Spo
             </div>
 
             {/* Cava Audio Spectrum Visualizer */}
-            <div className="h-8 sm:h-12 w-full bg-black/50 rounded border border-white/10 overflow-hidden flex items-center px-2 relative">
+            <div className="h-9 sm:h-14 md:h-16 w-full bg-black/50 rounded border border-white/10 overflow-hidden flex items-center px-2 relative">
               <canvas ref={canvasRef} className="w-full h-full" />
               <div className="absolute top-1 left-2 text-[8px] sm:text-[9px] text-slate-500">
                 CAVA SPECTRUM 32-BAND
@@ -551,7 +552,7 @@ export function SpotifyPlayer({ mode = 'panel', onOpenFullPlayer, onClose }: Spo
                   className="px-2 py-1 sm:px-3 sm:py-1.5 rounded bg-white/5 hover:bg-white/15 text-slate-300 hover:text-white border border-white/10 text-[10px] sm:text-xs font-bold transition-all cursor-pointer"
                   title="Previous song"
                 >
-                  [|&lt;]
+                  [|&lt; PREV]
                 </button>
 
                 <button
@@ -571,7 +572,7 @@ export function SpotifyPlayer({ mode = 'panel', onOpenFullPlayer, onClose }: Spo
                   className="px-2 py-1 sm:px-3 sm:py-1.5 rounded bg-white/5 hover:bg-white/15 text-slate-300 hover:text-white border border-white/10 text-[10px] sm:text-xs font-bold transition-all cursor-pointer"
                   title="Next song"
                 >
-                  [&gt;|]
+                  [NEXT &gt;|]
                 </button>
               </div>
 
@@ -602,9 +603,9 @@ export function SpotifyPlayer({ mode = 'panel', onOpenFullPlayer, onClose }: Spo
                   href={`https://www.youtube.com/watch?v=${currentTrack.youtubeVideoId}`}
                   target="_blank"
                   rel="noreferrer"
-                  className="flex-1 text-center bg-red-600/10 hover:bg-red-600/20 border border-red-500/30 text-red-300 hover:text-white py-0.5 sm:py-1 rounded transition-colors"
+                  className="flex-1 text-center bg-red-600/10 hover:bg-red-600/20 border border-red-500/30 text-red-300 hover:text-white py-1 rounded transition-colors"
                 >
-                  [YOUTUBE]
+                  [OPEN ON YOUTUBE]
                 </a>
               )}
               {currentTrack?.songUrl && (
@@ -612,19 +613,16 @@ export function SpotifyPlayer({ mode = 'panel', onOpenFullPlayer, onClose }: Spo
                   href={currentTrack.songUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="flex-1 text-center bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 hover:text-white py-0.5 sm:py-1 rounded transition-colors"
+                  className="flex-1 text-center bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 hover:text-white py-1 rounded transition-colors"
                 >
-                  [LAST.FM]
+                  [VIEW ON LAST.FM]
                 </a>
               )}
             </div>
           </div>
 
-        </div>
-      </div>
-
-      {/* Right Column: Today's Scrobbles / History */}
-      <div className="lg:col-span-5 bg-[#090d17]/90 border border-white/10 rounded-xl p-4 sm:p-5 flex flex-col gap-3 shadow-xl backdrop-blur-xl max-h-[520px]">
+          {/* Right Column: Today's Scrobbles / History */}
+          <div className="lg:col-span-5 bg-[#090d17]/90 border border-white/10 rounded-xl p-4 sm:p-5 flex flex-col gap-3 shadow-xl backdrop-blur-xl max-h-[520px]">
         <div className="flex items-center justify-between pb-2 border-b border-white/10 text-xs">
           <div className="flex items-center gap-1.5">
             <span className="text-emerald-400 font-bold">&gt;</span>
@@ -698,5 +696,7 @@ export function SpotifyPlayer({ mode = 'panel', onOpenFullPlayer, onClose }: Spo
         </div>
       </div>
     </div>
+  </div>
+</div>
   );
 }
