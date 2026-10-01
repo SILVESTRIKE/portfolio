@@ -18,15 +18,25 @@ export function normalizeMusicKey(artist: string, title: string): string {
   return `${cleanArtist}:::${cleanTitle}`;
 }
 
+export const IRON_MAN_FALLBACK_IDS: string[] = [
+  'kBVIDGxSKX8', // Black Sabbath - Iron Man (2009 Remaster)
+  'b3-QqGVt-tM', // Black Sabbath - Iron Man (2012 Remaster)
+  'Jw1EXRK3Ijw', // Black Sabbath - Iron Man (Audio)
+  'F3uM8LEwdOw', // Iron Man (2009 - Remaster)
+  'PXjdphD-NoE'  // Black Sabbath - Iron Man - HQ
+];
+
+export const DEFAULT_FALLBACK_VIDEO_ID = IRON_MAN_FALLBACK_IDS[0];
+
 /**
  * Curated manual overrides to guarantee 100% correct official audio / topic versions
  * and bypass YouTube search completely.
  */
 export const MUSIC_OVERRIDES: Record<string, string> = {
-  // Black Sabbath - Iron Man (Official Audio)
-  'black sabbath:::iron man': '5s7_WbiR79E',
-  'black sabbath:::iron man - 2009 remaster': '5s7_WbiR79E',
-  'black sabbath:::iron man (2009 remaster)': '5s7_WbiR79E',
+  // Black Sabbath - Iron Man (Official Audio - Multi-Candidate Validated)
+  'black sabbath:::iron man': DEFAULT_FALLBACK_VIDEO_ID,
+  'black sabbath:::iron man - 2009 remaster': DEFAULT_FALLBACK_VIDEO_ID,
+  'black sabbath:::iron man (2009 remaster)': DEFAULT_FALLBACK_VIDEO_ID,
 
   // The Weeknd - Starboy
   'the weeknd:::starboy': '34Na4j8AVgA',
@@ -46,11 +56,11 @@ export const FALLBACK_TRACK: MusicTrackInfo = {
   artist: 'Black Sabbath',
   album: 'Paranoid (2009 Remaster)',
   albumArt: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=600&q=80',
-  songUrl: 'https://www.youtube.com/watch?v=5s7_WbiR79E',
+  songUrl: `https://www.youtube.com/watch?v=${DEFAULT_FALLBACK_VIDEO_ID}`,
   previewUrl: null,
   progressMs: 0,
   durationMs: 355000,
   trackId: 'fallback-ironman',
-  youtubeVideoId: process.env.FALLBACK_MUSIC_VIDEO_ID || '5s7_WbiR79E',
+  youtubeVideoId: process.env.FALLBACK_MUSIC_VIDEO_ID || DEFAULT_FALLBACK_VIDEO_ID,
   source: 'fallback'
 };

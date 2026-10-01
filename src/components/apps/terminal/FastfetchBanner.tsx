@@ -298,6 +298,7 @@ export function FastfetchBanner() {
                     <span className="text-[#7aa2f7] font-semibold whitespace-nowrap">{row.label}</span>
                   </div>
                   <div
+                    suppressHydrationWarning
                     className={`text-right whitespace-nowrap ${row.bold ? 'text-[#9ece6a] font-bold' : 'text-slate-200'
                       }`}
                   >

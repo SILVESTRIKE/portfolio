@@ -72,7 +72,7 @@ export function ProfileView() {
           </div>
           <div className="col-span-1 min-[580px]:col-span-2 flex flex-wrap sm:flex-nowrap items-baseline gap-x-1.5 gap-y-0.5 min-w-0">
             <span className="text-[#7aa2f7] font-semibold shrink-0">Uptime:</span>
-            <span className="text-slate-300 font-mono break-all">{liveUptime}</span>
+            <span suppressHydrationWarning className="text-slate-300 font-mono break-all">{liveUptime}</span>
           </div>
         </div>
 

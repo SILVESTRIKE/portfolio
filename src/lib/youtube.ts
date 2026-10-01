@@ -4,7 +4,7 @@ System impact if absent: Application cannot stream full-length audio tracks thro
 */
 
 import { redisGet, redisSet } from '@/lib/redis';
-import { MUSIC_OVERRIDES, normalizeMusicKey } from '@/lib/musicOverrides';
+import { DEFAULT_FALLBACK_VIDEO_ID, MUSIC_OVERRIDES, normalizeMusicKey } from '@/lib/musicOverrides';
 
 const NOT_FOUND_SENTINEL = 'NOT_FOUND';
 const SIX_HOURS_SECONDS = 6 * 3600;
@@ -97,6 +97,11 @@ export async function resolveYouTubeVideoId(
   // 1. Check manual override dictionary first (0 quota cost, guaranteed match)
   if (MUSIC_OVERRIDES[normKey]) {
     return MUSIC_OVERRIDES[normKey];
+  }
+
+  // Guaranteed fallback for any Black Sabbath Iron Man variant
+  if (normKey.includes('black sabbath') && normKey.includes('iron man')) {
+    return DEFAULT_FALLBACK_VIDEO_ID;
   }
 
   const cacheKey = `yt:${normKey}`;

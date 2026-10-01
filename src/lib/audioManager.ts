@@ -4,6 +4,7 @@ System impact if absent: Music players will fail to play full tracks, auto-advan
 */
 
 import { MusicTrackInfo } from '@/types';
+import { DEFAULT_FALLBACK_VIDEO_ID, IRON_MAN_FALLBACK_IDS } from '@/lib/musicOverrides';
 
 type AudioListener = (isPlaying: boolean, volume: number, currentTime: number, duration: number) => void;
 type TrackChangeListener = (track: MusicTrackInfo) => void;
@@ -66,6 +67,7 @@ class GlobalAudioManager {
   private ytWatchdog: ReturnType<typeof setTimeout> | null = null;
   private currentYtVideoId: string | null = null;
   private activeOscillators: OscillatorNode[] = [];
+  private fallbackIndex = 0;
 
   constructor() {
     // Lazy initialization: Audio and YouTube engines load on demand to avoid unsolicited tracking and adblock errors on boot
@@ -221,7 +223,7 @@ class GlobalAudioManager {
         height: '150',
         width: '200',
         host: 'https://www.youtube.com',
-        videoId: this.currentYtVideoId || '5s7_WbiR79E',
+        videoId: this.currentYtVideoId || DEFAULT_FALLBACK_VIDEO_ID,
         playerVars: {
           autoplay: 0,
           controls: 0,
@@ -274,12 +276,32 @@ class GlobalAudioManager {
           },
           onError: () => {
             this.isYtPlaying = false;
-            // If current track fails to embed, fallback to Iron Man official audio
-            if (this.currentYtVideoId !== '5s7_WbiR79E') {
-              this.setYouTubeTrack('5s7_WbiR79E', this.isPlaying);
+            const isIronMan =
+              this.currentTrack?.title.toLowerCase().includes('iron man') ||
+              this.currentTrack?.artist.toLowerCase().includes('black sabbath');
+
+            if (isIronMan) {
+              this.fallbackIndex = (this.fallbackIndex + 1) % IRON_MAN_FALLBACK_IDS.length;
+              const nextCandidate = IRON_MAN_FALLBACK_IDS[this.fallbackIndex];
+              if (this.currentYtVideoId !== nextCandidate) {
+                if (this.currentTrack) {
+                  this.currentTrack = {
+                    ...this.currentTrack,
+                    youtubeVideoId: nextCandidate
+                  };
+                  this.notifyTrackChange(this.currentTrack);
+                }
+                this.setYouTubeTrack(nextCandidate, this.isPlaying);
+                return;
+              }
+            }
+
+            if (this.queue.length > 1) {
+              this.playNext();
             } else {
-              this.isPlaying = false;
-              this.notify();
+              this.fallbackIndex = (this.fallbackIndex + 1) % IRON_MAN_FALLBACK_IDS.length;
+              const nextCandidate = IRON_MAN_FALLBACK_IDS[this.fallbackIndex];
+              this.setYouTubeTrack(nextCandidate, this.isPlaying);
             }
           }
         }
@@ -420,7 +442,7 @@ class GlobalAudioManager {
     } else if (track.previewUrl) {
       this.setTrackUrl(track.previewUrl);
     } else {
-      this.setYouTubeTrack('5s7_WbiR79E', true);
+      this.setYouTubeTrack(DEFAULT_FALLBACK_VIDEO_ID, true);
     }
   }
 
@@ -480,7 +502,7 @@ class GlobalAudioManager {
       return;
     }
 
-    this.setYouTubeTrack('5s7_WbiR79E', true);
+    this.setYouTubeTrack(DEFAULT_FALLBACK_VIDEO_ID, true);
   }
 
   public pause() {

@@ -189,7 +189,7 @@ export function TopPanel({
         </button>
 
         {/* UTC Clock - Hidden on mobile (< sm), visible on desktop */}
-        <div className="hidden sm:flex items-center gap-1 bg-white/5 px-2 py-0.5 rounded border border-white/10 text-slate-200 font-semibold shrink-0 text-[10px] sm:text-[11px] whitespace-nowrap">
+        <div suppressHydrationWarning className="hidden sm:flex items-center gap-1 bg-white/5 px-2 py-0.5 rounded border border-white/10 text-slate-200 font-semibold shrink-0 text-[10px] sm:text-[11px] whitespace-nowrap">
           <span>{timeStr}</span>
           <span className="text-slate-500 text-[9px] sm:text-[10px] hidden min-[400px]:inline">UTC</span>
         </div>
