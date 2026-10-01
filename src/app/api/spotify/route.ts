@@ -1,15 +1,17 @@
 /*
-Reason for existence: Next.js API Route serving real-time music telemetry with YouTube audio resolution: Spotify / Last.fm scrobbler → static fallback.
-System impact if absent: Client-side music player cannot fetch live track status or YouTube audio IDs.
+Reason for existence: Legacy API Route adapter proxying to unified music telemetry engine without Spotify Web API dependencies.
+System impact if absent: Any legacy clients querying /api/spotify will fail to receive the current track.
 */
 
 import { NextResponse } from 'next/server';
-import { getLiveSpotifyTrack } from '@/lib/spotify';
+import { getLiveMusicTelemetry } from '@/lib/music';
 
 export async function GET() {
-  const track = await getLiveSpotifyTrack();
+  const telemetry = await getLiveMusicTelemetry();
 
-  return NextResponse.json(track, {
-    headers: { 'Cache-Control': 'public, s-maxage=5, stale-while-revalidate=10' }
+  return NextResponse.json(telemetry.current, {
+    headers: {
+      'Cache-Control': 'public, s-maxage=20, stale-while-revalidate=30'
+    }
   });
 }

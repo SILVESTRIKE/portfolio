@@ -152,7 +152,7 @@ export interface OdooInvoice {
   status: 'paid' | 'draft' | 'overdue';
 }
 
-export interface SpotifyTrackInfo {
+export interface MusicTrackInfo {
   isPlaying: boolean;
   title: string;
   artist: string;
@@ -165,6 +165,19 @@ export interface SpotifyTrackInfo {
   trackId: string;
   isrc?: string;
   youtubeVideoId?: string | null;
+  playedAt?: number;
+  relativeTime?: string;
+  source?: 'lastfm' | 'fallback' | 'override';
+}
+
+export type SpotifyTrackInfo = MusicTrackInfo;
+
+export interface MusicTelemetryResponse {
+  current: MusicTrackInfo;
+  today: MusicTrackInfo[];
+  todayCount: number;
+  timezone: string;
+  updatedAt: number;
 }
 
 export interface GitCommitNode {

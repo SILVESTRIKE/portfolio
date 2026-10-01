@@ -1,12 +1,12 @@
 /*
-Reason for existence: Spotify & Last.fm live music player component presenting landscape horizontal deck layout, audio streaming engine, and animated spectrum visualizer.
-System impact if absent: Desktop and window panes cannot render horizontal music player or stream audio previews.
+Reason for existence: Caelestia/Terminal style music player widget supporting live Last.fm scrobble telemetry, today's playlist history, YouTube audio playback, and responsive visualizers.
+System impact if absent: Desktop status panel and workspace panes cannot display now-playing telemetry or stream music.
 */
 
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { SpotifyTrackInfo } from '@/types';
+import { MusicTelemetryResponse, MusicTrackInfo } from '@/types';
 import { globalAudio } from '@/lib/audioManager';
 
 interface SpotifyPlayerProps {
@@ -15,75 +15,91 @@ interface SpotifyPlayerProps {
   onClose?: () => void;
 }
 
-const STORAGE_KEY_LAST_TRACK = 'silvestrike_music_last_track';
+const STORAGE_KEY_LAST_TELEMETRY = 'silvestrike_music_telemetry_cache';
 
-// Singleton shared track state across all mounted SpotifyPlayer components
-let sharedTrack: SpotifyTrackInfo | null = null;
-const sharedTrackListeners = new Set<(t: SpotifyTrackInfo | null) => void>();
+let sharedTelemetry: MusicTelemetryResponse | null = null;
+const sharedListeners = new Set<(data: MusicTelemetryResponse | null) => void>();
 let pollingTimer: ReturnType<typeof setInterval> | null = null;
 let activeMountCount = 0;
 
-async function syncTrack() {
+async function syncMusicTelemetry() {
+  if (typeof document !== 'undefined' && document.hidden) {
+    return;
+  }
+
   try {
-    const res = await fetch('/api/spotify');
+    const res = await fetch('/api/music');
     if (res.ok) {
-      const data = (await res.json()) as SpotifyTrackInfo;
-      if (data && data.title) {
-        const titleChanged = !sharedTrack || sharedTrack.title !== data.title || sharedTrack.artist !== data.artist;
-        sharedTrack = data;
+      const data = (await res.json()) as MusicTelemetryResponse;
+      if (data && data.current) {
+        const prevTrack = sharedTelemetry?.current;
+        const trackChanged =
+          !prevTrack ||
+          prevTrack.title !== data.current.title ||
+          prevTrack.artist !== data.current.artist;
+
+        sharedTelemetry = data;
         try {
-          localStorage.setItem(STORAGE_KEY_LAST_TRACK, JSON.stringify(data));
+          localStorage.setItem(STORAGE_KEY_LAST_TELEMETRY, JSON.stringify(data));
         } catch {
           // Ignore localStorage errors
         }
-        sharedTrackListeners.forEach((fn) => fn(data));
 
-        if (titleChanged) {
-          if (data.youtubeVideoId) {
-            globalAudio.setYouTubeTrack(data.youtubeVideoId);
-          } else if (data.previewUrl) {
-            globalAudio.setTrackUrl(data.previewUrl);
-          }
+        sharedListeners.forEach(fn => fn(data));
+
+        // Update audio queue with today's tracks
+        if (data.today && data.today.length > 0) {
+          globalAudio.setQueue(data.today, data.current.trackId);
         }
+
+        // Synchronize live telemetry to globalAudio when idle
+        globalAudio.setLiveTrack(data.current);
       }
     }
   } catch {
-    // Network silent fail
+    // Fail silently
   }
 }
 
-function useSharedTrack(): SpotifyTrackInfo | null {
-  const [track, setTrack] = useState<SpotifyTrackInfo | null>(null);
+function useMusicTelemetry(): MusicTelemetryResponse | null {
+  const [telemetry, setTelemetry] = useState<MusicTelemetryResponse | null>(null);
 
   useEffect(() => {
-    // Read cached track from localStorage on client mount (safe from SSR hydration mismatch)
-    if (!sharedTrack) {
+    if (!sharedTelemetry) {
       try {
-        const raw = localStorage.getItem(STORAGE_KEY_LAST_TRACK);
+        const raw = localStorage.getItem(STORAGE_KEY_LAST_TELEMETRY);
         if (raw) {
           const parsed = JSON.parse(raw);
-          if (parsed && parsed.title) {
-            sharedTrack = parsed;
-            setTrack(parsed);
+          if (parsed && parsed.current) {
+            sharedTelemetry = parsed;
+            setTelemetry(parsed);
           }
         }
       } catch {
-        // Ignore localStorage errors
+        // Ignore localStorage error
       }
     } else {
-      setTrack(sharedTrack);
+      setTelemetry(sharedTelemetry);
     }
 
-    sharedTrackListeners.add(setTrack);
+    sharedListeners.add(setTelemetry);
     activeMountCount++;
 
     if (activeMountCount === 1) {
-      syncTrack();
-      pollingTimer = setInterval(syncTrack, 10000);
+      syncMusicTelemetry();
+      pollingTimer = setInterval(syncMusicTelemetry, 25000);
     }
 
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        syncMusicTelemetry();
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
     return () => {
-      sharedTrackListeners.delete(setTrack);
+      sharedListeners.delete(setTelemetry);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
       activeMountCount--;
       if (activeMountCount <= 0) {
         activeMountCount = 0;
@@ -95,36 +111,48 @@ function useSharedTrack(): SpotifyTrackInfo | null {
     };
   }, []);
 
-  return track;
+  return telemetry;
 }
 
 export function SpotifyPlayer({ mode = 'panel', onOpenFullPlayer, onClose }: SpotifyPlayerProps) {
-  const track = useSharedTrack();
+  const telemetry = useMusicTelemetry();
+  const [currentTrack, setCurrentTrack] = useState<MusicTrackInfo | null>(
+    () => globalAudio.getCurrentTrack() || telemetry?.current || null
+  );
   const [isPlayingAudio, setIsPlayingAudio] = useState(false);
   const [volume, setVolume] = useState(0.7);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [showFlyout, setShowFlyout] = useState(false);
 
-  const formatTime = (secs: number) => {
-    if (!Number.isFinite(secs) || isNaN(secs) || secs < 0) return '00:00';
-    const m = Math.floor(secs / 60);
-    const s = Math.floor(secs % 60);
-    return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
-  };
-
-  // Subscribe to synchronized global audio engine
+  // Sync track when telemetry loads and no track is active yet
   useEffect(() => {
-    const unsub = globalAudio.subscribe((playing, vol, curTime, dur) => {
+    if (!currentTrack && telemetry?.current) {
+      setCurrentTrack(telemetry.current);
+    }
+  }, [telemetry, currentTrack]);
+
+  // Subscribe to audio state
+  useEffect(() => {
+    const unsubAudio = globalAudio.subscribe((playing, vol, curTime, dur) => {
       setIsPlayingAudio(playing);
       setVolume(vol);
       if (typeof curTime === 'number') setCurrentTime(curTime);
       if (typeof dur === 'number') setDuration(dur);
     });
-    return unsub;
+
+    const unsubTrack = globalAudio.subscribeTrackChange(track => {
+      setCurrentTrack(track);
+    });
+
+    return () => {
+      unsubAudio();
+      unsubTrack();
+    };
   }, []);
 
-  // Real Web Audio frequency spectrum canvas rendering loop (runs in full and flyout modes)
+  // Visualizer canvas loop for flyout and full modes
   useEffect(() => {
     if (mode === 'panel') return;
     let animId: number;
@@ -134,13 +162,13 @@ export function SpotifyPlayer({ mode = 'panel', onOpenFullPlayer, onClose }: Spo
       if (canvas && canvas.parentElement) {
         const ctx = canvas.getContext('2d');
         if (ctx) {
-          const width = canvas.width = canvas.parentElement.clientWidth;
-          const height = canvas.height = canvas.parentElement.clientHeight;
+          const width = (canvas.width = canvas.parentElement.clientWidth);
+          const height = (canvas.height = canvas.parentElement.clientHeight);
 
           ctx.clearRect(0, 0, width, height);
 
           const freqData = globalAudio.getFrequencyData();
-          const numBars = mode === 'flyout' ? 16 : 24;
+          const numBars = mode === 'flyout' ? 16 : 32;
           const gap = 3;
           const barWidth = Math.max(2, (width - (numBars - 1) * gap) / numBars);
 
@@ -148,15 +176,19 @@ export function SpotifyPlayer({ mode = 'panel', onOpenFullPlayer, onClose }: Spo
             const raw = freqData[i] || 0;
             const normalized = raw / 255;
             const barHeight = isPlayingAudio ? Math.max(3, normalized * (height - 2)) : 2;
-            const x = i * (barWidth + gap);
-            const y = height - barHeight;
 
             const grad = ctx.createLinearGradient(0, height, 0, 0);
-            grad.addColorStop(0, 'rgba(29, 185, 84, 0.35)');
-            grad.addColorStop(1, isPlayingAudio ? '#1db954' : 'rgba(255, 255, 255, 0.15)');
+            grad.addColorStop(0, 'rgba(16, 185, 129, 0.4)');
+            grad.addColorStop(0.7, 'rgba(52, 211, 153, 0.9)');
+            grad.addColorStop(1, 'rgba(125, 211, 252, 1)');
 
             ctx.fillStyle = grad;
-            ctx.fillRect(x, y, barWidth, barHeight);
+            ctx.fillRect(
+              i * (barWidth + gap),
+              height - barHeight,
+              barWidth,
+              barHeight
+            );
           }
         }
       }
@@ -167,84 +199,120 @@ export function SpotifyPlayer({ mode = 'panel', onOpenFullPlayer, onClose }: Spo
     return () => cancelAnimationFrame(animId);
   }, [mode, isPlayingAudio]);
 
-  const togglePlayback = (e?: React.MouseEvent) => {
-    if (e) {
-      e.stopPropagation();
-      e.preventDefault();
+  const formatTime = (secs: number) => {
+    if (!Number.isFinite(secs) || isNaN(secs) || secs < 0) return '00:00';
+    const m = Math.floor(secs / 60);
+    const s = Math.floor(secs % 60);
+    return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+  };
+
+  const handleTogglePlay = () => {
+    if (isPlayingAudio) {
+      globalAudio.pause();
+    } else {
+      if (globalAudio.getCurrentTrack()) {
+        globalAudio.play();
+      } else if (currentTrack) {
+        globalAudio.playTrack(currentTrack);
+      } else if (telemetry?.current) {
+        globalAudio.playTrack(telemetry.current);
+      } else {
+        globalAudio.play();
+      }
     }
-    globalAudio.toggle();
   };
 
-  const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const val = parseFloat(e.target.value);
-    setVolume(val);
-    globalAudio.setVolume(val);
+  const handleSeek = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!duration || duration <= 0) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    const pos = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+    globalAudio.seek(pos * duration);
   };
 
-  // Compact TopPanel View
+  const isNowPlayingLive = currentTrack?.isPlaying ?? false;
+  const relativeTimeLabel = currentTrack?.relativeTime || (isNowPlayingLive ? 'now playing' : 'recently');
+  const todayList = telemetry?.today || [];
+
+  // ==========================================
+  // MODE 1: PANEL (TopPanel & Dock Status Pill)
+  // ==========================================
   if (mode === 'panel') {
     return (
-      <div
-        onClick={onOpenFullPlayer}
-        className="flex items-center gap-1 sm:gap-2 bg-[#1db954]/10 hover:bg-[#1db954]/15 border border-[#1db954]/30 px-1.5 py-0.5 sm:px-2.5 sm:py-1 rounded text-xs font-mono select-none sm:max-w-[200px] md:max-w-[240px] shrink-0 cursor-pointer transition-colors"
-        title="Click to open Music Player in Special Workspace (Alt+S)"
-      >
-        <span className="text-[#1db954] text-[10px] sm:hidden">♫</span>
-
-        <div className="hidden sm:flex items-end gap-0.5 h-3 shrink-0">
-          <span className={`w-0.5 bg-[#1db954] rounded-full transition-all ${isPlayingAudio ? 'h-3 animate-pulse' : 'h-1'}`} />
-          <span className={`w-0.5 bg-[#1db954] rounded-full transition-all ${isPlayingAudio ? 'h-2 animate-bounce' : 'h-1.5'}`} />
-          <span className={`w-0.5 bg-[#1db954] rounded-full transition-all ${isPlayingAudio ? 'h-3.5 animate-pulse' : 'h-2'}`} />
-          <span className={`w-0.5 bg-[#1db954] rounded-full transition-all ${isPlayingAudio ? 'h-2 animate-bounce' : 'h-1.5'}`} />
-        </div>
-
-        <div className="hidden sm:flex items-center gap-1 text-slate-200 hover:text-white min-w-0 flex-1 truncate text-left">
-          <span className="text-[#1db954] font-bold text-[10px] shrink-0">MUSIC:</span>
-          <span className="truncate text-[10px] sm:text-[11px]">{track?.title || 'Connecting...'}</span>
-        </div>
-
-        <button
-          type="button"
-          onClick={(e) => {
-            e.stopPropagation();
-            togglePlayback(e);
-          }}
-          className={`px-1.5 py-0.5 rounded text-[9px] sm:text-[10px] font-bold transition-all active:scale-95 cursor-pointer shrink-0 ${isPlayingAudio
-            ? 'bg-[#1db954] text-black shadow-[0_0_10px_#1db954]'
-            : 'bg-white/10 hover:bg-white/20 text-slate-200'
-            }`}
-          title={isPlayingAudio ? 'Pause live stream' : 'Listen with me (Audio stream)'}
+      <div className="relative">
+        <div
+          onClick={() => setShowFlyout(!showFlyout)}
+          className={`flex items-center gap-2 px-2.5 py-1 rounded border font-mono text-[11px] cursor-pointer transition-all ${
+            isPlayingAudio
+              ? 'bg-emerald-500/15 border-emerald-500/40 text-emerald-300 shadow-[0_0_12px_rgba(16,185,129,0.2)]'
+              : 'bg-black/50 border-white/10 text-slate-300 hover:border-emerald-500/30 hover:text-white'
+          }`}
+          title="Click to toggle music widget HUD"
         >
-          {isPlayingAudio ? 'PAUSE' : 'PLAY'}
-        </button>
+          <span
+            className={`w-2 h-2 rounded-full ${
+              isPlayingAudio
+                ? 'bg-emerald-400 animate-pulse shadow-[0_0_8px_#34d399]'
+                : isNowPlayingLive
+                ? 'bg-emerald-500'
+                : 'bg-amber-400/80'
+            }`}
+          />
+
+          <span className="font-semibold text-slate-400 text-[10px]">
+            {isPlayingAudio ? '[PLAYING]' : isNowPlayingLive ? '[LIVE]' : '[IDLE]'}
+          </span>
+
+          <span className="max-w-[140px] sm:max-w-[190px] truncate text-slate-200">
+            {currentTrack?.title || 'Iron Man'} - {currentTrack?.artist || 'Black Sabbath'}
+          </span>
+
+          <span className="text-[10px] text-emerald-400/80 font-mono hidden md:inline">
+            {isPlayingAudio ? '||||' : '..'}
+          </span>
+        </div>
+
+        {/* Panel Dropdown Flyout */}
+        {showFlyout && (
+          <div className="absolute right-0 top-full mt-2 w-80 z-50">
+            <SpotifyPlayer
+              mode="flyout"
+              onOpenFullPlayer={() => {
+                setShowFlyout(false);
+                onOpenFullPlayer?.();
+              }}
+              onClose={() => setShowFlyout(false)}
+            />
+          </div>
+        )}
       </div>
     );
   }
 
-  // Floating Popover Flyout Deck (Shown when clicking TopPanel music pill)
+  // ==========================================
+  // MODE 2: FLYOUT (Corner HUD Card)
+  // ==========================================
   if (mode === 'flyout') {
     return (
-      <div className="w-[320px] sm:w-[360px] bg-[#0c101a]/95 border border-emerald-500/30 rounded-xl p-4 shadow-[0_20px_50px_rgba(0,0,0,0.85)] backdrop-blur-2xl flex flex-col gap-3 font-sans select-none text-xs relative overflow-hidden ring-1 ring-white/10">
-        {/* Ambient glow */}
-        <div className="absolute -left-10 -top-10 w-32 h-32 bg-[#1db954]/15 rounded-full blur-2xl pointer-events-none" />
-        <div className="absolute -right-10 -bottom-10 w-32 h-32 bg-[#3b82f6]/10 rounded-full blur-2xl pointer-events-none" />
-
-        {/* Flyout Header */}
-        <div className="flex items-center justify-between pb-2 border-b border-white/10 relative z-10">
+      <div className="w-80 bg-[#090d16]/95 border border-emerald-500/30 rounded-xl p-3.5 shadow-2xl backdrop-blur-xl font-mono text-xs flex flex-col gap-3 select-none relative overflow-hidden ring-1 ring-white/10">
+        <div className="flex items-center justify-between pb-2 border-b border-white/10 text-[10px]">
           <div className="flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-[#1db954] animate-ping" />
-            <span className="text-[#1db954] font-mono font-bold text-[10px] tracking-wider uppercase">
-              {track?.isPlaying ? 'LIVE ON SPOTIFY' : 'SPOTIFY & YOUTUBE'}
+            <span
+              className={`w-2 h-2 rounded-full ${
+                isPlayingAudio ? 'bg-emerald-400 animate-pulse' : 'bg-slate-500'
+              }`}
+            />
+            <span className="text-emerald-400 font-bold uppercase">
+              {isNowPlayingLive ? 'LAST.FM LIVE' : 'STATION IDLE'}
             </span>
           </div>
 
-          <div className="flex items-center gap-1 font-mono text-[10px]">
+          <div className="flex items-center gap-1.5">
             {onOpenFullPlayer && (
               <button
                 type="button"
                 onClick={onOpenFullPlayer}
-                className="px-2 py-0.5 rounded bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white border border-white/10 transition-colors cursor-pointer"
-                title="Expand to workspace pane"
+                className="px-1.5 py-0.5 rounded bg-white/5 hover:bg-white/15 text-slate-300 hover:text-white border border-white/10 transition-colors"
+                title="Expand to Full Player"
               >
                 [+] PANE
               </button>
@@ -253,8 +321,8 @@ export function SpotifyPlayer({ mode = 'panel', onOpenFullPlayer, onClose }: Spo
               <button
                 type="button"
                 onClick={onClose}
-                className="w-5 h-5 flex items-center justify-center rounded bg-white/5 hover:bg-rose-500/20 text-slate-400 hover:text-rose-400 transition-colors cursor-pointer font-bold"
-                title="Close flyout"
+                className="px-1.5 py-0.5 rounded bg-white/5 hover:bg-rose-500/20 text-slate-400 hover:text-rose-400 transition-colors font-bold"
+                title="Close"
               >
                 [x]
               </button>
@@ -262,297 +330,346 @@ export function SpotifyPlayer({ mode = 'panel', onOpenFullPlayer, onClose }: Spo
           </div>
         </div>
 
-        {/* Track Info Card */}
-        <div className="flex items-center gap-3 relative z-10">
-          <div className="relative w-16 h-16 rounded-lg overflow-hidden border border-white/15 shrink-0 shadow-md">
-            {track?.albumArt ? (
+        {/* Track Details */}
+        <div className="flex items-center gap-3">
+          <div className="w-14 h-14 rounded-lg overflow-hidden border border-white/15 shrink-0 bg-black">
+            {currentTrack?.albumArt ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img
-                src={track.albumArt}
-                alt={track.album}
-                className={`w-full h-full object-cover transition-transform duration-500 ${isPlayingAudio ? 'scale-105' : 'scale-100'
-                  }`}
+                src={currentTrack.albumArt}
+                alt={currentTrack.title}
+                className={`w-full h-full object-cover transition-transform ${
+                  isPlayingAudio ? 'scale-105' : 'scale-100'
+                }`}
               />
             ) : (
-              <div className="w-full h-full bg-slate-900 flex items-center justify-center font-mono text-slate-500 text-[9px]">
-                No Art
+              <div className="w-full h-full flex items-center justify-center text-[9px] text-slate-500">
+                NO ART
               </div>
             )}
-            <div className="absolute bottom-0 right-0 bg-black/80 px-1 py-0.2 rounded-tl text-[8px] font-mono text-slate-400">
-              320K
-            </div>
           </div>
 
           <div className="flex-1 min-w-0">
-            <h4 className="font-bold text-sm text-white truncate leading-tight">
-              {track?.title || 'Connecting...'}
+            <h4 className="font-bold text-white text-xs truncate">
+              {currentTrack?.title || 'Iron Man'}
             </h4>
-            <p className="text-slate-300 text-xs truncate mt-0.5">
-              {track?.artist || 'Live Stream'}
+            <p className="text-slate-300 text-[11px] truncate mt-0.5">
+              {currentTrack?.artist || 'Black Sabbath'}
             </p>
-            <p className="text-slate-500 text-[10px] truncate mt-0.5 font-mono">
-              {track?.album || 'Live Audio'}
+            <p className="text-slate-500 text-[9px] truncate mt-0.5">
+              {relativeTimeLabel}
             </p>
           </div>
         </div>
 
-        {/* Real Audio Spectrum Canvas */}
-        <div className="h-6 w-full bg-white/[0.03] px-1 py-0.5 rounded border border-white/5 overflow-hidden flex items-center relative z-10">
+        {/* Cava Visualizer */}
+        <div className="h-6 w-full bg-black/40 rounded border border-white/5 overflow-hidden flex items-center px-1">
           <canvas ref={canvasRef} className="w-full h-full" />
         </div>
 
-        {/* Controls & Volume */}
-        <div className="flex items-center gap-2 pt-1 border-t border-white/10 relative z-10">
+        {/* Controls */}
+        <div className="flex items-center gap-1.5 pt-1 border-t border-white/10">
           <button
             type="button"
-            onClick={togglePlayback}
-            className={`flex-1 py-1.5 px-3 rounded-lg font-bold font-mono text-xs transition-all active:scale-95 cursor-pointer flex items-center justify-center gap-1.5 ${isPlayingAudio
-              ? 'bg-[#1db954] text-black shadow-[0_0_15px_rgba(29,185,84,0.4)]'
-              : 'bg-white text-black hover:bg-slate-200'
-              }`}
+            onClick={() => globalAudio.playPrev()}
+            className="px-2 py-1 rounded bg-white/5 hover:bg-white/15 text-slate-300 text-[10px] font-bold"
+            title="Previous track"
           >
-            <span>{isPlayingAudio ? 'PAUSE AUDIO' : 'PLAY AUDIO'}</span>
+            [|&lt;]
           </button>
 
-          <div className="flex items-center gap-1.5 bg-white/5 px-2 py-1.5 rounded-lg border border-white/10 font-mono text-[10px] text-slate-300">
-            <input
-              type="range"
-              min="0"
-              max="1"
-              step="0.01"
-              value={volume}
-              onChange={handleVolumeChange}
-              className="w-16 accent-[#1db954] cursor-pointer h-1"
-            />
-            <span className="w-7 text-right">{Math.round(volume * 100)}%</span>
-          </div>
-        </div>
+          <button
+            type="button"
+            onClick={handleTogglePlay}
+            className={`flex-1 py-1 px-2 rounded font-bold text-[10px] transition-all flex items-center justify-center ${
+              isPlayingAudio
+                ? 'bg-emerald-500 text-black shadow-[0_0_10px_rgba(16,185,129,0.4)]'
+                : 'bg-white text-black hover:bg-slate-200'
+            }`}
+          >
+            {isPlayingAudio ? '[PAUSE]' : '[PLAY AUDIO]'}
+          </button>
 
-        {/* External Links */}
-        <div className="flex items-center gap-1.5 w-full relative z-10">
-          {track?.youtubeVideoId && (
-            <a
-              href={`https://www.youtube.com/watch?v=${track.youtubeVideoId}`}
-              target="_blank"
-              rel="noreferrer"
-              className="flex-1 text-center bg-red-600/15 hover:bg-red-600/25 border border-red-500/30 text-red-300 hover:text-white py-1 px-2 rounded-lg font-mono text-[10px] transition-colors truncate"
-            >
-              YouTube
-            </a>
-          )}
-          {track?.songUrl && (
-            <a
-              href={track.songUrl}
-              target="_blank"
-              rel="noreferrer"
-              className="flex-1 text-center bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 hover:text-white py-1 px-2 rounded-lg font-mono text-[10px] transition-colors truncate"
-            >
-              Spotify
-            </a>
-          )}
+          <button
+            type="button"
+            onClick={() => globalAudio.playNext()}
+            className="px-2 py-1 rounded bg-white/5 hover:bg-white/15 text-slate-300 text-[10px] font-bold"
+            title="Next track"
+          >
+            [&gt;|]
+          </button>
         </div>
       </div>
     );
   }
 
-  // Full Mode: Rich Full-Screen Media Station (Fills pane beautifully, never cramped)
+  // ==========================================
+  // MODE 3: FULL (Maximized Workspace Station)
+  // ==========================================
   return (
-    <div className="h-full w-full p-4 sm:p-6 md:p-10 flex flex-col justify-between font-mono bg-[#070a12] select-none text-xs overflow-y-auto">
-      <div className="w-full max-w-5xl mx-auto flex-1 flex flex-col justify-center gap-6 my-auto">
-        {/* Main Music Deck Card */}
-        <div className="w-full bg-[#0c101a]/95 border border-emerald-500/25 rounded-2xl p-5 sm:p-7 md:p-8 shadow-[0_25px_60px_rgba(0,0,0,0.9)] backdrop-blur-2xl ring-1 ring-white/10 relative overflow-hidden flex flex-col gap-6">
-          {/* Ambient dynamic glow */}
-          <div className="absolute -left-20 -top-20 w-72 h-72 bg-[#1db954]/20 rounded-full blur-3xl pointer-events-none" />
-          <div className="absolute -right-20 -bottom-20 w-72 h-72 bg-[#3b82f6]/15 rounded-full blur-3xl pointer-events-none" />
-
-          {/* Top Status Header */}
-          <div className="flex items-center justify-between pb-3 border-b border-white/10 relative z-10">
-            <div className="flex items-center gap-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-[#1db954] animate-pulse shadow-[0_0_10px_#1db954]" />
-              <span className="text-[#1db954] font-bold text-xs tracking-wider uppercase">
-                {track?.isPlaying ? 'LIVE ON SPOTIFY' : 'SPOTIFY & YOUTUBE'}
-              </span>
-              <span className="text-slate-600 hidden sm:inline">|</span>
-              <span className="text-slate-400 text-xs hidden sm:inline">
-                LOSSLESS AUDIO STREAM
-              </span>
-            </div>
-
-            <div className="flex items-center gap-2 font-mono text-[10px]">
-              <span className="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 font-bold">
-                320 KBPS
-              </span>
-              <span className="px-2 py-0.5 rounded bg-white/5 text-slate-300 border border-white/10">
-                SPECIAL:MUSIC
-              </span>
-            </div>
+    <div className="h-full w-full p-3 sm:p-5 md:p-6 flex flex-col justify-between font-mono bg-[#060911] text-slate-200 select-none overflow-y-auto">
+      <div className="w-full max-w-6xl mx-auto flex-1 flex flex-col gap-4">
+        {/* Terminal Header Bar */}
+        <div className="flex flex-wrap items-center justify-between gap-2 pb-2.5 border-b border-emerald-500/20 text-xs">
+          <div className="flex items-center gap-2">
+            <span className="text-emerald-400 font-bold">root@srv-silvestrike:~$</span>
+            <span className="text-slate-300">cava-player --scrobbler=lastfm</span>
           </div>
 
-          {/* Main Hero: Large Album Art + Track Details */}
-          <div className="flex flex-col md:flex-row items-center md:items-start gap-6 lg:gap-8 relative z-10">
-            {/* Album Cover Art */}
-            <div className="relative w-40 h-40 sm:w-52 sm:h-52 md:w-60 md:h-60 rounded-2xl overflow-hidden shadow-2xl border border-white/20 shrink-0 group">
-              {track?.albumArt ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={track.albumArt}
-                  alt={track.album}
-                  className={`w-full h-full object-cover transition-transform duration-700 ${isPlayingAudio ? 'scale-105' : 'scale-100'
-                    }`}
-                />
-              ) : (
-                <div className="w-full h-full bg-slate-900 flex items-center justify-center text-slate-500 text-xs">
-                  No Artwork
-                </div>
-              )}
-
-              <div className="absolute top-2 left-2 bg-black/80 px-2 py-0.5 rounded text-[9px] font-bold text-[#1db954] border border-[#1db954]/40 backdrop-blur-md">
-                {track?.isPlaying ? 'LIVE' : 'SCROBBLED'}
-              </div>
-            </div>
-
-            {/* Track Info & Visualizer Deck */}
-            <div className="flex-1 w-full min-w-0 flex flex-col justify-between gap-4">
-              <div>
-                <h2 className="font-extrabold text-xl sm:text-2xl md:text-3xl text-white tracking-tight leading-tight">
-                  {track?.title || 'Connecting...'}
-                </h2>
-                <p className="text-emerald-400 font-semibold text-sm sm:text-base mt-1">
-                  {track?.artist || 'Live Stream'}
-                </p>
-                <p className="text-slate-400 text-xs mt-0.5">
-                  {track?.album || 'Live Audio'}
-                </p>
-              </div>
-
-              {/* Real Audio Spectrum Canvas */}
-              <div className="h-12 sm:h-14 w-full bg-white/[0.03] px-2 py-1 rounded-xl border border-white/10 overflow-hidden flex items-center">
-                <canvas ref={canvasRef} className="w-full h-full" />
-              </div>
-
-              {/* Full-width Interactive Seek Bar */}
-              <div className="w-full flex items-center gap-3 text-xs text-slate-400">
-                <span className="w-10 shrink-0">{formatTime(currentTime)}</span>
-                <div
-                  onClick={(e) => {
-                    if (duration > 0) {
-                      const rect = e.currentTarget.getBoundingClientRect();
-                      const pct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
-                      globalAudio.seek(pct * duration);
-                    }
-                  }}
-                  className={`flex-1 h-2.5 bg-white/10 rounded-full overflow-hidden relative group/bar ${duration > 0 ? 'cursor-pointer hover:bg-white/20' : ''
-                    }`}
-                  title={duration > 0 ? 'Click to seek' : 'Audio progress'}
-                >
-                  <div
-                    className="h-full bg-[#1db954] rounded-full transition-all duration-200 shadow-[0_0_12px_#1db954]"
-                    style={{
-                      width: duration > 0
-                        ? `${Math.min(100, Math.max(0, (currentTime / duration) * 100))}%`
-                        : isPlayingAudio
-                          ? `${((currentTime % 30) / 30) * 100}%`
-                          : '0%'
-                    }}
-                  />
-                </div>
-                <span className="w-10 shrink-0 text-right">
-                  {duration > 0 ? formatTime(duration) : (isPlayingAudio ? 'LIVE' : '00:00')}
-                </span>
-              </div>
-            </div>
-          </div>
-
-          {/* Controls Footer */}
-          <div className="flex items-center justify-between gap-4 pt-3 border-t border-white/10 relative z-10 flex-wrap">
-            {/* Play/Pause Button & External Links */}
-            <div className="flex items-center gap-3">
-              <button
-                type="button"
-                onClick={togglePlayback}
-                className={`py-2 px-5 rounded-full font-bold text-xs transition-all active:scale-95 cursor-pointer flex items-center gap-2 shrink-0 ${isPlayingAudio
-                  ? 'bg-[#1db954] hover:bg-[#1ed760] text-black shadow-[0_0_20px_rgba(29,185,84,0.5)]'
-                  : 'bg-white hover:bg-slate-200 text-black shadow-lg'
-                  }`}
-              >
-                <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
-                  {isPlayingAudio ? (
-                    <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z" />
-                  ) : (
-                    <path d="M8 5v14l11-7z" />
-                  )}
-                </svg>
-                <span>{isPlayingAudio ? 'PAUSE AUDIO' : 'PLAY AUDIO'}</span>
-              </button>
-
-              {/* YouTube Link */}
-              {track?.youtubeVideoId && (
-                <a
-                  href={`https://www.youtube.com/watch?v=${track.youtubeVideoId}`}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="px-3 py-2 rounded-full bg-red-600/15 hover:bg-red-600/25 border border-red-500/30 text-red-300 hover:text-white text-xs transition-colors flex items-center gap-1.5 shrink-0"
-                  title="Watch video on YouTube"
-                >
-                  <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
-                    <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
-                  </svg>
-                  <span>YouTube</span>
-                </a>
-              )}
-
-              {/* Spotify Link */}
-              {track?.songUrl && (
-                <a
-                  href={track.songUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="px-3 py-2 rounded-full bg-[#1db954]/10 hover:bg-[#1db954]/20 border border-[#1db954]/30 text-[#1db954] hover:text-white text-xs transition-colors flex items-center gap-1.5 shrink-0"
-                  title="Open track on Spotify"
-                >
-                  <span>♫</span>
-                  <span>Spotify</span>
-                </a>
-              )}
-            </div>
-
-            {/* Volume Pill Container */}
-            <div className="flex items-center gap-2 text-xs text-slate-300 bg-white/[0.04] px-3.5 py-1.5 rounded-full border border-white/10 shrink-0">
-              <svg className="w-4 h-4 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.536 8.464a5 5 0 010 7.072M18.364 5.636a9 9 0 010 12.728M11 5L6 9H2v6h4l5 4V5z" />
-              </svg>
-              <input
-                type="range"
-                min="0"
-                max="1"
-                step="0.01"
-                value={volume}
-                onChange={handleVolumeChange}
-                className="w-20 min-[380px]:w-24 accent-[#1db954] cursor-pointer h-1.5"
-              />
-              <span className="shrink-0 w-8 text-right font-semibold text-slate-200">
-                {Math.round(volume * 100)}%
-              </span>
-            </div>
+          <div className="flex items-center gap-2 text-[10px]">
+            <span
+              className={`px-2 py-0.5 rounded border ${
+                isNowPlayingLive
+                  ? 'bg-emerald-500/15 border-emerald-500/40 text-emerald-400'
+                  : 'bg-white/5 border-white/10 text-slate-400'
+              }`}
+            >
+              {isNowPlayingLive ? 'LIVE SCROBBLING' : 'IDLE / RECENT'}
+            </span>
+            <span className="px-2 py-0.5 rounded bg-white/5 border border-white/10 text-slate-400">
+              TIMEZONE: VN (UTC+7)
+            </span>
           </div>
         </div>
 
-        {/* Pipeline Telemetry Card */}
-        <div className="w-full bg-[#0c101a]/70 border border-white/5 rounded-xl p-4 text-xs font-mono text-slate-400 backdrop-blur-md flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 text-base shrink-0">
-              ⚡
+        {/* Main Content: Hero Deck (Left) + Today Scrobbles Queue (Right) */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 flex-1 items-start">
+          {/* Left Column: Player Deck */}
+          <div className="lg:col-span-7 bg-[#0b101c]/90 border border-emerald-500/30 rounded-xl p-4 sm:p-6 shadow-2xl backdrop-blur-xl relative overflow-hidden flex flex-col gap-4">
+            <div className="flex flex-col sm:flex-row items-center sm:items-start gap-5">
+              {/* Album Art with CRT Glow */}
+              <div className="relative w-36 h-36 sm:w-44 sm:h-44 rounded-xl overflow-hidden shadow-2xl border border-white/20 shrink-0 bg-black group">
+                {currentTrack?.albumArt ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={currentTrack.albumArt}
+                    alt={currentTrack.title}
+                    className={`w-full h-full object-cover transition-transform duration-700 ${
+                      isPlayingAudio ? 'scale-105' : 'scale-100'
+                    }`}
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-xs text-slate-500">
+                    NO ARTWORK
+                  </div>
+                )}
+                <div className="absolute bottom-1 right-1 bg-black/85 px-1.5 py-0.5 rounded text-[9px] font-mono text-emerald-400 border border-emerald-500/30">
+                  {isPlayingAudio ? 'AUDIO ON' : 'STANDBY'}
+                </div>
+              </div>
+
+              {/* Track Metadata */}
+              <div className="flex-1 min-w-0 text-center sm:text-left flex flex-col justify-center">
+                <span className="text-[10px] text-emerald-400 tracking-wider font-semibold uppercase">
+                  {currentTrack?.source === 'fallback' ? 'FALLBACK AUDIOTRACK' : 'CURRENT SELECTION'}
+                </span>
+                <h3 className="font-bold text-lg sm:text-xl text-white truncate mt-1">
+                  {currentTrack?.title || 'Iron Man'}
+                </h3>
+                <p className="text-slate-300 text-sm truncate mt-1">
+                  {currentTrack?.artist || 'Black Sabbath'}
+                </p>
+                <p className="text-slate-500 text-xs truncate mt-0.5">
+                  {currentTrack?.album || 'Paranoid'}
+                </p>
+
+                <div className="mt-3 flex flex-wrap items-center justify-center sm:justify-start gap-1.5 text-[10px]">
+                  <span className="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-300 border border-emerald-500/20">
+                    STATUS: {relativeTimeLabel}
+                  </span>
+                  {currentTrack?.youtubeVideoId && (
+                    <span className="px-2 py-0.5 rounded bg-red-500/10 text-red-300 border border-red-500/20">
+                      YOUTUBE EMBEDDED
+                    </span>
+                  )}
+                </div>
+              </div>
             </div>
-            <div>
-              <div className="text-slate-200 font-bold text-xs">Decoupled Audio Pipeline</div>
-              <div className="text-slate-500 text-[11px]">Continuous lossless audio stream via YouTube IFrame & Spotify resolver</div>
+
+            {/* Cava Audio Spectrum Visualizer */}
+            <div className="h-14 w-full bg-black/50 rounded-lg border border-white/10 overflow-hidden flex items-center px-2 relative">
+              <canvas ref={canvasRef} className="w-full h-full" />
+              <div className="absolute top-1 left-2 text-[9px] text-slate-500">
+                CAVA SPECTRUM 32-BAND
+              </div>
+            </div>
+
+            {/* Seek Bar & Timers */}
+            <div className="flex flex-col gap-1.5">
+              <div
+                onClick={handleSeek}
+                className="w-full h-2 bg-white/10 hover:bg-white/20 rounded cursor-pointer relative overflow-hidden transition-colors"
+                title="Click to seek"
+              >
+                <div
+                  className="h-full bg-gradient-to-r from-emerald-500 to-cyan-400 transition-all duration-200"
+                  style={{
+                    width: `${duration > 0 ? (currentTime / duration) * 100 : 0}%`
+                  }}
+                />
+              </div>
+
+              <div className="flex items-center justify-between text-[10px] text-slate-400 font-mono">
+                <span>{formatTime(currentTime)}</span>
+                <span>{duration > 0 ? formatTime(duration) : 'LIVE AUDIO'}</span>
+              </div>
+            </div>
+
+            {/* Controls Bar */}
+            <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-white/10">
+              <div className="flex items-center gap-1.5">
+                <button
+                  type="button"
+                  onClick={() => globalAudio.playPrev()}
+                  className="px-3 py-1.5 rounded bg-white/5 hover:bg-white/15 text-slate-300 hover:text-white border border-white/10 text-xs font-bold transition-all"
+                  title="Previous song"
+                >
+                  [|&lt; PREV]
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleTogglePlay}
+                  className={`px-5 py-1.5 rounded font-bold text-xs transition-all flex items-center gap-2 ${
+                    isPlayingAudio
+                      ? 'bg-emerald-500 text-black shadow-[0_0_15px_rgba(16,185,129,0.4)]'
+                      : 'bg-white text-black hover:bg-slate-200'
+                  }`}
+                >
+                  <span>{isPlayingAudio ? '[|| PAUSE]' : '[&gt; PLAY]'}</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => globalAudio.playNext()}
+                  className="px-3 py-1.5 rounded bg-white/5 hover:bg-white/15 text-slate-300 hover:text-white border border-white/10 text-xs font-bold transition-all"
+                  title="Next song"
+                >
+                  [NEXT &gt;|]
+                </button>
+              </div>
+
+              {/* Volume Slider */}
+              <div className="flex items-center gap-2 bg-white/5 px-2.5 py-1.5 rounded border border-white/10 text-[10px] text-slate-300">
+                <span className="text-slate-400">VOL:</span>
+                <input
+                  type="range"
+                  min="0"
+                  max="1"
+                  step="0.01"
+                  value={volume}
+                  onChange={e => {
+                    const next = parseFloat(e.target.value);
+                    setVolume(next);
+                    globalAudio.setVolume(next);
+                  }}
+                  className="w-16 sm:w-20 accent-emerald-500 cursor-pointer h-1"
+                />
+                <span className="w-7 text-right">{Math.round(volume * 100)}%</span>
+              </div>
+            </div>
+
+            {/* External Links */}
+            <div className="flex items-center gap-2 pt-1 text-[10px]">
+              {currentTrack?.youtubeVideoId && (
+                <a
+                  href={`https://www.youtube.com/watch?v=${currentTrack.youtubeVideoId}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex-1 text-center bg-red-600/10 hover:bg-red-600/20 border border-red-500/30 text-red-300 hover:text-white py-1 rounded transition-colors"
+                >
+                  [OPEN ON YOUTUBE]
+                </a>
+              )}
+              {currentTrack?.songUrl && (
+                <a
+                  href={currentTrack.songUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex-1 text-center bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 hover:text-white py-1 rounded transition-colors"
+                >
+                  [VIEW ON LAST.FM]
+                </a>
+              )}
             </div>
           </div>
 
-          <div className="flex items-center gap-2 self-end sm:self-auto text-[11px]">
-            <span className="px-2.5 py-1 rounded bg-white/5 border border-white/10 text-slate-300">
-              STATUS: <span className="text-emerald-400 font-bold">{isPlayingAudio ? 'STREAMING' : 'READY'}</span>
-            </span>
+          {/* Right Column: Today's Scrobbles / History */}
+          <div className="lg:col-span-5 bg-[#090d17]/90 border border-white/10 rounded-xl p-4 sm:p-5 flex flex-col gap-3 shadow-xl backdrop-blur-xl max-h-[520px]">
+            <div className="flex items-center justify-between pb-2 border-b border-white/10 text-xs">
+              <div className="flex items-center gap-1.5">
+                <span className="text-emerald-400 font-bold">&gt;</span>
+                <span className="font-bold text-white uppercase">
+                  TODAY&apos;S SCROBBLES
+                </span>
+                <span className="px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300 text-[10px]">
+                  {todayList.length}
+                </span>
+              </div>
+
+              <span className="text-[10px] text-slate-500 font-mono">
+                SPOTIFY / YT / NCT
+              </span>
+            </div>
+
+            {/* Scrollable Track Queue */}
+            <div className="flex-1 overflow-y-auto flex flex-col gap-1.5 pr-1 text-xs">
+              {todayList.length === 0 ? (
+                <div className="p-4 text-center text-slate-500 font-mono text-[11px]">
+                  No scrobbles logged today yet. Playing fallback &quot;Iron Man&quot;.
+                </div>
+              ) : (
+                todayList.map((item, idx) => {
+                  const isCurrent =
+                    currentTrack?.title === item.title &&
+                    currentTrack?.artist === item.artist;
+
+                  return (
+                    <div
+                      key={item.trackId || idx}
+                      onClick={() => globalAudio.playTrack(item)}
+                      className={`flex items-center justify-between gap-3 p-2 rounded border cursor-pointer transition-all ${
+                        isCurrent
+                          ? 'bg-emerald-500/15 border-emerald-500/50 text-white shadow-[0_0_10px_rgba(16,185,129,0.15)]'
+                          : 'bg-white/[0.02] border-white/5 text-slate-300 hover:bg-white/10 hover:text-white'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <span className="text-[10px] text-slate-500 w-5 text-right font-mono">
+                          #{String(idx + 1).padStart(2, '0')}
+                        </span>
+                        <div className="min-w-0">
+                          <p className="font-bold text-[11px] truncate">
+                            {item.title}
+                          </p>
+                          <p className="text-[10px] text-slate-400 truncate">
+                            {item.artist}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-1.5 shrink-0 text-[10px] font-mono">
+                        {isCurrent && isPlayingAudio ? (
+                          <span className="text-emerald-400 font-bold animate-pulse">
+                            [PLAYING]
+                          </span>
+                        ) : (
+                          <span className="text-slate-500">
+                            {item.relativeTime}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })
+              )}
+            </div>
+
+            {/* Footer Attribution */}
+            <div className="pt-2 border-t border-white/10 flex items-center justify-between text-[10px] text-slate-500 font-mono">
+              <span>DATA BY LAST.FM</span>
+              <span>AUDIO VIA YOUTUBE IFRAME</span>
+            </div>
           </div>
         </div>
       </div>

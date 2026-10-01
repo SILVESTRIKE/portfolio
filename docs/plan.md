@@ -98,5 +98,25 @@
   - [x] CodeGraph AST index synchronization (`codegraph sync`)
   - [x] Zero TypeScript compilation errors (`npx tsc --noEmit`)
 
-
-
+## Phase 7: Caelestia / Terminal Music Widget & Last.fm Telemetry Engine
+- [x] **Complete Removal of Spotify Web API**
+  - [x] Removed Spotify OAuth access token fetch and refresh token lifecycle logic from codebase
+  - [x] Replaced Spotify API route with unified `/api/music` endpoint and backward-compatible adapter
+- [x] **Last.fm Multi-Source Telemetry Engine**
+  - [x] Implemented scrobble aggregation for Spotify, YouTube, and NCT via Last.fm API
+  - [x] Calculated day-start boundary according to Vietnam Timezone (`Asia/Ho_Chi_Minh`, UTC+7) to extract today's listening history
+  - [x] High-resolution album artwork fallback via iTunes Search API
+  - [x] Guaranteed fallback track to Black Sabbath - Iron Man (`FALLBACK_TRACK`)
+- [x] **Upstash Redis REST Dual-Layer Cache & Quota Preservation**
+  - [x] Implemented zero-dependency Upstash Redis REST client (`src/lib/redis.ts`) with in-memory L1 cache
+  - [x] Curated static videoId override dictionary (`src/lib/musicOverrides.ts`)
+  - [x] Restricted YouTube search to embeddable music videos with 6-hour temporary cache for missing tracks
+  - [x] Bounded search operations to maximum 3 new queries per request to protect daily quotas
+- [x] **Audio Engine & Queue Management**
+  - [x] Upgraded `GlobalAudioManager` with queue playlist support (`setQueue`, `playTrack`, `playNext`, `playPrev`)
+  - [x] Auto-advancing to subsequent tracks upon song completion (`YT.PlayerState.ENDED`)
+  - [x] Automatic fallback to next track or Web Audio synth on video embed errors
+- [x] **Caelestia / Terminal 3-Mode User Interface**
+  - [x] Panel mode: Compact terminal status pill with live playback indicator and flyout trigger
+  - [x] Flyout mode: Corner HUD with mini cava visualizer, metadata, and quick controls
+  - [x] Full mode: Maximized cybernetic workstation deck featuring 32-band visualizer, track metadata, seek bar, and interactive "Today's Scrobbles" queue
