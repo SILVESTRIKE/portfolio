@@ -89,6 +89,22 @@ body:has(#desktop-workspace) {
   user-select: text;
 }
 
+/* Radiant glow animation for silves.dev resume launcher */
+@keyframes silves-glow {
+  0%, 100% {
+    box-shadow: 0 0 10px rgba(122, 162, 247, 0.45), inset 0 0 6px rgba(122, 162, 247, 0.2);
+    border-color: rgba(122, 162, 247, 0.6);
+  }
+  50% {
+    box-shadow: 0 0 18px rgba(122, 162, 247, 0.8), inset 0 0 10px rgba(122, 162, 247, 0.35);
+    border-color: rgba(122, 162, 247, 0.95);
+  }
+}
+
+.silves-luminous {
+  animation: silves-glow 2.4s ease-in-out infinite;
+}
+
 /* Glassmorphism helpers */
 .glass-panel {
   background: rgba(14, 18, 26, 0.88);

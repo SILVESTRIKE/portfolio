@@ -6,6 +6,7 @@ System impact if absent: System level metrics, active workspaces, and tiling con
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { monitor } from '@/lib/monitor';
 import { SystemSnapshot, WorkspaceId, TilingLayoutMode } from '@/types';
 import { SpotifyPlayer } from '@/components/SpotifyPlayer';
@@ -79,17 +80,16 @@ export function TopPanel({
     <header className="h-[42px] glass-panel border-b border-white/10 px-1.5 sm:px-3 flex items-center justify-between gap-1 sm:gap-4 z-50 text-xs font-mono select-none relative w-full overflow-hidden">
       {/* Left section: host badge, Workspace Switcher & Tiling indicator */}
       <div className="flex items-center gap-1 sm:gap-2.5 shrink-0 min-w-0">
-        {/* Host Home Button -> Switch to Workspace 2 */}
-        <button
-          type="button"
-          onClick={() => onSelectWorkspace(2)}
-          className="flex items-center gap-1 sm:gap-2 px-1.5 sm:px-2.5 py-1 bg-white/5 hover:bg-white/10 active:scale-95 border border-white/10 hover:border-[#7aa2f7]/40 rounded shrink-0 transition-all cursor-pointer group"
-          title="Home (Workspace 2: dev)"
+        {/* Host Badge -> 30s Executive Summary (Resume) with permanent radiant glow */}
+        <Link
+          href="/resume"
+          className="silves-luminous flex items-center gap-1 sm:gap-2 px-2 sm:px-2.5 py-1 bg-[#7aa2f7]/15 hover:bg-[#7aa2f7]/25 active:scale-95 border border-[#7aa2f7]/60 rounded shrink-0 transition-all cursor-pointer group"
+          title="Candidate 30s Executive Summary (Resume)"
         >
-          <span className="font-semibold text-slate-100 text-[10.5px] sm:text-xs tracking-tight group-hover:text-[#7aa2f7] transition-colors">
+          <span className="font-bold text-[#7aa2f7] text-[10.5px] sm:text-xs tracking-tight drop-shadow-[0_0_8px_rgba(122,162,247,0.75)] group-hover:text-white transition-colors">
             {hostname}
           </span>
-        </button>
+        </Link>
 
         {/* Workspace Switcher (Hyprland / i3 style) */}
         <div className="flex items-center gap-0.5 sm:gap-1 bg-black/40 p-0.5 sm:p-1 rounded-sm border border-white/10 shrink-0">
@@ -168,14 +168,6 @@ export function TopPanel({
           />
         </div>
 
-        {/* Recruiter 30s Resume Button */}
-        <a
-          href="/resume"
-          className="hidden sm:flex items-center gap-1 bg-emerald-500/15 hover:bg-emerald-500/25 px-2 py-0.5 rounded-sm border border-emerald-500/40 text-emerald-300 font-bold text-[10px] transition-colors cursor-pointer shrink-0"
-          title="Open Recruiter 30-Second Resume Summary"
-        >
-          <span>30s RESUME</span>
-        </a>
 
         {/* Language Switcher Button */}
         <button
