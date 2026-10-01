@@ -6,8 +6,8 @@ System impact if absent: Application renders without dark server styling, custom
 @import "tailwindcss";
 
 @theme inline {
-  --font-mono: 'JetBrains Mono', monospace;
-  --font-sans: 'JetBrains Mono', monospace;
+  --font-mono: var(--font-mono), 'JetBrains Mono', monospace;
+  --font-sans: var(--font-sans), 'Outfit', sans-serif;
 
   --color-obsidian-950: #0a0d14;
   --color-obsidian-900: #0e121a;

@@ -222,7 +222,7 @@ class GlobalAudioManager {
       this.ytPlayer = new window.YT.Player('yt-audio-player-slot', {
         height: '150',
         width: '200',
-        host: 'https://www.youtube.com',
+        host: 'https://www.youtube-nocookie.com',
         videoId: this.currentYtVideoId || DEFAULT_FALLBACK_VIDEO_ID,
         playerVars: {
           autoplay: 0,
@@ -233,7 +233,7 @@ class GlobalAudioManager {
           modestbranding: 1,
           playsinline: 1,
           enablejsapi: 1,
-          origin: typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000'
+          origin: typeof window !== 'undefined' ? window.location.origin : undefined
         },
         events: {
           onReady: (event: { target: YTPlayerInstance }) => {

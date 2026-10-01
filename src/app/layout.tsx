@@ -60,7 +60,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${jetbrainsMono.variable} ${outfit.variable} min-h-full dark`}>
+    <html
+      lang="en"
+      data-scroll-behavior="smooth"
+      className={`${jetbrainsMono.variable} ${outfit.variable} min-h-full dark`}
+    >
       <body className="min-h-full w-full font-sans text-slate-100 antialiased flex flex-col bg-obsidian-950">
         <I18nProvider>
           {children}
