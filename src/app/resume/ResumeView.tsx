@@ -288,32 +288,6 @@ export function ResumeView() {
           </Link>
 
           <div className="flex items-center gap-2">
-            {/* Language Toggle Pill */}
-            <div className="flex items-center bg-white/5 border border-white/10 rounded p-0.5 font-mono text-xs">
-              <button
-                type="button"
-                onClick={() => setLocale('vi')}
-                className={`px-2 py-1 rounded transition-colors ${
-                  locale === 'vi'
-                    ? 'bg-[#7aa2f7] text-black font-bold shadow-[0_0_8px_rgba(122,162,247,0.4)]'
-                    : 'text-slate-400 hover:text-white'
-                }`}
-              >
-                VI
-              </button>
-              <button
-                type="button"
-                onClick={() => setLocale('en')}
-                className={`px-2 py-1 rounded transition-colors ${
-                  locale === 'en'
-                    ? 'bg-[#7aa2f7] text-black font-bold shadow-[0_0_8px_rgba(122,162,247,0.4)]'
-                    : 'text-slate-400 hover:text-white'
-                }`}
-              >
-                EN
-              </button>
-            </div>
-
             <a
               href="/CV_VanTrongDuong.docx"
               download="CV_VanTrongDuong.docx"
@@ -512,18 +486,9 @@ export function ResumeView() {
           </div>
         </section>
 
-        {/* Footer with Bilingual Switcher */}
-        <footer className="flex flex-wrap items-center justify-between gap-3 text-xs text-slate-500 font-mono pt-4 pb-8 border-t border-white/5">
-          <div>{data.footerCopy}</div>
-          <div className="flex items-center gap-2">
-            <span>Ngôn ngữ / Language:</span>
-            <button
-              onClick={() => setLocale(locale === 'en' ? 'vi' : 'en')}
-              className="text-[#7aa2f7] hover:underline font-bold"
-            >
-              {locale === 'en' ? 'Chuyển sang Tiếng Việt' : 'Switch to English'}
-            </button>
-          </div>
+        {/* Footer */}
+        <footer className="text-center text-xs text-slate-500 font-mono pt-4 pb-8 border-t border-white/5">
+          {data.footerCopy}
         </footer>
       </div>
     </main>
