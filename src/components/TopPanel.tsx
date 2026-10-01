@@ -77,16 +77,16 @@ export function TopPanel({
   };
 
   return (
-    <header className="h-[42px] glass-panel border-b border-white/10 px-1.5 sm:px-3 flex items-center justify-between gap-1 sm:gap-4 z-50 text-xs font-mono select-none relative w-full overflow-hidden">
+    <header className="h-[38px] sm:h-[42px] glass-panel border-b border-white/10 px-1.5 sm:px-3 flex items-center justify-between gap-1 sm:gap-4 z-50 text-xs font-mono select-none relative w-full overflow-hidden">
       {/* Left section: host badge, Workspace Switcher & Tiling indicator */}
       <div className="flex items-center gap-1 sm:gap-2.5 shrink-0 min-w-0">
         {/* Host Badge -> 30s Executive Summary (Resume) with permanent radiant glow */}
         <Link
           href="/resume"
-          className="silves-luminous flex items-center gap-1 sm:gap-2 px-2 sm:px-2.5 py-1 bg-[#7aa2f7]/15 hover:bg-[#7aa2f7]/25 active:scale-95 border border-[#7aa2f7]/60 rounded shrink-0 transition-all cursor-pointer group"
+          className="silves-luminous flex items-center gap-1 sm:gap-2 px-1.5 py-0.5 sm:px-2.5 sm:py-1 bg-[#7aa2f7]/15 hover:bg-[#7aa2f7]/25 active:scale-95 border border-[#7aa2f7]/60 rounded shrink-0 transition-all cursor-pointer group"
           title="Candidate 30s Executive Summary (Resume)"
         >
-          <span className="font-bold text-[#7aa2f7] text-[10.5px] sm:text-xs tracking-tight drop-shadow-[0_0_8px_rgba(122,162,247,0.75)] group-hover:text-white transition-colors">
+          <span className="font-bold text-[#7aa2f7] text-[10px] sm:text-xs tracking-tight drop-shadow-[0_0_8px_rgba(122,162,247,0.75)] group-hover:text-white transition-colors">
             {hostname}
           </span>
         </Link>
@@ -101,7 +101,7 @@ export function TopPanel({
               <button
                 key={ws.id}
                 onClick={() => onSelectWorkspace(ws.id)}
-                className={`px-1.5 sm:px-2 py-0.5 rounded-sm text-[10.5px] sm:text-[11px] font-mono transition-all flex items-center gap-1 ${isActive
+                className={`px-1 py-0.5 sm:px-2 sm:py-0.5 rounded-sm text-[10px] sm:text-[11px] font-mono transition-all flex items-center gap-0.5 sm:gap-1 ${isActive
                   ? 'bg-[#7aa2f7]/15 text-[#7aa2f7] border border-[#7aa2f7]/40 font-bold shadow-[0_0_10px_rgba(122,162,247,0.15)]'
                   : 'text-slate-400 hover:text-slate-200 hover:bg-white/5'
                   }`}
@@ -110,7 +110,7 @@ export function TopPanel({
                 <span className="hidden md:inline">{ws.label}</span>
                 <span className="md:hidden font-bold">{ws.id}</span>
                 {count > 0 && (
-                  <span className={`text-[9px] px-1 rounded-sm hidden sm:inline ${isActive ? 'bg-[#7aa2f7] text-black font-bold' : 'bg-white/10 text-slate-400'
+                  <span className={`text-[8.5px] sm:text-[9px] px-1 rounded-sm hidden sm:inline ${isActive ? 'bg-[#7aa2f7] text-black font-bold' : 'bg-white/10 text-slate-400'
                     }`}>
                     {count}
                   </span>
@@ -122,7 +122,7 @@ export function TopPanel({
           {/* Hyprland Special Music Workspace Button */}
           <button
             onClick={() => onSelectWorkspace(currentWorkspace === 'special' ? 1 : 'special')}
-            className={`px-2 py-0.5 rounded-sm text-[11px] font-mono transition-all flex items-center justify-center ${currentWorkspace === 'special'
+            className={`px-1.5 py-0.5 sm:px-2 sm:py-0.5 rounded-sm text-[10px] sm:text-[11px] font-mono transition-all flex items-center justify-center ${currentWorkspace === 'special'
               ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/50 font-bold shadow-[0_0_12px_rgba(29,185,84,0.25)]'
               : 'text-slate-400 hover:text-emerald-400 hover:bg-white/5'
               }`}

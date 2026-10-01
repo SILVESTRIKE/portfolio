@@ -240,11 +240,10 @@ export function SpotifyPlayer({ mode = 'panel', onOpenFullPlayer, onClose }: Spo
     return (
       <div className="relative flex items-center">
         <div
-          className={`flex items-center rounded border font-mono text-[11px] transition-all overflow-hidden ${
-            isPlayingAudio
-              ? 'bg-emerald-500/15 border-emerald-500/40 text-emerald-300 shadow-[0_0_12px_rgba(16,185,129,0.25)]'
-              : 'bg-black/50 border-white/10 text-slate-300 hover:border-emerald-500/30'
-          }`}
+          className={`flex items-center rounded border font-mono text-[11px] transition-all overflow-hidden ${isPlayingAudio
+            ? 'bg-emerald-500/15 border-emerald-500/40 text-emerald-300 shadow-[0_0_12px_rgba(16,185,129,0.25)]'
+            : 'bg-black/50 border-white/10 text-slate-300 hover:border-emerald-500/30'
+            }`}
         >
           {/* Quick Play/Pause Action Button (Always visible on mobile & desktop) */}
           <button
@@ -253,11 +252,10 @@ export function SpotifyPlayer({ mode = 'panel', onOpenFullPlayer, onClose }: Spo
               e.stopPropagation();
               handleTogglePlay();
             }}
-            className={`p-1.5 sm:px-2 sm:py-1 flex items-center justify-center gap-1 transition-all cursor-pointer font-bold text-[10px] ${
-              isPlayingAudio
-                ? 'bg-emerald-400 text-black hover:bg-emerald-300 shadow-[0_0_8px_rgba(52,211,153,0.6)]'
-                : 'bg-white/10 hover:bg-white/20 text-slate-200 hover:text-white'
-            }`}
+            className={`p-1.5 sm:px-2 sm:py-1 flex items-center justify-center gap-1 transition-all cursor-pointer font-bold text-[10px] ${isPlayingAudio
+              ? 'bg-emerald-400 text-black hover:bg-emerald-300 shadow-[0_0_8px_rgba(52,211,153,0.6)]'
+              : 'bg-white/10 hover:bg-white/20 text-slate-200 hover:text-white'
+              }`}
             title={isPlayingAudio ? 'Pause music' : 'Play music'}
             aria-label={isPlayingAudio ? 'Pause' : 'Play'}
           >
@@ -280,13 +278,12 @@ export function SpotifyPlayer({ mode = 'panel', onOpenFullPlayer, onClose }: Spo
             title="Click to toggle music widget HUD"
           >
             <span
-              className={`w-1.5 h-1.5 rounded-full shrink-0 ${
-                isPlayingAudio
-                  ? 'bg-emerald-400 animate-pulse shadow-[0_0_6px_#34d399]'
-                  : isNowPlayingLive
+              className={`w-1.5 h-1.5 rounded-full shrink-0 ${isPlayingAudio
+                ? 'bg-emerald-400 animate-pulse shadow-[0_0_6px_#34d399]'
+                : isNowPlayingLive
                   ? 'bg-emerald-500'
                   : 'bg-amber-400/80'
-              }`}
+                }`}
             />
 
             <span className="font-semibold text-slate-400 text-[10px] hidden md:inline shrink-0">
@@ -329,9 +326,8 @@ export function SpotifyPlayer({ mode = 'panel', onOpenFullPlayer, onClose }: Spo
         <div className="flex items-center justify-between pb-2 border-b border-white/10 text-[10px]">
           <div className="flex items-center gap-1.5">
             <span
-              className={`w-2 h-2 rounded-full ${
-                isPlayingAudio ? 'bg-emerald-400 animate-pulse' : 'bg-slate-500'
-              }`}
+              className={`w-2 h-2 rounded-full ${isPlayingAudio ? 'bg-emerald-400 animate-pulse' : 'bg-slate-500'
+                }`}
             />
             <span className="text-emerald-400 font-bold uppercase">
               {isNowPlayingLive ? 'LAST.FM LIVE' : 'STATION IDLE'}
@@ -370,9 +366,8 @@ export function SpotifyPlayer({ mode = 'panel', onOpenFullPlayer, onClose }: Spo
               <img
                 src={currentTrack.albumArt}
                 alt={currentTrack.title}
-                className={`w-full h-full object-cover transition-transform ${
-                  isPlayingAudio ? 'scale-105' : 'scale-100'
-                }`}
+                className={`w-full h-full object-cover transition-transform ${isPlayingAudio ? 'scale-105' : 'scale-100'
+                  }`}
               />
             ) : (
               <div className="w-full h-full flex items-center justify-center text-[9px] text-slate-500">
@@ -413,11 +408,10 @@ export function SpotifyPlayer({ mode = 'panel', onOpenFullPlayer, onClose }: Spo
           <button
             type="button"
             onClick={handleTogglePlay}
-            className={`flex-1 py-1 px-2 rounded font-bold text-[10px] transition-all flex items-center justify-center ${
-              isPlayingAudio
-                ? 'bg-emerald-500 text-black shadow-[0_0_10px_rgba(16,185,129,0.4)]'
-                : 'bg-white text-black hover:bg-slate-200'
-            }`}
+            className={`flex-1 py-1 px-2 rounded font-bold text-[10px] transition-all flex items-center justify-center ${isPlayingAudio
+              ? 'bg-emerald-500 text-black shadow-[0_0_10px_rgba(16,185,129,0.4)]'
+              : 'bg-white text-black hover:bg-slate-200'
+              }`}
           >
             {isPlayingAudio ? '[PAUSE]' : '[PLAY AUDIO]'}
           </button>
@@ -439,79 +433,77 @@ export function SpotifyPlayer({ mode = 'panel', onOpenFullPlayer, onClose }: Spo
   // MODE 3: FULL (Maximized Workspace Station)
   // ==========================================
   return (
-    <div className="h-full w-full p-3 sm:p-5 md:p-6 flex flex-col justify-between font-mono bg-[#060911] text-slate-200 select-none overflow-y-auto">
-      <div className="w-full max-w-6xl mx-auto flex-1 flex flex-col gap-4">
+    <div className="h-full w-full p-2.5 sm:p-5 md:p-6 flex flex-col justify-between font-mono bg-[#060911] text-slate-200 select-none overflow-y-auto">
+      <div className="w-full max-w-6xl mx-auto flex-1 flex flex-col gap-3 sm:gap-4">
         {/* Terminal Header Bar */}
-        <div className="flex flex-wrap items-center justify-between gap-2 pb-2.5 border-b border-emerald-500/20 text-xs">
-          <div className="flex items-center gap-2">
-            <span className="text-emerald-400 font-bold">root@srv-silvestrike:~$</span>
-            <span className="text-slate-300">cava-player --scrobbler=lastfm</span>
+        <div className="flex items-center justify-between gap-2 pb-2 border-b border-emerald-500/20 text-xs">
+          <div className="flex items-center gap-1.5 truncate">
+            <span className="text-emerald-400 font-bold shrink-0">root@srv:~#</span>
+            <span className="text-slate-300 truncate text-[11px] sm:text-xs">cava-player</span>
           </div>
 
-          <div className="flex items-center gap-2 text-[10px]">
+          <div className="flex items-center gap-1.5 text-[10px] shrink-0">
             <span
-              className={`px-2 py-0.5 rounded border ${
-                isNowPlayingLive
-                  ? 'bg-emerald-500/15 border-emerald-500/40 text-emerald-400'
-                  : 'bg-white/5 border-white/10 text-slate-400'
-              }`}
+              className={`px-1.5 py-0.5 rounded border text-[9px] sm:text-[10px] ${isNowPlayingLive
+                ? 'bg-emerald-500/15 border-emerald-500/40 text-emerald-400'
+                : 'bg-white/5 border-white/10 text-slate-400'
+                }`}
             >
-              {isNowPlayingLive ? 'LIVE SCROBBLING' : 'IDLE / RECENT'}
+              {isNowPlayingLive ? 'LIVE' : 'IDLE'}
             </span>
-            <span className="px-2 py-0.5 rounded bg-white/5 border border-white/10 text-slate-400">
+            <span className="hidden sm:inline-block px-2 py-0.5 rounded bg-white/5 border border-white/10 text-slate-400">
               TIMEZONE: VN (UTC+7)
             </span>
           </div>
         </div>
 
         {/* Main Content: Hero Deck (Left) + Today Scrobbles Queue (Right) */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 flex-1 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 sm:gap-5 flex-1 items-start">
           {/* Left Column: Player Deck */}
-          <div className="lg:col-span-7 bg-[#0b101c]/90 border border-emerald-500/30 rounded-xl p-4 sm:p-6 shadow-2xl backdrop-blur-xl relative overflow-hidden flex flex-col gap-4">
-            <div className="flex flex-col sm:flex-row items-center sm:items-start gap-5">
+          <div className="lg:col-span-7 bg-[#0b101c]/90 border border-emerald-500/30 rounded-xl p-3 sm:p-5 shadow-2xl backdrop-blur-xl relative overflow-hidden flex flex-col gap-2.5 sm:gap-4">
+            <div className="flex flex-row items-center sm:items-start gap-3 sm:gap-5">
               {/* Album Art with CRT Glow */}
-              <div className="relative w-36 h-36 sm:w-44 sm:h-44 rounded-xl overflow-hidden shadow-2xl border border-white/20 shrink-0 bg-black group">
+              <div className="relative w-20 h-20 sm:w-36 sm:h-36 rounded-lg sm:rounded-xl overflow-hidden shadow-xl sm:shadow-2xl border border-white/20 shrink-0 bg-black group">
                 {currentTrack?.albumArt ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
                     src={currentTrack.albumArt}
                     alt={currentTrack.title}
-                    className={`w-full h-full object-cover transition-transform duration-700 ${
-                      isPlayingAudio ? 'scale-105' : 'scale-100'
-                    }`}
+                    className={`w-full h-full object-cover transition-transform duration-700 ${isPlayingAudio ? 'scale-105' : 'scale-100'
+                      }`}
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-xs text-slate-500">
                     NO ARTWORK
                   </div>
                 )}
-                <div className="absolute bottom-1 right-1 bg-black/85 px-1.5 py-0.5 rounded text-[9px] font-mono text-emerald-400 border border-emerald-500/30">
-                  {isPlayingAudio ? 'AUDIO ON' : 'STANDBY'}
+                <div className="absolute bottom-1 right-1 bg-black/85 px-1 py-0.2 sm:px-1.5 sm:py-0.5 rounded text-[8px] sm:text-[9px] font-mono text-emerald-400 border border-emerald-500/30">
+                  {isPlayingAudio ? 'ON' : 'OFF'}
                 </div>
               </div>
 
               {/* Track Metadata */}
-              <div className="flex-1 min-w-0 text-center sm:text-left flex flex-col justify-center">
-                <span className="text-[10px] text-emerald-400 tracking-wider font-semibold uppercase">
+              <div className="flex-1 min-w-0 text-left flex flex-col justify-center">
+                <span className="text-[9px] sm:text-[10px] text-emerald-400 tracking-wider font-semibold uppercase">
                   {currentTrack?.source === 'fallback' ? 'FALLBACK AUDIOTRACK' : 'CURRENT SELECTION'}
                 </span>
-                <h3 className="font-bold text-lg sm:text-xl text-white truncate mt-1">
+                <h3 className="font-bold text-sm sm:text-lg text-white truncate mt-0.5">
                   {currentTrack?.title || 'Iron Man'}
                 </h3>
-                <p className="text-slate-300 text-sm truncate mt-1">
+                <p className="text-slate-300 text-xs sm:text-sm truncate">
                   {currentTrack?.artist || 'Black Sabbath'}
                 </p>
-                <p className="text-slate-500 text-xs truncate mt-0.5">
+                <p className="text-slate-500 text-[10px] sm:text-xs truncate">
                   {currentTrack?.album || 'Paranoid'}
                 </p>
 
-                <div className="mt-3 flex flex-wrap items-center justify-center sm:justify-start gap-1.5 text-[10px]">
-                  <span className="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-300 border border-emerald-500/20">
-                    STATUS: {relativeTimeLabel}
+                <div className="mt-1 sm:mt-2.5 flex flex-wrap items-center gap-1.5 text-[9px] sm:text-[10px]">
+                  <span className="px-1.5 py-0.2 rounded bg-emerald-500/10 text-emerald-300 border border-emerald-500/20">
+                    {relativeTimeLabel}
                   </span>
                   {currentTrack?.youtubeVideoId && (
-                    <span className="px-2 py-0.5 rounded bg-red-500/10 text-red-300 border border-red-500/20">
-                      YOUTUBE EMBEDDED
+                    <span className="px-1.5 py-0.2 rounded bg-red-500/10 text-red-300 border border-red-500/20">
+                      YT EMBED
                     </span>
                   )}
                 </div>
@@ -519,18 +511,18 @@ export function SpotifyPlayer({ mode = 'panel', onOpenFullPlayer, onClose }: Spo
             </div>
 
             {/* Cava Audio Spectrum Visualizer */}
-            <div className="h-14 w-full bg-black/50 rounded-lg border border-white/10 overflow-hidden flex items-center px-2 relative">
+            <div className="h-8 sm:h-12 w-full bg-black/50 rounded border border-white/10 overflow-hidden flex items-center px-2 relative">
               <canvas ref={canvasRef} className="w-full h-full" />
-              <div className="absolute top-1 left-2 text-[9px] text-slate-500">
+              <div className="absolute top-1 left-2 text-[8px] sm:text-[9px] text-slate-500">
                 CAVA SPECTRUM 32-BAND
               </div>
             </div>
 
             {/* Seek Bar & Timers */}
-            <div className="flex flex-col gap-1.5">
+            <div className="flex flex-col gap-1">
               <div
                 onClick={handleSeek}
-                className="w-full h-2 bg-white/10 hover:bg-white/20 rounded cursor-pointer relative overflow-hidden transition-colors"
+                className="w-full h-1.5 sm:h-2 bg-white/10 hover:bg-white/20 rounded cursor-pointer relative overflow-hidden transition-colors"
                 title="Click to seek"
               >
                 <div
@@ -541,48 +533,47 @@ export function SpotifyPlayer({ mode = 'panel', onOpenFullPlayer, onClose }: Spo
                 />
               </div>
 
-              <div className="flex items-center justify-between text-[10px] text-slate-400 font-mono">
+              <div className="flex items-center justify-between text-[9px] sm:text-[10px] text-slate-400 font-mono">
                 <span>{formatTime(currentTime)}</span>
                 <span>{duration > 0 ? formatTime(duration) : 'LIVE AUDIO'}</span>
               </div>
             </div>
 
             {/* Controls Bar */}
-            <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-white/10">
-              <div className="flex items-center gap-1.5">
+            <div className="flex items-center justify-between gap-2 pt-1.5 border-t border-white/10">
+              <div className="flex items-center gap-1 sm:gap-1.5">
                 <button
                   type="button"
                   onClick={() => globalAudio.playPrev()}
-                  className="px-3 py-1.5 rounded bg-white/5 hover:bg-white/15 text-slate-300 hover:text-white border border-white/10 text-xs font-bold transition-all"
+                  className="px-2 py-1 sm:px-3 sm:py-1.5 rounded bg-white/5 hover:bg-white/15 text-slate-300 hover:text-white border border-white/10 text-[10px] sm:text-xs font-bold transition-all cursor-pointer"
                   title="Previous song"
                 >
-                  [|&lt; PREV]
+                  [|&lt;]
                 </button>
 
                 <button
                   type="button"
                   onClick={handleTogglePlay}
-                  className={`px-5 py-1.5 rounded font-bold text-xs transition-all flex items-center gap-2 ${
-                    isPlayingAudio
-                      ? 'bg-emerald-500 text-black shadow-[0_0_15px_rgba(16,185,129,0.4)]'
-                      : 'bg-white text-black hover:bg-slate-200'
-                  }`}
+                  className={`px-3 py-1 sm:px-4 sm:py-1.5 rounded font-bold text-[10px] sm:text-xs transition-all flex items-center gap-1.5 cursor-pointer ${isPlayingAudio
+                    ? 'bg-emerald-500 text-black shadow-[0_0_15px_rgba(16,185,129,0.4)]'
+                    : 'bg-white text-black hover:bg-slate-200'
+                    }`}
                 >
-                  <span>{isPlayingAudio ? '[|| PAUSE]' : '[&gt; PLAY]'}</span>
+                  <span>{isPlayingAudio ? '[|| PAUSE]' : '[> PLAY]'}</span>
                 </button>
 
                 <button
                   type="button"
                   onClick={() => globalAudio.playNext()}
-                  className="px-3 py-1.5 rounded bg-white/5 hover:bg-white/15 text-slate-300 hover:text-white border border-white/10 text-xs font-bold transition-all"
+                  className="px-2 py-1 sm:px-3 sm:py-1.5 rounded bg-white/5 hover:bg-white/15 text-slate-300 hover:text-white border border-white/10 text-[10px] sm:text-xs font-bold transition-all cursor-pointer"
                   title="Next song"
                 >
-                  [NEXT &gt;|]
+                  [&gt;|]
                 </button>
               </div>
 
               {/* Volume Slider */}
-              <div className="flex items-center gap-2 bg-white/5 px-2.5 py-1.5 rounded border border-white/10 text-[10px] text-slate-300">
+              <div className="flex items-center gap-1.5 sm:gap-2 bg-white/5 px-2 py-1 sm:px-2.5 sm:py-1.5 rounded border border-white/10 text-[9px] sm:text-[10px] text-slate-300 shrink-0">
                 <span className="text-slate-400">VOL:</span>
                 <input
                   type="range"
@@ -595,22 +586,22 @@ export function SpotifyPlayer({ mode = 'panel', onOpenFullPlayer, onClose }: Spo
                     setVolume(next);
                     globalAudio.setVolume(next);
                   }}
-                  className="w-16 sm:w-20 accent-emerald-500 cursor-pointer h-1"
+                  className="w-12 sm:w-20 accent-emerald-500 cursor-pointer h-1"
                 />
-                <span className="w-7 text-right">{Math.round(volume * 100)}%</span>
+                <span className="w-5 sm:w-7 text-right">{Math.round(volume * 100)}%</span>
               </div>
             </div>
 
             {/* External Links */}
-            <div className="flex items-center gap-2 pt-1 text-[10px]">
+            <div className="flex items-center gap-2 pt-1 text-[9px] sm:text-[10px]">
               {currentTrack?.youtubeVideoId && (
                 <a
                   href={`https://www.youtube.com/watch?v=${currentTrack.youtubeVideoId}`}
                   target="_blank"
                   rel="noreferrer"
-                  className="flex-1 text-center bg-red-600/10 hover:bg-red-600/20 border border-red-500/30 text-red-300 hover:text-white py-1 rounded transition-colors"
+                  className="flex-1 text-center bg-red-600/10 hover:bg-red-600/20 border border-red-500/30 text-red-300 hover:text-white py-0.5 sm:py-1 rounded transition-colors"
                 >
-                  [OPEN ON YOUTUBE]
+                  [YOUTUBE]
                 </a>
               )}
               {currentTrack?.songUrl && (
@@ -618,93 +609,89 @@ export function SpotifyPlayer({ mode = 'panel', onOpenFullPlayer, onClose }: Spo
                   href={currentTrack.songUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="flex-1 text-center bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 hover:text-white py-1 rounded transition-colors"
+                  className="flex-1 text-center bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 hover:text-white py-0.5 sm:py-1 rounded transition-colors"
                 >
-                  [VIEW ON LAST.FM]
+                  [LAST.FM]
                 </a>
               )}
             </div>
           </div>
 
-          {/* Right Column: Today's Scrobbles / History */}
-          <div className="lg:col-span-5 bg-[#090d17]/90 border border-white/10 rounded-xl p-4 sm:p-5 flex flex-col gap-3 shadow-xl backdrop-blur-xl max-h-[520px]">
-            <div className="flex items-center justify-between pb-2 border-b border-white/10 text-xs">
-              <div className="flex items-center gap-1.5">
-                <span className="text-emerald-400 font-bold">&gt;</span>
-                <span className="font-bold text-white uppercase">
-                  TODAY&apos;S SCROBBLES
-                </span>
-                <span className="px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300 text-[10px]">
-                  {todayList.length}
-                </span>
-              </div>
+        </div>
+      </div>
 
-              <span className="text-[10px] text-slate-500 font-mono">
-                SPOTIFY / YT / NCT
-              </span>
-            </div>
-
-            {/* Scrollable Track Queue */}
-            <div className="flex-1 overflow-y-auto flex flex-col gap-1.5 pr-1 text-xs">
-              {todayList.length === 0 ? (
-                <div className="p-4 text-center text-slate-500 font-mono text-[11px]">
-                  No scrobbles logged today yet. Playing fallback &quot;Iron Man&quot;.
-                </div>
-              ) : (
-                todayList.map((item, idx) => {
-                  const isCurrent =
-                    Boolean(currentTrack) &&
-                    ((currentTrack?.trackId && item.trackId && currentTrack.trackId === item.trackId) ||
-                     (currentTrack?.title.toLowerCase() === item.title.toLowerCase() &&
-                      currentTrack?.artist.toLowerCase() === item.artist.toLowerCase()));
-
-                  return (
-                    <div
-                      key={item.trackId || idx}
-                      onClick={() => globalAudio.playIndex(idx)}
-                      className={`flex items-center justify-between gap-3 p-2 rounded border cursor-pointer transition-all ${
-                        isCurrent
-                          ? 'bg-emerald-500/15 border-emerald-500/50 text-white shadow-[0_0_10px_rgba(16,185,129,0.15)]'
-                          : 'bg-white/[0.02] border-white/5 text-slate-300 hover:bg-white/10 hover:text-white'
-                      }`}
-                    >
-                      <div className="flex items-center gap-2.5 min-w-0">
-                        <span className="text-[10px] text-slate-500 w-5 text-right font-mono">
-                          #{String(idx + 1).padStart(2, '0')}
-                        </span>
-                        <div className="min-w-0">
-                          <p className="font-bold text-[11px] truncate">
-                            {item.title}
-                          </p>
-                          <p className="text-[10px] text-slate-400 truncate">
-                            {item.artist}
-                          </p>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center gap-1.5 shrink-0 text-[10px] font-mono">
-                        {isCurrent && isPlayingAudio ? (
-                          <span className="text-emerald-400 font-bold animate-pulse">
-                            [PLAYING]
-                          </span>
-                        ) : (
-                          <span className="text-slate-500">
-                            {item.relativeTime}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })
-              )}
-            </div>
-
-            {/* Footer Attribution */}
-            <div className="pt-2 border-t border-white/10 flex items-center justify-between text-[10px] text-slate-500 font-mono">
-              <span>DATA BY LAST.FM</span>
-              <span>AUDIO VIA YOUTUBE IFRAME</span>
-            </div>
+      {/* Right Column: Today's Scrobbles / History */}
+      <div className="lg:col-span-5 bg-[#090d17]/90 border border-white/10 rounded-xl p-4 sm:p-5 flex flex-col gap-3 shadow-xl backdrop-blur-xl max-h-[520px]">
+        <div className="flex items-center justify-between pb-2 border-b border-white/10 text-xs">
+          <div className="flex items-center gap-1.5">
+            <span className="text-emerald-400 font-bold">&gt;</span>
+            <span className="font-bold text-white uppercase">
+              TODAY&apos;S SCROBBLES
+            </span>
+            <span className="px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300 text-[10px]">
+              {todayList.length}
+            </span>
           </div>
+        </div>
+
+        {/* Scrollable Track Queue */}
+        <div className="flex-1 overflow-y-auto flex flex-col gap-1.5 pr-1 text-xs">
+          {todayList.length === 0 ? (
+            <div className="p-4 text-center text-slate-500 font-mono text-[11px]">
+              No scrobbles logged today yet. Playing fallback &quot;Iron Man&quot;.
+            </div>
+          ) : (
+            todayList.map((item, idx) => {
+              const isCurrent =
+                Boolean(currentTrack) &&
+                ((currentTrack?.trackId && item.trackId && currentTrack.trackId === item.trackId) ||
+                  (currentTrack?.title.toLowerCase() === item.title.toLowerCase() &&
+                    currentTrack?.artist.toLowerCase() === item.artist.toLowerCase()));
+
+              return (
+                <div
+                  key={item.trackId || idx}
+                  onClick={() => globalAudio.playIndex(idx)}
+                  className={`flex items-center justify-between gap-3 p-2 rounded border cursor-pointer transition-all ${isCurrent
+                    ? 'bg-emerald-500/15 border-emerald-500/50 text-white shadow-[0_0_10px_rgba(16,185,129,0.15)]'
+                    : 'bg-white/[0.02] border-white/5 text-slate-300 hover:bg-white/10 hover:text-white'
+                    }`}
+                >
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <span className="text-[10px] text-slate-500 w-5 text-right font-mono">
+                      #{String(idx + 1).padStart(2, '0')}
+                    </span>
+                    <div className="min-w-0">
+                      <p className="font-bold text-[11px] truncate">
+                        {item.title}
+                      </p>
+                      <p className="text-[10px] text-slate-400 truncate">
+                        {item.artist}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-1.5 shrink-0 text-[10px] font-mono">
+                    {isCurrent && isPlayingAudio ? (
+                      <span className="text-emerald-400 font-bold animate-pulse">
+                        [PLAYING]
+                      </span>
+                    ) : (
+                      <span className="text-slate-500">
+                        {item.relativeTime}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              );
+            })
+          )}
+        </div>
+
+        {/* Footer Attribution */}
+        <div className="pt-2 border-t border-white/10 flex items-center justify-between text-[10px] text-slate-500 font-mono">
+          <span>DATA BY LAST.FM</span>
+          <span>AUDIO VIA YOUTUBE IFRAME</span>
         </div>
       </div>
     </div>

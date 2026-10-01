@@ -35,7 +35,7 @@ export function Dock({ windows, activeId, onToggleApp }: DockProps) {
     >
       {/* Left: tmux session & directory */}
       <div className="flex items-center gap-2 shrink-0">
-        <span className="bg-[#7aa2f7]/20 text-[#7aa2f7] px-1.5 py-0.2 rounded-sm font-bold text-[10px]">
+        <span className="hidden sm:inline-flex bg-[#7aa2f7]/20 text-[#7aa2f7] px-1.5 py-0.2 rounded-sm font-bold text-[10px]">
           [tmux:0]
         </span>
         <span className="text-slate-300 font-semibold hidden sm:inline">
@@ -51,7 +51,7 @@ export function Dock({ windows, activeId, onToggleApp }: DockProps) {
       </div>
 
       {/* Center: Running / Open Application Taskbar Tags */}
-      <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none py-0.5">
+      <div className="flex items-center gap-1 sm:gap-1.5 overflow-x-auto scrollbar-none py-0.5">
         {dockApps.map((app) => {
           const win = windows[app.id];
           const isOpen = win?.isOpen && !win?.isMinimized;
@@ -61,7 +61,7 @@ export function Dock({ windows, activeId, onToggleApp }: DockProps) {
             <button
               key={app.id}
               onClick={() => onToggleApp(app.id)}
-              className={`px-2.5 py-0.5 rounded-sm transition-all flex items-center gap-1.5 text-[10px] sm:text-[11px] cursor-pointer whitespace-nowrap shrink-0 ${isFocused
+              className={`px-2 sm:px-2.5 py-0.5 rounded-sm transition-all flex items-center gap-1 sm:gap-1.5 text-[10px] sm:text-[11px] cursor-pointer whitespace-nowrap shrink-0 ${isFocused
                 ? 'bg-[#7aa2f7]/20 text-[#7aa2f7] border border-[#7aa2f7]/40 font-bold shadow-[0_0_8px_rgba(122,162,247,0.15)]'
                 : isOpen
                   ? 'bg-white/5 text-slate-300 border border-white/10 hover:bg-white/10'
