@@ -225,7 +225,6 @@ class GlobalAudioManager {
       this.ytPlayer = new window.YT.Player('yt-audio-player-slot', {
         height: '150',
         width: '200',
-        host: 'https://www.youtube.com',
         videoId: this.currentYtVideoId || DEFAULT_FALLBACK_VIDEO_ID,
         playerVars: {
           autoplay: 0,
