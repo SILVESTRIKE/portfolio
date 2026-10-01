@@ -621,13 +621,15 @@ export function SpotifyPlayer({ mode = 'panel', onOpenFullPlayer, onClose }: Spo
               ) : (
                 todayList.map((item, idx) => {
                   const isCurrent =
-                    currentTrack?.title === item.title &&
-                    currentTrack?.artist === item.artist;
+                    Boolean(currentTrack) &&
+                    ((currentTrack?.trackId && item.trackId && currentTrack.trackId === item.trackId) ||
+                     (currentTrack?.title.toLowerCase() === item.title.toLowerCase() &&
+                      currentTrack?.artist.toLowerCase() === item.artist.toLowerCase()));
 
                   return (
                     <div
                       key={item.trackId || idx}
-                      onClick={() => globalAudio.playTrack(item)}
+                      onClick={() => globalAudio.playIndex(idx)}
                       className={`flex items-center justify-between gap-3 p-2 rounded border cursor-pointer transition-all ${
                         isCurrent
                           ? 'bg-emerald-500/15 border-emerald-500/50 text-white shadow-[0_0_10px_rgba(16,185,129,0.15)]'

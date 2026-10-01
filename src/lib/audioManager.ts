@@ -141,8 +141,12 @@ class GlobalAudioManager {
   public setYouTubeTrack(videoId: string | null, forcePlay = false) {
     if (!videoId) return;
     if (this.currentYtVideoId === videoId && (this.isYtReady || this.isYtPlaying)) {
-      if (forcePlay && !this.isPlaying) {
-        this.play();
+      if (forcePlay) {
+        if (!this.isPlaying) {
+          this.play();
+        } else if (this.ytPlayer?.seekTo) {
+          this.ytPlayer.seekTo(0, true);
+        }
       }
       return;
     }
@@ -312,16 +316,36 @@ class GlobalAudioManager {
   // --- Queue Management ---
   public setQueue(tracks: MusicTrackInfo[], activeTrackId?: string) {
     this.queue = tracks;
-    if (activeTrackId) {
+
+    // 1. If currently playing or have an active track, retain its index in the updated queue
+    if (this.currentTrack) {
+      const idx = tracks.findIndex(
+        t =>
+          (t.trackId && t.trackId === this.currentTrack?.trackId) ||
+          (t.title.toLowerCase() === this.currentTrack?.title.toLowerCase() &&
+            t.artist.toLowerCase() === this.currentTrack?.artist.toLowerCase())
+      );
+      if (idx !== -1) {
+        this.currentQueueIndex = idx;
+        return;
+      }
+    }
+
+    // 2. If activeTrackId specified and idle
+    if (activeTrackId && !this.isPlaying) {
       const idx = tracks.findIndex(t => t.trackId === activeTrackId);
       if (idx !== -1) {
         this.currentQueueIndex = idx;
-        if (!this.isPlaying && !this.currentTrack) {
+        if (!this.currentTrack) {
           this.currentTrack = tracks[idx];
           this.notifyTrackChange(this.currentTrack);
         }
+        return;
       }
-    } else if (this.currentQueueIndex === -1 && tracks.length > 0 && !this.currentTrack) {
+    }
+
+    // 3. Fallback to first track if idle
+    if (this.currentQueueIndex === -1 && tracks.length > 0 && !this.currentTrack) {
       this.currentQueueIndex = 0;
       this.currentTrack = tracks[0];
       this.notifyTrackChange(this.currentTrack);
@@ -347,10 +371,23 @@ class GlobalAudioManager {
     return this.currentTrack;
   }
 
+  public async playIndex(index: number) {
+    if (this.queue.length === 0) return;
+    const cleanIdx = ((index % this.queue.length) + this.queue.length) % this.queue.length;
+    this.currentQueueIndex = cleanIdx;
+    const track = this.queue[cleanIdx];
+    if (track) {
+      await this.playTrack(track);
+    }
+  }
+
   public async playTrack(track: MusicTrackInfo) {
     this.currentTrack = track;
     const foundIdx = this.queue.findIndex(
-      t => t.title === track.title && t.artist === track.artist
+      t =>
+        (t.trackId && t.trackId === track.trackId) ||
+        (t.title.toLowerCase() === track.title.toLowerCase() &&
+          t.artist.toLowerCase() === track.artist.toLowerCase())
     );
     if (foundIdx !== -1) {
       this.currentQueueIndex = foundIdx;
@@ -389,16 +426,14 @@ class GlobalAudioManager {
 
   public playNext() {
     if (this.queue.length === 0) return;
-    const nextIdx = (this.currentQueueIndex + 1) % this.queue.length;
-    this.currentQueueIndex = nextIdx;
-    this.playTrack(this.queue[nextIdx]);
+    const nextIdx = this.currentQueueIndex + 1;
+    this.playIndex(nextIdx);
   }
 
   public playPrev() {
     if (this.queue.length === 0) return;
-    const prevIdx = (this.currentQueueIndex - 1 + this.queue.length) % this.queue.length;
-    this.currentQueueIndex = prevIdx;
-    this.playTrack(this.queue[prevIdx]);
+    const prevIdx = this.currentQueueIndex - 1;
+    this.playIndex(prevIdx);
   }
 
   public setTrackUrl(url: string | null) {

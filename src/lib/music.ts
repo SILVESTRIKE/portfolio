@@ -5,7 +5,7 @@ System impact if absent: Music widget cannot retrieve live listening activity, h
 
 import { MusicTelemetryResponse, MusicTrackInfo } from '@/types';
 import { resolveYouTubeVideoId } from '@/lib/youtube';
-import { FALLBACK_TRACK } from '@/lib/musicOverrides';
+import { FALLBACK_TRACK, normalizeMusicKey } from '@/lib/musicOverrides';
 
 const LASTFM_API_KEY = process.env.LASTFM_API_KEY;
 const LASTFM_USERNAME = process.env.LASTFM_USERNAME;
@@ -176,10 +176,11 @@ export async function getLiveMusicTelemetry(): Promise<MusicTelemetryResponse> {
       return fallbackResponse;
     }
 
-    // Convert raw tracks to MusicTrackInfo
+    // Convert raw tracks to MusicTrackInfo (deduplicated by song identity)
+    const seenMusicKeys = new Set<string>();
     const parsedTracks: MusicTrackInfo[] = [];
     let nowPlayingTrack: MusicTrackInfo | null = null;
-    let newSearchBudget = 3;
+    let newSearchBudget = 8;
 
     for (let i = 0; i < tracks.length; i++) {
       const t = tracks[i];
@@ -187,6 +188,12 @@ export async function getLiveMusicTelemetry(): Promise<MusicTelemetryResponse> {
       const artistName = typeof t.artist === 'object' ? t.artist['#text'] : t.artist || 'Unknown Artist';
       const albumName = typeof t.album === 'object' ? t.album['#text'] : t.album || 'Single';
       const trackTitle = t.name;
+
+      const normKey = normalizeMusicKey(artistName, trackTitle);
+      if (seenMusicKeys.has(normKey)) {
+        continue;
+      }
+      seenMusicKeys.add(normKey);
 
       let artUrl = '';
       if (Array.isArray(t.image) && t.image.length > 0) {
